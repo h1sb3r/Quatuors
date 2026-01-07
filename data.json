@@ -1,22 +1,22 @@
 [
   {
-    "category": "TERMES DÉFENSIFS (US FOOTBALL)",
+    "category": "MATÉRIAUX DE SOL",
     "color": "#f9df6d",
-    "items": ["BLOCK", "TACKLE", "SACK", "BLITZ"]
+    "items": ["BÉTON", "CARRELAGE", "CÉRAMIQUE", "TOMETTE"]
   },
   {
-    "category": "EXEMPLAIRES D'UNE PUBLICATION",
+    "category": "CLUBS DE GOLF",
     "color": "#a0c35a",
-    "items": ["COPY", "ISSUE", "PRINT", "EDITION"]
+    "items": ["BOIS", "DRIVER", "FER", "PUTTER"]
   },
   {
-    "category": "ACTIONS D'ENROULEMENT",
+    "category": "SYNONYMES DE STABILITÉ",
     "color": "#b0c4ef",
-    "items": ["COIL", "CRANK", "REEL", "WIND"]
+    "items": ["RIGIDITÉ", "RÉGULARITÉ", "SOLIDITÉ", "ÉQUILIBRE"]
   },
   {
-    "category": "MOTS FINISSANT PAR UN POSTÉRIEUR (ARGOT)",
+    "category": "EXPRESSIONS AVEC « ÂGE »",
     "color": "#ba81c5",
-    "items": ["DREAR", "ETAIL", "GRUMP", "SCAN"]
+    "items": ["OR", "PIERRE", "RAISON", "TROISIÈME"]
   }
 ]
