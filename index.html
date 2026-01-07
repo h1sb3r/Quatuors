@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quatuors</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --item-bg-default: #efefe6;
+            --item-bg-selected: #5a594e;
+            --text-selected: #ffffff;
+            --text-default: #000000;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Libre Franklin', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: #000;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            width: 100%;
+            border-bottom: 1px solid #dcdcdc;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 65px;
+            z-index: 10;
+            background: #fff;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+
+        h1 {
+            font-family: 'Zilla Slab', serif;
+            font-weight: 700;
+            font-size: 32px;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .date { font-size: 16px; font-weight: 500; margin-left: 10px; padding-top: 5px; }
+        .header-icons { display: flex; gap: 15px; }
+        .icon { width: 24px; height: 24px; cursor: pointer; }
+
+        .game-container {
+            width: 100%;
+            max-width: 650px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            margin-bottom: 25px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .card {
+            background-color: var(--item-bg-default);
+            border-radius: 6px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'Libre Franklin', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 15px; /* Ajuste si les mots sont longs */
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s ease, background-color 0.2s;
+            z-index: 1;
+            padding: 5px;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+
+        .card.animating {
+            transition: transform 0.6s cubic-bezier(0.2, 0, 0, 1), background-color 0.3s;
+            z-index: 100;
+        }
+
+        @media (max-width: 500px) {
+            .card { font-size: 11px; height: 60px; }
+            h1 { font-size: 24px; }
+            .date { font-size: 14px; }
+        }
+
+        .card.selected {
+            background-color: var(--item-bg-selected);
+            color: var(--text-selected);
+            transform: scale(0.95);
+        }
+
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        .solved-banner {
+            grid-column: span 4;
+            border-radius: 6px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .solved-banner.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .solved-title { font-weight: 700; text-transform: uppercase; font-size: 16px; margin-bottom: 4px; }
+        .solved-words { font-weight: 500; font-size: 14px; }
+
+        .mistakes-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            background-color: #5a594e;
+            border-radius: 50%;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+        
+        .dot.lost { opacity: 0; transform: scale(0); }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        button {
+            padding: 13px 24px;
+            border-radius: 40px;
+            border: 1px solid #000;
+            background: #fff;
+            color: #000;
+            font-family: 'Libre Franklin', sans-serif;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover { background-color: #f2f2f2; }
+
+        #submit-btn {
+            border: 1px solid #7f7f7f;
+            color: #7f7f7f;
+            background-color: #ffffff;
+            cursor: default;
+        }
+        
+        #submit-btn.active {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+            border-color: #000000 !important;
+            cursor: pointer;
+        }
+
+        #submit-btn.active:hover { opacity: 0.9; }
+
+        #message {
+            position: fixed;
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #000;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <h1>Quatuors</h1>
+            <div class="date" id="date-display"></div>
+        </div>
+        <div class="header-icons">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="3" width="4" height="18" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="2" y="13" width="4" height="8" rx="1"/></svg>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </div>
+    </header>
+
+    <div class="game-container">
+        <div class="instructions">Créez 4 groupes de 4 mots !</div>
+        
+        <div id="grid-container">
+            <!-- Loader au cas où la connexion est lente -->
+            <div style="grid-column: span 4; text-align: center; padding: 20px;">Chargement...</div>
+        </div>
+
+        <div class="mistakes-container">
+            Erreurs restantes :
+            <div id="dots" style="display: flex; gap: 8px; margin-left:5px;">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="shuffleGrid()">Mélanger</button>
+            <button onclick="deselectAll()">Désélectionner</button>
+            <button id="submit-btn" onclick="submitGuess()">Soumettre</button>
+        </div>
+    </div>
+
+    <div id="message"></div>
+
+    <script>
+        let gameData = []; // Vide au départ, sera rempli par le JSON
+        let gridItems = [];
+        let selectedItems = [];
+        let mistakes = 4;
+        let solvedCount = 0;
+        let isAnimating = false;
+
+        // Fonction pour afficher la date du jour
+        function setDate() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').innerText = new Date().toLocaleDateString('fr-FR', options);
+        }
+
+        // Chargement des données JSON externe
+        async function loadGameData() {
+            try {
+                // Fetch va chercher le fichier data.json à la racine du site
+                const response = await fetch('data.json');
+                if (!response.ok) {
+                    throw new Error('Erreur réseau lors du chargement du JSON');
+                }
+                gameData = await response.json();
+                
+                // Une fois chargé, on initialise le jeu
+                initGame();
+            } catch (error) {
+                console.error("Impossible de charger les données :", error);
+                document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center'>Erreur de chargement des données.</div>";
+            }
+        }
+
+        function initGame() {
+            setDate();
+            const container = document.getElementById('grid-container');
+            container.innerHTML = '';
+            gridItems = [];
+            selectedItems = [];
+
+            // Création des items de grille à partir du JSON
+            gameData.forEach(group => {
+                group.items.forEach(word => {
+                    gridItems.push({ word: word, category: group.category, color: group.color, solved: false, element: null });
+                });
+            });
+
+            shuffleArray(gridItems);
+            renderGrid();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function renderGrid() {
+            const container = document.getElementById('grid-container');
+            const currentCards = Array.from(container.querySelectorAll('.card'));
+            currentCards.forEach(c => c.remove());
+
+            gridItems.forEach(item => {
+                if (!item.solved) {
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerText = item.word;
+                    div.onclick = () => toggleSelect(item, div);
+                    item.element = div;
+                    if (selectedItems.includes(item)) div.classList.add('selected');
+                    container.appendChild(div);
+                }
+            });
+            updateSubmitButton();
+        }
+
+        function shuffleGrid() {
+            if(isAnimating) return;
+            const unsolvedItems = gridItems.filter(i => !i.solved);
+            shuffleArray(unsolvedItems);
+            const container = document.getElementById('grid-container');
+            unsolvedItems.forEach(item => { if(item.element) item.element.remove(); });
+            unsolvedItems.forEach(item => { container.appendChild(item.element); });
+        }
+
+        function toggleSelect(item, element) {
+            if (item.solved || isAnimating) return;
+            const index = selectedItems.indexOf(item);
+            if (index > -1) {
+                selectedItems.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                if (selectedItems.length < 4) {
+                    selectedItems.push(item);
+                    element.classList.add('selected');
+                }
+            }
+            updateSubmitButton();
+        }
+
+        function deselectAll() {
+            if(isAnimating) return;
+            selectedItems.forEach(item => { if(item.element) item.element.classList.remove('selected'); });
+            selectedItems = [];
+            updateSubmitButton();
+        }
+
+        function updateSubmitButton() {
+            const btn = document.getElementById('submit-btn');
+            if (selectedItems.length === 4) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        }
+
+        function submitGuess() {
+            if (selectedItems.length !== 4 || isAnimating) return;
+
+            const categories = selectedItems.map(i => i.category);
+            const firstCategory = categories[0];
+            const allMatch = categories.every(c => c === firstCategory);
+
+            if (allMatch) {
+                handleSuccess(firstCategory);
+            } else {
+                const counts = {};
+                categories.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+                const isOneAway = Object.values(counts).includes(3);
+                showMessage(isOneAway ? "Plus qu'un !" : "Incorrect");
+                handleError();
+            }
+        }
+
+        async function handleSuccess(categoryName) {
+            isAnimating = true;
+            const groupData = gameData.find(g => g.category === categoryName);
+            const container = document.getElementById('grid-container');
+
+            selectedItems.forEach(item => {
+                item.element.style.backgroundColor = groupData.color;
+                item.element.style.color = '#000';
+                item.element.classList.remove('selected');
+            });
+
+            await new Promise(r => setTimeout(r, 200));
+
+            const banner = document.createElement('div');
+            banner.className = 'solved-banner';
+            banner.style.backgroundColor = groupData.color;
+            banner.innerHTML = `<div class="solved-title">${groupData.category}</div><div class="solved-words">${groupData.items.join(', ')}</div>`;
+            
+            const firstCard = container.querySelector('.card');
+            if (firstCard) container.insertBefore(banner, firstCard);
+            else container.appendChild(banner);
+
+            const targetRect = banner.getBoundingClientRect();
+            
+            const promises = selectedItems.map((item) => {
+                return new Promise(resolve => {
+                    const card = item.element;
+                    const startRect = card.getBoundingClientRect();
+                    const deltaX = targetRect.left - startRect.left;
+                    const deltaY = targetRect.top - startRect.top;
+                    
+                    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                    card.classList.add('animating');
+                    setTimeout(resolve, 600);
+                });
+            });
+
+            await Promise.all(promises);
+
+            selectedItems.forEach(item => {
+                item.solved = true;
+                if(item.element) item.element.remove();
+            });
+
+            banner.classList.add('visible');
+            selectedItems = [];
+            solvedCount++;
+            isAnimating = false;
+            updateSubmitButton();
+
+            if (solvedCount === 4) setTimeout(() => showMessage("Bravo !"), 1000);
+        }
+
+        function handleError() {
+            isAnimating = true;
+            const cards = selectedItems.map(i => i.element);
+            cards.forEach(c => c.classList.add('shake'));
+            setTimeout(() => {
+                cards.forEach(c => c.classList.remove('shake'));
+                isAnimating = false;
+            }, 500);
+
+            mistakes--;
+            const dots = document.querySelectorAll('.dot');
+            if (dots[mistakes]) dots[mistakes].classList.add('lost');
+
+            if (mistakes === 0) {
+                showMessage("Perdu pour cette fois !");
+                document.getElementById('submit-btn').disabled = true;
+            }
+        }
+
+        function showMessage(text) {
+            const msg = document.getElementById('message');
+            msg.innerText = text;
+            msg.style.display = 'block';
+            setTimeout(() => { msg.style.display = 'none'; }, 2500);
+        }
+
+        // DÉMARRAGE DU JEU
+        loadGameData(); // Appelle le JSON
+    </script>
+</body>
+</html>

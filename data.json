@@ -1,0 +1,22 @@
+[
+  {
+    "category": "TERMES DÉFENSIFS (US FOOTBALL)",
+    "color": "#f9df6d",
+    "items": ["BLOCK", "TACKLE", "SACK", "BLITZ"]
+  },
+  {
+    "category": "EXEMPLAIRES D'UNE PUBLICATION",
+    "color": "#a0c35a",
+    "items": ["COPY", "ISSUE", "PRINT", "EDITION"]
+  },
+  {
+    "category": "ACTIONS D'ENROULEMENT",
+    "color": "#b0c4ef",
+    "items": ["COIL", "CRANK", "REEL", "WIND"]
+  },
+  {
+    "category": "MOTS FINISSANT PAR UN POSTÉRIEUR (ARGOT)",
+    "color": "#ba81c5",
+    "items": ["DREAR", "ETAIL", "GRUMP", "SCAN"]
+  }
+]
