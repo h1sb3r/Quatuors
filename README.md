@@ -12,13 +12,30 @@ Trouvez les 4 groupes de 4 mots liés par un thème commun !
 ---
 
 ## 🛠 Fonctionnement technique
-Ce projet est un site statique léger :
-*   **index.html** : Contient toute la structure et le code (HTML/CSS/JS).
-*   **data.json** : Contient les données du jeu (les mots et catégories).
+Ce projet est un site statique léger + un petit serveur local pour éditer :
+*   **index.html** : Le jeu (HTML/CSS/JS).
+*   **studio.html** : L'éditeur pour créer/dupliquer des jeux.
+*   **data.json** : Contient tous les jeux (4 catégories x 4 mots).
+*   **server.py** : Serveur local + endpoints de sauvegarde/push.
 
-## 📝 Comment modifier les mots ?
-Pour changer la grille du jour, il suffit de modifier le fichier `data.json` et de respecter la structure JSON :
-1.  Ouvrez `data.json`.
-2.  Changez les mots dans les listes `"items"`.
-3.  Changez les titres dans `"category"`.
-4.  Pushez les modifications sur GitHub.
+## 🧰 Studio local (édition + push)
+1. Lancez le serveur : `python server.py`
+2. Ouvrez `http://localhost:8000/studio.html`
+3. Ajoutez vos catégories et mots, puis cliquez sur **Sauvegarder**.
+4. Cliquez sur **Push GitHub** pour publier.
+
+## 📝 Structure des données
+Chaque jeu contient exactement 4 catégories de 4 mots :
+```json
+{
+  "games": [
+    {
+      "id": "2026-01-07",
+      "title": "Jeu du 7 jan 2026",
+      "groups": [
+        { "category": "EXEMPLE", "color": "#f9df6d", "items": ["A", "B", "C", "D"] }
+      ]
+    }
+  ]
+}
+```

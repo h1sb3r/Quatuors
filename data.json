@@ -1,22 +1,96 @@
-[
-  {
-    "category": "MATÉRIAUX DE SOL",
-    "color": "#f9df6d",
-    "items": ["BÉTON", "CARRELAGE", "CÉRAMIQUE", "TOMETTE"]
-  },
-  {
-    "category": "CLUBS DE GOLF",
-    "color": "#a0c35a",
-    "items": ["BOIS", "DRIVER", "FER", "PUTTER"]
-  },
-  {
-    "category": "SYNONYMES DE STABILITÉ",
-    "color": "#b0c4ef",
-    "items": ["RIGIDITÉ", "RÉGULARITÉ", "SOLIDITÉ", "ÉQUILIBRE"]
-  },
-  {
-    "category": "EXPRESSIONS AVEC « ÂGE »",
-    "color": "#ba81c5",
-    "items": ["OR", "PIERRE", "RAISON", "TROISIÈME"]
-  }
-]
+{
+  "games": [
+    {
+      "id": "2026-01-07",
+      "title": "Jeu du 7 jan 2026",
+      "groups": [
+        {
+          "category": "MATÉRIAUX DE SOL",
+          "color": "#f9df6d",
+          "items": [
+            "BÉTON",
+            "CARRELAGE",
+            "CÉRAMIQUE",
+            "TOMETTE"
+          ]
+        },
+        {
+          "category": "CLUBS DE GOLF",
+          "color": "#a0c35a",
+          "items": [
+            "BOIS",
+            "DRIVER",
+            "FER",
+            "PUTTER"
+          ]
+        },
+        {
+          "category": "SYNONYMES DE STABILITÉ",
+          "color": "#b0c4ef",
+          "items": [
+            "RIGIDITÉ",
+            "RÉGULARITÉ",
+            "SOLIDITÉ",
+            "ÉQUILIBRE"
+          ]
+        },
+        {
+          "category": "EXPRESSIONS AVEC « ÂGE »",
+          "color": "#ba81c5",
+          "items": [
+            "OR",
+            "PIERRE",
+            "RAISON",
+            "TROISIÈME"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gymnastique-esprit",
+      "title": "Gymnastique de l'Esprit",
+      "groups": [
+        {
+          "category": "Meubles de rangement",
+          "color": "#f9df6d",
+          "items": [
+            "Armoire",
+            "Buffet",
+            "Commode",
+            "Étagère"
+          ]
+        },
+        {
+          "category": "Palindromes",
+          "color": "#a0c35a",
+          "items": [
+            "Kayak",
+            "Radar",
+            "Rotor",
+            "Solos"
+          ]
+        },
+        {
+          "category": "Commencent par une couleur",
+          "color": "#b0c4ef",
+          "items": [
+            "Blancbec",
+            "Orangeade",
+            "Roseau",
+            "Vertige"
+          ]
+        },
+        {
+          "category": "Homophones de nombres",
+          "color": "#ba81c5",
+          "items": [
+            "Ain",
+            "Sète",
+            "Vain",
+            "Sang"
+          ]
+        }
+      ]
+    }
+  ]
+}

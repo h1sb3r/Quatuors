@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Quatuors Studio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #151515;
+            --muted: #6c6c6c;
+            --paper: #ffffff;
+            --panel: #f8f6f2;
+            --accent: #c28a52;
+            --accent-dark: #9b6a3f;
+            --border: #ded8cf;
+            --shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+            --color-yellow: #f9df6d;
+            --color-green: #a0c35a;
+            --color-blue: #b0c4ef;
+            --color-purple: #ba81c5;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Libre Franklin', sans-serif;
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 10% 20%, rgba(194, 138, 82, 0.12), transparent 45%),
+                radial-gradient(circle at 90% 10%, rgba(176, 196, 239, 0.16), transparent 40%),
+                linear-gradient(180deg, #f9f7f3 0%, #f3efe8 100%);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(6px);
+            background: rgba(249, 247, 243, 0.9);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-inner {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .badge {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-family: 'Zilla Slab', serif;
+            font-size: 26px;
+        }
+
+        .brand p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            background: #fff;
+            color: var(--ink);
+            transition: all 0.2s;
+        }
+
+        .btn:hover { transform: translateY(-1px); }
+
+        .btn.primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn.primary:hover {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+        }
+
+        .btn.ghost {
+            background: transparent;
+        }
+
+        .layout {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 30px 24px 60px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+
+        .panel {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            font-size: 16px;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 520px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .game-card {
+            background: var(--panel);
+            border: 1px solid transparent;
+            border-radius: 14px;
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: border 0.2s, transform 0.2s;
+        }
+
+        .game-card.active {
+            border-color: var(--accent);
+            background: #fff6ed;
+            transform: translateY(-1px);
+        }
+
+        .game-card-title {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .game-card-meta {
+            font-size: 11px;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+        }
+
+        .editor {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .editor-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .field-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        input, select, textarea {
+            font-family: 'Libre Franklin', sans-serif;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            font-size: 13px;
+            background: #fff;
+            outline: none;
+        }
+
+        input.error, select.error {
+            border-color: #c0392b;
+            background: #fff3f0;
+        }
+
+        .helper {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .group-card {
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            padding: 16px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .group-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .group-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            background: var(--panel);
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .color-chip {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1px solid #e5e1da;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .status {
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: #fff;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .status.error {
+            border-color: #c0392b;
+            color: #c0392b;
+            background: #fff3f0;
+        }
+
+        .status.success {
+            border-color: #2ecc71;
+            color: #2c7f4b;
+            background: #f1fff5;
+        }
+
+        .footer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .commit-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .api-warning {
+            border: 1px dashed var(--accent);
+            background: rgba(194, 138, 82, 0.12);
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #6a4a2a;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .topbar-inner { padding: 14px 16px; }
+            .layout { padding: 24px 16px 50px; }
+            .groups-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="badge">Studio</span>
+                <div>
+                    <h1>Quatuors</h1>
+                    <p>Composez vos jeux en 4x4 et publiez-les en un clic.</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <a href="index.html" class="btn ghost">Retour au jeu</a>
+                <button class="btn" id="reload-btn">Recharger</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout">
+        <aside class="panel sidebar">
+            <div class="sidebar-header">
+                <h2>Jeux</h2>
+                <button class="btn" id="new-game-btn">Nouveau</button>
+            </div>
+            <div class="game-list" id="game-list"></div>
+            <button class="btn ghost" id="duplicate-btn">Dupliquer le jeu</button>
+        </aside>
+
+        <main class="panel editor">
+            <div id="api-warning" class="api-warning" style="display: none;">
+                Lancez <strong>python server.py</strong> dans le dossier du projet pour activer la sauvegarde et le push.
+            </div>
+
+            <div class="editor-header">
+                <div class="field-group">
+                    <div class="field">
+                        <label for="game-id">ID du jeu</label>
+                        <input id="game-id" type="text" placeholder="2026-01-07">
+                    </div>
+                    <div class="field">
+                        <label for="game-title">Titre</label>
+                        <input id="game-title" type="text" placeholder="Jeu du 7 jan 2026">
+                    </div>
+                </div>
+                <div class="field-group">
+                    <button class="btn" id="preview-btn">Aperçu</button>
+                    <button class="btn primary" id="save-btn">Sauvegarder</button>
+                </div>
+            </div>
+
+            <div class="helper">
+                4 categories, 4 mots chacune. Choisissez les couleurs selon la difficulte.
+            </div>
+
+            <section class="groups-grid" id="groups-container"></section>
+
+            <div class="footer-actions">
+                <div class="commit-row">
+                    <div class="field">
+                        <label for="commit-message">Message de commit</label>
+                        <input id="commit-message" type="text" placeholder="Nouveau jeu Quatuors">
+                    </div>
+                    <button class="btn primary" id="push-btn">Push GitHub</button>
+                </div>
+                <div class="status" id="status">Pret.</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const DIFFICULTIES = [
+            { label: 'Facile', color: '#f9df6d' },
+            { label: 'Intermediaire', color: '#a0c35a' },
+            { label: 'Difficile', color: '#b0c4ef' },
+            { label: 'Expert', color: '#ba81c5' }
+        ];
+
+        const state = {
+            games: [],
+            selectedIndex: 0,
+            apiReady: false
+        };
+
+        const gameList = document.getElementById('game-list');
+        const groupsContainer = document.getElementById('groups-container');
+        const statusEl = document.getElementById('status');
+        const apiWarning = document.getElementById('api-warning');
+        const saveBtn = document.getElementById('save-btn');
+        const pushBtn = document.getElementById('push-btn');
+
+        function setStatus(text, kind = '') {
+            statusEl.textContent = text;
+            statusEl.classList.remove('error', 'success');
+            if (kind) statusEl.classList.add(kind);
+        }
+
+        function defaultGroups() {
+            return DIFFICULTIES.map(entry => ({
+                category: '',
+                color: entry.color,
+                items: ['', '', '', '']
+            }));
+        }
+
+        function normalizeGame(game) {
+            const groups = Array.isArray(game.groups) ? game.groups.slice(0, 4) : [];
+            while (groups.length < 4) {
+                groups.push({ category: '', color: DIFFICULTIES[groups.length].color, items: ['', '', '', ''] });
+            }
+            const fixedGroups = groups.map((group, idx) => ({
+                category: group.category || '',
+                color: group.color || DIFFICULTIES[idx].color,
+                items: Array.isArray(group.items) ? group.items.slice(0, 4) : ['', '', '', '']
+            }));
+            fixedGroups.forEach(group => {
+                while (group.items.length < 4) group.items.push('');
+            });
+            return {
+                id: game.id || '',
+                title: game.title || '',
+                groups: fixedGroups
+            };
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function renderGameList() {
+            gameList.innerHTML = '';
+            state.games.forEach((game, index) => {
+                const button = document.createElement('button');
+                button.className = 'game-card' + (index === state.selectedIndex ? ' active' : '');
+                const title = game.title || game.id || `Jeu ${index + 1}`;
+                button.innerHTML = `
+                    <div class="game-card-title">${title}</div>
+                    <div class="game-card-meta">
+                        <span>${game.id || 'Sans ID'}</span>
+                        <span>${game.groups?.length || 0}/4</span>
+                    </div>
+                `;
+                button.onclick = () => {
+                    applyEditorToState();
+                    state.selectedIndex = index;
+                    renderAll();
+                };
+                gameList.appendChild(button);
+            });
+        }
+
+        function renderGroups(game) {
+            groupsContainer.innerHTML = '';
+            game.groups.forEach((group, index) => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.dataset.index = index.toString();
+                card.innerHTML = `
+                    <div class="group-head">
+                        <div class="group-number">${index + 1}</div>
+                        <input class="group-category" type="text" placeholder="Categorie" value="${escapeHtml(group.category)}">
+                        <select class="group-color"></select>
+                        <div class="color-chip"></div>
+                    </div>
+                    <div class="items-grid">
+                        ${group.items.map((item, itemIndex) => `<input class="item-input" type="text" placeholder="Mot ${itemIndex + 1}" value="${escapeHtml(item)}">`).join('')}
+                    </div>
+                `;
+                const select = card.querySelector('.group-color');
+                DIFFICULTIES.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.color;
+                    opt.textContent = option.label;
+                    select.appendChild(opt);
+                });
+                select.value = group.color;
+                const chip = card.querySelector('.color-chip');
+                chip.style.background = group.color;
+                select.addEventListener('change', () => {
+                    chip.style.background = select.value;
+                });
+                groupsContainer.appendChild(card);
+            });
+        }
+
+        function renderEditor() {
+            const game = normalizeGame(state.games[state.selectedIndex] || { groups: defaultGroups() });
+            document.getElementById('game-id').value = game.id;
+            document.getElementById('game-title').value = game.title;
+            renderGroups(game);
+        }
+
+        function renderAll() {
+            renderGameList();
+            renderEditor();
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+        }
+
+        function applyEditorToState() {
+            if (!state.games.length) return;
+            const game = collectEditorGame();
+            if (game) state.games[state.selectedIndex] = game;
+        }
+
+        function collectEditorGame() {
+            clearErrors();
+            const idInput = document.getElementById('game-id');
+            const titleInput = document.getElementById('game-title');
+            const groups = [];
+            let hasError = false;
+
+            if (!idInput.value.trim()) {
+                idInput.classList.add('error');
+                hasError = true;
+            }
+
+            groupsContainer.querySelectorAll('.group-card').forEach(card => {
+                const categoryInput = card.querySelector('.group-category');
+                const colorSelect = card.querySelector('.group-color');
+                const itemInputs = Array.from(card.querySelectorAll('.item-input'));
+
+                if (!categoryInput.value.trim()) {
+                    categoryInput.classList.add('error');
+                    hasError = true;
+                }
+
+                const items = itemInputs.map(input => {
+                    if (!input.value.trim()) {
+                        input.classList.add('error');
+                        hasError = true;
+                    }
+                    return input.value.trim();
+                });
+
+                groups.push({
+                    category: categoryInput.value.trim(),
+                    color: colorSelect.value,
+                    items
+                });
+            });
+
+            if (hasError) {
+                setStatus('Completer tous les champs avant de sauvegarder.', 'error');
+                return null;
+            }
+
+            return {
+                id: idInput.value.trim(),
+                title: titleInput.value.trim() || idInput.value.trim(),
+                groups
+            };
+        }
+
+        async function loadGames() {
+            try {
+                const response = await fetch('/api/games', { cache: 'no-store' });
+                if (!response.ok) throw new Error('API indisponible');
+                const payload = await response.json();
+                state.games = Array.isArray(payload.games) ? payload.games : [];
+                state.apiReady = true;
+                apiWarning.style.display = 'none';
+                saveBtn.disabled = false;
+                pushBtn.disabled = false;
+            } catch (error) {
+                state.apiReady = false;
+                apiWarning.style.display = 'block';
+                saveBtn.disabled = true;
+                pushBtn.disabled = true;
+                state.games = [];
+                setStatus('API indisponible. Mode lecture seule.', 'error');
+            }
+
+            if (!state.games.length) {
+                state.games = [{
+                    id: '',
+                    title: '',
+                    groups: defaultGroups()
+                }];
+            }
+            state.selectedIndex = 0;
+            renderAll();
+        }
+
+        async function saveGames() {
+            const game = collectEditorGame();
+            if (!game) return;
+            state.games[state.selectedIndex] = game;
+            if (!state.apiReady) return;
+            setStatus('Sauvegarde en cours...');
+            const response = await fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ games: state.games })
+            });
+            if (response.ok) {
+                setStatus('Sauvegarde terminee.', 'success');
+                renderGameList();
+            } else {
+                setStatus('Erreur pendant la sauvegarde.', 'error');
+            }
+        }
+
+        async function pushGithub() {
+            if (!state.apiReady) return;
+            const commitMessage = document.getElementById('commit-message').value.trim();
+            setStatus('Push en cours...');
+            const response = await fetch('/api/push', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: commitMessage })
+            });
+            const payload = await response.json().catch(() => ({}));
+            if (response.ok && payload.ok) {
+                setStatus('Push termine.', 'success');
+            } else {
+                setStatus(payload.error || 'Erreur pendant le push.', 'error');
+            }
+        }
+
+        function newGame() {
+            applyEditorToState();
+            const today = new Date().toISOString().slice(0, 10);
+            let id = today;
+            let counter = 2;
+            while (state.games.some(game => game.id === id)) {
+                id = `${today}-${counter}`;
+                counter += 1;
+            }
+            state.games.push({
+                id,
+                title: `Jeu du ${id}`,
+                groups: defaultGroups()
+            });
+            state.selectedIndex = state.games.length - 1;
+            renderAll();
+        }
+
+        function duplicateGame() {
+            applyEditorToState();
+            const source = state.games[state.selectedIndex];
+            if (!source) return;
+            const copy = JSON.parse(JSON.stringify(source));
+            const baseId = `${source.id || 'jeu'}-copie`;
+            let id = baseId;
+            let counter = 2;
+            while (state.games.some(game => game.id === id)) {
+                id = `${baseId}-${counter}`;
+                counter += 1;
+            }
+            copy.id = id;
+            copy.title = `${source.title || 'Jeu'} (copie)`;
+            state.games.push(copy);
+            state.selectedIndex = state.games.length - 1;
+            renderAll();
+        }
+
+        document.getElementById('new-game-btn').addEventListener('click', newGame);
+        document.getElementById('duplicate-btn').addEventListener('click', duplicateGame);
+        document.getElementById('save-btn').addEventListener('click', saveGames);
+        document.getElementById('push-btn').addEventListener('click', pushGithub);
+        document.getElementById('reload-btn').addEventListener('click', loadGames);
+        document.getElementById('preview-btn').addEventListener('click', () => {
+            const game = collectEditorGame();
+            if (!game) return;
+            const url = new URL('index.html', window.location.href);
+            url.searchParams.set('game', game.id);
+            window.open(url.toString(), '_blank');
+        });
+
+        loadGames();
+    </script>
+</body>
+</html>

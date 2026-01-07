@@ -95,6 +95,7 @@
 
         .btn-subscribe { background: #000; color: #fff; border: 1px solid #000; }
         .btn-login { background: #fff; color: #000; border: 1px solid #000; }
+        .btn-studio { background: #fff; color: #000; border: 1px solid #000; }
 
         /* L'icône dans la nav */
         .nav-icon {
@@ -132,6 +133,25 @@
             margin-left: 10px;
             vertical-align: middle;
             color: #000;
+        }
+
+        .game-picker {
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+
+        .game-picker select {
+            border: 1px solid #ccc;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            background: #fff;
         }
 
         /* --- CONTENEUR PRINCIPAL --- */
@@ -332,6 +352,8 @@
             #grid-container { gap: 6px; margin-bottom: 15px; }
 
             .controls button { padding: 10px 16px; font-size: 12px; }
+            .game-picker { font-size: 11px; }
+            .game-picker select { font-size: 11px; }
         }
         
         /* Très petits écrans (iPhone SE etc) */
@@ -353,6 +375,7 @@
         <div class="nav-right">
             <a href="#" class="nav-btn btn-subscribe">Subscribe</a>
             <a href="#" class="nav-btn btn-login">Log In</a>
+            <a href="studio.html" class="nav-btn btn-studio">Studio</a>
             
             <!-- Point d'interrogation intégré ici -->
             <svg class="nav-icon" onclick="toggleHelp()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -367,6 +390,10 @@
     <div class="game-header-container">
         <h1>Quatuors</h1>
         <div class="date" id="date-display"></div>
+        <div id="game-picker-wrap" class="game-picker" style="display: none;">
+            <span>Jeu</span>
+            <select id="game-picker" aria-label="Choisir un jeu"></select>
+        </div>
     </div>
 
     <!-- PLUS DE TOOLBAR ICI -->
@@ -430,6 +457,8 @@
     </div>
 
     <script>
+        let allGames = [];
+        let currentGame = null;
         let gameData = [];
         let gridItems = [];
         let selectedItems = [];
@@ -451,11 +480,60 @@
             if(e.target === this) toggleHelp();
         });
 
+        function normalizeGamesData(payload) {
+            if (Array.isArray(payload)) {
+                return [{ id: 'default', title: 'Jeu', groups: payload }];
+            }
+            if (payload && Array.isArray(payload.games)) {
+                return payload.games;
+            }
+            return [];
+        }
+
+        function renderGamePicker() {
+            const wrap = document.getElementById('game-picker-wrap');
+            const select = document.getElementById('game-picker');
+            if (!wrap || !select) return;
+            if (allGames.length <= 1) {
+                wrap.style.display = 'none';
+                return;
+            }
+            select.innerHTML = '';
+            allGames.forEach(game => {
+                const option = document.createElement('option');
+                option.value = game.id || '';
+                option.textContent = game.title || game.id || 'Jeu';
+                if (currentGame && game.id === currentGame.id) option.selected = true;
+                select.appendChild(option);
+            });
+            select.onchange = () => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('game', select.value);
+                window.location.href = url.toString();
+            };
+            wrap.style.display = 'inline-flex';
+        }
+
+        function resetMistakesUI() {
+            mistakes = 4;
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach(dot => dot.classList.remove('lost'));
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = false;
+        }
+
         async function loadGameData() {
             try {
-                const response = await fetch('data.json');
+                const response = await fetch('data.json', { cache: 'no-store' });
                 if (!response.ok) throw new Error('Erreur');
-                gameData = await response.json();
+                const payload = await response.json();
+                allGames = normalizeGamesData(payload);
+                if (!allGames.length) throw new Error('Aucun jeu');
+                const params = new URLSearchParams(window.location.search);
+                const requestedId = params.get('game');
+                currentGame = allGames.find(game => game.id === requestedId) || allGames[allGames.length - 1];
+                gameData = currentGame.groups || [];
+                renderGamePicker();
                 initGame();
             } catch (error) {
                 console.error(error);
@@ -469,8 +547,17 @@
             container.innerHTML = '';
             gridItems = [];
             selectedItems = [];
+            solvedCount = 0;
+            isAnimating = false;
+            resetMistakesUI();
+
+            if (!Array.isArray(gameData) || gameData.length === 0) {
+                container.innerHTML = "<div style='grid-column: span 4; text-align:center; padding:20px; color:red;'>Aucun groupe valide</div>";
+                return;
+            }
 
             gameData.forEach(group => {
+                if (!group || !Array.isArray(group.items)) return;
                 group.items.forEach(word => {
                     gridItems.push({ word: word, category: group.category, color: group.color, solved: false, element: null });
                 });
