@@ -343,6 +343,42 @@
             color: #6a4a2a;
         }
 
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 15, 15, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 20;
+        }
+
+        .modal-card {
+            width: min(720px, 100%);
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-card textarea {
+            min-height: 180px;
+            resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
         @media (max-width: 980px) {
             .layout {
                 grid-template-columns: 1fr;
@@ -368,6 +404,7 @@
             </div>
             <div class="topbar-actions">
                 <a href="index.html" class="btn ghost">Retour au jeu</a>
+                <button class="btn" id="import-btn">Import IA</button>
                 <button class="btn" id="reload-btn">Recharger</button>
             </div>
         </div>
@@ -424,6 +461,22 @@
         </main>
     </div>
 
+    <div class="modal" id="import-modal">
+        <div class="modal-card">
+            <div>
+                <h2 style="margin:0; font-family:'Zilla Slab',serif;">Import IA</h2>
+                <p class="helper" style="margin:6px 0 0;">
+                    Collez un JSON complet ou un seul jeu. Le formulaire se mettra a jour.
+                </p>
+            </div>
+            <textarea id="import-text" placeholder='{"id":"2026-01-08","title":"Jeu du 8 jan 2026","groups":[...]}'></textarea>
+            <div class="modal-actions">
+                <button class="btn ghost" id="import-cancel">Annuler</button>
+                <button class="btn primary" id="import-confirm">Importer</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const DIFFICULTIES = [
             { label: 'Facile', color: '#f9df6d' },
@@ -444,6 +497,8 @@
         const apiWarning = document.getElementById('api-warning');
         const saveBtn = document.getElementById('save-btn');
         const pushBtn = document.getElementById('push-btn');
+        const importModal = document.getElementById('import-modal');
+        const importText = document.getElementById('import-text');
 
         function setStatus(text, kind = '') {
             statusEl.textContent = text;
@@ -465,9 +520,13 @@
                 groups.push({ category: '', color: DIFFICULTIES[groups.length].color, items: ['', '', '', ''] });
             }
             const fixedGroups = groups.map((group, idx) => ({
-                category: group.category || '',
-                color: group.color || DIFFICULTIES[idx].color,
-                items: Array.isArray(group.items) ? group.items.slice(0, 4) : ['', '', '', '']
+                category: group.category || group.title || '',
+                color: group.color || resolveColor(group.difficulty, idx),
+                items: Array.isArray(group.items)
+                    ? group.items.slice(0, 4)
+                    : Array.isArray(group.words)
+                        ? group.words.slice(0, 4)
+                        : ['', '', '', '']
             }));
             fixedGroups.forEach(group => {
                 while (group.items.length < 4) group.items.push('');
@@ -485,6 +544,55 @@
                 .replace(/"/g, '&quot;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;');
+        }
+
+        function resolveColor(difficulty, fallbackIndex) {
+            if (difficulty) {
+                const key = String(difficulty).toLowerCase();
+                const found = DIFFICULTIES.find(entry => entry.label.toLowerCase() === key);
+                if (found) return found.color;
+            }
+            return DIFFICULTIES[fallbackIndex]?.color || DIFFICULTIES[0].color;
+        }
+
+        function generateId(seed = 0) {
+            const base = new Date().toISOString().slice(0, 10);
+            return seed ? `${base}-${seed + 1}` : base;
+        }
+
+        function fillMissingId(game, seed = 0) {
+            const id = (game.id || '').trim() || generateId(seed);
+            const title = (game.title || '').trim() || `Jeu du ${id}`;
+            return { ...game, id, title };
+        }
+
+        function ensureUniqueGame(game, existingGames) {
+            const existingIds = new Set(existingGames.map(entry => entry.id));
+            const baseId = (game.id || '').trim() || generateId(existingGames.length);
+            let id = baseId;
+            let counter = 2;
+            while (existingIds.has(id)) {
+                id = `${baseId}-${counter}`;
+                counter += 1;
+            }
+            const title = (game.title || '').trim() || `Jeu du ${id}`;
+            return { ...game, id, title };
+        }
+
+        function normalizeImportPayload(payload) {
+            if (!payload) return null;
+            if (payload.games && Array.isArray(payload.games)) {
+                const normalizedGames = payload.games
+                    .map((game, index) => fillMissingId(normalizeGame(game), index))
+                    .filter(game => game.groups && game.groups.length);
+                if (!normalizedGames.length) return null;
+                return { games: normalizedGames };
+            }
+
+            const gamePayload = Array.isArray(payload) ? { groups: payload } : payload;
+            if (!gamePayload.groups || !Array.isArray(gamePayload.groups)) return null;
+            const normalizedGame = fillMissingId(normalizeGame(gamePayload));
+            return { games: [normalizedGame] };
         }
 
         function renderGameList() {
@@ -553,6 +661,45 @@
         function renderAll() {
             renderGameList();
             renderEditor();
+        }
+
+        function openImportModal() {
+            importText.value = '';
+            importModal.style.display = 'flex';
+        }
+
+        function closeImportModal() {
+            importModal.style.display = 'none';
+        }
+
+        function handleImport() {
+            const raw = importText.value.trim();
+            if (!raw) {
+                setStatus('Collez un JSON pour importer.', 'error');
+                return;
+            }
+            applyEditorToState();
+            let payload;
+            try {
+                payload = JSON.parse(raw);
+            } catch (error) {
+                setStatus('JSON invalide.', 'error');
+                return;
+            }
+            const result = normalizeImportPayload(payload);
+            if (!result) {
+                setStatus('JSON non reconnu.', 'error');
+                return;
+            }
+            const incoming = [];
+            result.games.forEach(game => {
+                incoming.push(ensureUniqueGame(game, state.games.concat(incoming)));
+            });
+            state.games = state.games.concat(incoming);
+            state.selectedIndex = state.games.length - 1;
+            renderAll();
+            setStatus('Import ajoute.', 'success');
+            closeImportModal();
         }
 
         function clearErrors() {
@@ -722,6 +869,12 @@
         document.getElementById('save-btn').addEventListener('click', saveGames);
         document.getElementById('push-btn').addEventListener('click', pushGithub);
         document.getElementById('reload-btn').addEventListener('click', loadGames);
+        document.getElementById('import-btn').addEventListener('click', openImportModal);
+        document.getElementById('import-cancel').addEventListener('click', closeImportModal);
+        document.getElementById('import-confirm').addEventListener('click', handleImport);
+        importModal.addEventListener('click', (event) => {
+            if (event.target === importModal) closeImportModal();
+        });
         document.getElementById('preview-btn').addEventListener('click', () => {
             const game = collectEditorGame();
             if (!game) return;

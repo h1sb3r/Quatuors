@@ -108,7 +108,7 @@ class Handler(SimpleHTTPRequestHandler):
             message = str(payload.get("message") or "")
         message = message.strip().splitlines()[0] if message.strip() else "Update data"
 
-        add_result = run_git(["add", "-A"])
+        add_result = run_git(["add", "data.json"])
         if add_result.returncode != 0:
             return self.send_json(
                 500,
@@ -119,7 +119,7 @@ class Handler(SimpleHTTPRequestHandler):
                 },
             )
 
-        diff_result = run_git(["diff", "--cached", "--name-only"])
+        diff_result = run_git(["diff", "--cached", "--name-only", "--", "data.json"])
         if diff_result.returncode != 0:
             return self.send_json(
                 500,
@@ -131,18 +131,26 @@ class Handler(SimpleHTTPRequestHandler):
             )
 
         commit_output = ""
-        if diff_result.stdout.strip():
-            commit_result = run_git(["commit", "-m", message])
-            commit_output = commit_result.stdout + commit_result.stderr
-            if commit_result.returncode != 0:
-                return self.send_json(
-                    500,
-                    {
-                        "ok": False,
-                        "error": "git commit failed",
-                        "details": commit_output.strip(),
-                    },
-                )
+        if not diff_result.stdout.strip():
+            return self.send_json(
+                200,
+                {
+                    "ok": True,
+                    "message": "No changes to push",
+                },
+            )
+
+        commit_result = run_git(["commit", "-m", message, "--", "data.json"])
+        commit_output = commit_result.stdout + commit_result.stderr
+        if commit_result.returncode != 0:
+            return self.send_json(
+                500,
+                {
+                    "ok": False,
+                    "error": "git commit failed",
+                    "details": commit_output.strip(),
+                },
+            )
 
         pull_result = run_git(["pull", "--rebase"])
         if pull_result.returncode != 0:

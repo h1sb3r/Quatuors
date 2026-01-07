@@ -1,0 +1,14 @@
+{
+  "games": [
+    {
+      "id": "2026-01-08",
+      "title": "Jeu du 8 jan 2026",
+      "groups": [
+        { "category": "POISSONS", "color": "#f9df6d", "items": ["BAR", "COLIN", "SAUMON", "TRUITE"] },
+        { "category": "POMME DE ___", "color": "#a0c35a", "items": ["PIN", "TERRE", "DOUCHE", "DISCORDE"] },
+        { "category": "INSTRUMENTS A CORDES", "color": "#b0c4ef", "items": ["ALTO", "GUITARE", "HARPE", "VIOLON"] },
+        { "category": "EN HAUT DE L'AFFICHE", "color": "#ba81c5", "items": ["STAR", "VEDETTE", "ICONE", "TETE D'AFFICHE"] }
+      ]
+    }
+  ]
+}

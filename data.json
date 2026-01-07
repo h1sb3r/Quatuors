@@ -1,93 +1,231 @@
 {
   "games": [
     {
-      "id": "2026-01-07",
-      "title": "Jeu du 7 jan 2026",
+      "id": "2026-01-08",
+      "title": "Jeu du 8 jan 2026",
       "groups": [
         {
-          "category": "MATÉRIAUX DE SOL",
+          "category": "POISSONS",
           "color": "#f9df6d",
           "items": [
-            "BÉTON",
-            "CARRELAGE",
-            "CÉRAMIQUE",
-            "TOMETTE"
+            "BAR",
+            "COLIN",
+            "SAUMON",
+            "TRUITE"
           ]
         },
         {
-          "category": "CLUBS DE GOLF",
+          "category": "POMME DE ___",
           "color": "#a0c35a",
           "items": [
-            "BOIS",
-            "DRIVER",
-            "FER",
-            "PUTTER"
+            "PIN",
+            "TERRE",
+            "DOUCHE",
+            "DISCORDE"
           ]
         },
         {
-          "category": "SYNONYMES DE STABILITÉ",
+          "category": "INSTRUMENTS A CORDES",
           "color": "#b0c4ef",
           "items": [
-            "RIGIDITÉ",
-            "RÉGULARITÉ",
-            "SOLIDITÉ",
-            "ÉQUILIBRE"
+            "ALTO",
+            "GUITARE",
+            "HARPE",
+            "VIOLON"
           ]
         },
         {
-          "category": "EXPRESSIONS AVEC « ÂGE »",
+          "category": "EN HAUT DE L'AFFICHE",
           "color": "#ba81c5",
           "items": [
-            "OR",
-            "PIERRE",
-            "RAISON",
-            "TROISIÈME"
+            "STAR",
+            "VEDETTE",
+            "ICONE",
+            "TETE D'AFFICHE"
           ]
         }
       ]
     },
     {
-      "id": "gymnastique-esprit",
-      "title": "Gymnastique de l'Esprit",
+      "id": "2026-01-09",
+      "title": "Jeu du 9 jan 2026",
       "groups": [
         {
-          "category": "Meubles de rangement",
+          "category": "COULEURS",
           "color": "#f9df6d",
           "items": [
-            "Armoire",
-            "Buffet",
-            "Commode",
-            "Étagère"
+            "ROUGE",
+            "VERT",
+            "BLEU",
+            "JAUNE"
           ]
         },
         {
-          "category": "Palindromes",
+          "category": "PARTIES DE L'ŒIL",
           "color": "#a0c35a",
           "items": [
-            "Kayak",
-            "Radar",
-            "Rotor",
-            "Solos"
+            "IRIS",
+            "PUPILLE",
+            "CORNÉE",
+            "RÉTINE"
           ]
         },
         {
-          "category": "Commencent par une couleur",
+          "category": "SUIVIS DE \"MARIN\"",
           "color": "#b0c4ef",
           "items": [
-            "Blancbec",
-            "Orangeade",
-            "Roseau",
-            "Vertige"
+            "BLEU",
+            "CORPS",
+            "LOUPE",
+            "PIED"
           ]
         },
         {
-          "category": "Homophones de nombres",
+          "category": "ANAGRAMMES DE CHIFFRES",
           "color": "#ba81c5",
           "items": [
-            "Ain",
-            "Sète",
-            "Vain",
-            "Sang"
+            "NU",
+            "ROTIS",
+            "TRAQUE",
+            "PETS"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-10",
+      "title": "Jeu du 10 jan 2026",
+      "groups": [
+        {
+          "category": "AGRUMES",
+          "color": "#f9df6d",
+          "items": [
+            "CITRON",
+            "MANDARINE",
+            "PAMPLEMOUSSE",
+            "KUMQUAT"
+          ]
+        },
+        {
+          "category": "PIÈCES D'ÉCHECS",
+          "color": "#a0c35a",
+          "items": [
+            "PION",
+            "ROI",
+            "DAME",
+            "CAVALIER"
+          ]
+        },
+        {
+          "category": "VILLES FRANÇAISES ET NOMS COMMUNS",
+          "color": "#b0c4ef",
+          "items": [
+            "ORANGE",
+            "TOURS",
+            "MOULINS",
+            "VANNES"
+          ]
+        },
+        {
+          "category": "DÉBUTENT PAR UN JOUR DE LA SEMAINE (ABR.)",
+          "color": "#ba81c5",
+          "items": [
+            "LUNAIRE",
+            "MARIN",
+            "MERLAN",
+            "JEUNESSE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-11",
+      "title": "Jeu du 11 jan 2026",
+      "groups": [
+        {
+          "category": "MEMBRES D'UN GROUPE DE ROCK",
+          "color": "#f9df6d",
+          "items": [
+            "BASSISTE",
+            "BATTEUR",
+            "CHANTEUR",
+            "GUITARISTE"
+          ]
+        },
+        {
+          "category": "VILLES FRANÇAISES APRÈS \"SAINT\"",
+          "color": "#a0c35a",
+          "items": [
+            "DENIS",
+            "ÉTIENNE",
+            "MALO",
+            "NAZAIRE"
+          ]
+        },
+        {
+          "category": "SYNONYMES FAMILIERS DE \"VITE\"",
+          "color": "#b0c4ef",
+          "items": [
+            "DARE-DARE",
+            "FISSA",
+            "ILLICO",
+            "PRESTO"
+          ]
+        },
+        {
+          "category": "SON [O] SANS LA LETTRE \"O\"",
+          "color": "#ba81c5",
+          "items": [
+            "CHAUX",
+            "EAU",
+            "FAUX",
+            "SAUT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-12",
+      "title": "Jeu du 12 jan 2026",
+      "groups": [
+        {
+          "category": "INGRÉDIENTS DE LA RATATOUILLE",
+          "color": "#f9df6d",
+          "items": [
+            "AUBERGINE",
+            "COURGETTE",
+            "POIVRON",
+            "TOMATE"
+          ]
+        },
+        {
+          "category": "PLURIELS EN \"X\" (LES 7 DE LA RÈGLE)",
+          "color": "#a0c35a",
+          "items": [
+            "BIJOU",
+            "CAILLOU",
+            "CHOU",
+            "GENOU"
+          ]
+        },
+        {
+          "category": "SYNONYMES FAMILIERS D'UN ÉCHEC",
+          "color": "#b0c4ef",
+          "items": [
+            "BIDE",
+            "FLOP",
+            "FOUR",
+            "VESTE"
+          ]
+        },
+        {
+          "category": "VILLES FRANÇAISES ET NOMS COMMUNS",
+          "color": "#ba81c5",
+          "items": [
+            "LILLE",
+            "MOULINS",
+            "TOURS",
+            "VANNES"
           ]
         }
       ]
