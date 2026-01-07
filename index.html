@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quatuors</title>
     
+    <!-- Polices Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -16,79 +17,168 @@
             --item-bg-selected: #5a594e;
             --text-selected: #ffffff;
             --text-default: #000000;
+            
+            --color-yellow: #f9df6d;
+            --color-green: #a0c35a;
+            --color-blue: #b0c4ef;
+            --color-purple: #ba81c5;
         }
 
         * { box-sizing: border-box; }
 
         body {
             font-family: 'Libre Franklin', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             margin: 0;
             padding: 0;
             background-color: var(--bg-color);
             color: #000;
             min-height: 100vh;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden; /* Évite le scroll horizontal */
         }
 
-        header {
+        /* --- BARRE DE NAVIGATION GLOBALE --- */
+        .nyt-nav {
             width: 100%;
-            border-bottom: 1px solid #dcdcdc;
-            padding: 10px 20px;
+            height: 50px;
+            border-bottom: 1px solid #e2e2e2;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 65px;
-            z-index: 10;
+            padding: 0 20px;
             background: #fff;
+            position: fixed;
+            top: 0;
+            z-index: 100;
         }
 
-        .header-left { display: flex; align-items: center; gap: 15px; }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 700;
+            font-size: 20px;
+            font-family: 'Zilla Slab', serif;
+        }
+
+        .hamburger {
+            width: 18px;
+            height: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .hamburger span { display: block; width: 100%; height: 2px; background: #000; }
+
+        .nav-right { display: flex; gap: 10px; }
+
+        .nav-btn {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 8px 12px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Libre Franklin', sans-serif;
+        }
+
+        .btn-subscribe { background: #000; color: #fff; border: 1px solid #000; }
+        .btn-login { background: #fff; color: #000; border: 1px solid #000; }
+
+        /* --- EN-TÊTE DU JEU --- */
+        .game-header-container {
+            margin-top: 80px;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px;
+        }
 
         h1 {
             font-family: 'Zilla Slab', serif;
             font-weight: 700;
-            font-size: 32px;
+            font-size: 40px;
             margin: 0;
             letter-spacing: -0.5px;
+            display: inline-block;
         }
 
-        .date { font-size: 16px; font-weight: 500; margin-left: 10px; padding-top: 5px; }
-        .header-icons { display: flex; gap: 15px; }
-        .icon { width: 24px; height: 24px; cursor: pointer; }
+        .date {
+            font-family: 'Libre Franklin', sans-serif;
+            font-size: 16px;
+            font-weight: 400;
+            display: inline-block;
+            margin-left: 10px;
+            vertical-align: middle;
+            color: #000;
+        }
 
+        /* --- BARRE D'OUTILS --- */
+        .toolbar {
+            /* LARGEUR TOTALE */
+            width: 100%;
+            max-width: 100%;
+            
+            /* LIGNES */
+            border-top: 1px solid #000000; 
+            border-bottom: 1px solid #000000;
+            
+            /* POSITIONNEMENT 3/4 DROITE */
+            display: flex;
+            justify-content: flex-end; /* Pousse à droite */
+            padding-right: 25%; /* Décale de 25% depuis la droite = position à 3/4 */
+            
+            padding-top: 10px;
+            padding-bottom: 10px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .icon { 
+            width: 32px; 
+            height: 32px; 
+            cursor: pointer; 
+            transition: opacity 0.2s; 
+            color: #000;
+        }
+        .icon:hover { opacity: 0.7; }
+
+        /* --- CONTENEUR PRINCIPAL --- */
         .game-container {
             width: 100%;
             max-width: 650px;
-            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            position: relative;
+            padding: 0 10px;
         }
 
         .instructions {
-            margin-top: 20px;
-            margin-bottom: 25px;
+            margin-top: 15px;
+            margin-bottom: 20px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 400;
             text-align: center;
         }
 
+        /* --- GRILLE --- */
         #grid-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             width: 100%;
             margin-bottom: 20px;
+            min-height: 350px;
             position: relative;
         }
 
         .card {
             background-color: var(--item-bg-default);
-            border-radius: 6px;
+            border-radius: 5px;
             height: 80px;
             display: flex;
             align-items: center;
@@ -97,14 +187,18 @@
             font-family: 'Libre Franklin', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 15px; /* Ajuste si les mots sont longs */
+            font-size: 15px;
             cursor: pointer;
             user-select: none;
             transition: transform 0.1s ease, background-color 0.2s;
             z-index: 1;
             padding: 5px;
             overflow: hidden;
-            word-wrap: break-word;
+        }
+
+        .card.selected {
+            background-color: var(--item-bg-selected);
+            color: var(--text-selected);
         }
 
         .card.animating {
@@ -112,62 +206,45 @@
             z-index: 100;
         }
 
-        @media (max-width: 500px) {
-            .card { font-size: 11px; height: 60px; }
-            h1 { font-size: 24px; }
-            .date { font-size: 14px; }
-        }
-
-        .card.selected {
-            background-color: var(--item-bg-selected);
-            color: var(--text-selected);
-            transform: scale(0.95);
-        }
-
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-
+        /* --- BANNIÈRE RÉSOLUE --- */
         .solved-banner {
             grid-column: span 4;
-            border-radius: 6px;
+            border-radius: 5px;
             height: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0 10px;
             opacity: 0;
             transform: scale(0.95);
             transition: opacity 0.3s, transform 0.3s;
         }
-        
-        .solved-banner.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
+        .solved-banner.visible { opacity: 1; transform: scale(1); }
+        .solved-title { font-weight: 700; text-transform: uppercase; font-size: 15px; margin-bottom: 4px; }
+        .solved-words { font-weight: 400; font-size: 14px; }
 
-        .solved-title { font-weight: 700; text-transform: uppercase; font-size: 16px; margin-bottom: 4px; }
-        .solved-words { font-weight: 500; font-size: 14px; }
-
+        /* --- ERREURS --- */
         .mistakes-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 500;
-            font-size: 16px;
-            margin-bottom: 25px;
+            font-weight: 400;
+            font-size: 15px;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .dot {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             background-color: #5a594e;
             border-radius: 50%;
             transition: transform 0.3s, opacity 0.3s;
         }
-        
         .dot.lost { opacity: 0; transform: scale(0); }
 
+        /* --- BOUTONS --- */
         .controls {
             display: flex;
             gap: 10px;
@@ -176,19 +253,19 @@
         }
 
         button {
-            padding: 13px 24px;
-            border-radius: 40px;
-            border: 1px solid #000;
+            padding: 12px 20px;
+            border-radius: 30px;
+            border: 1px solid #7f7f7f;
             background: #fff;
             color: #000;
             font-family: 'Libre Franklin', sans-serif;
-            font-weight: 600;
+            font-weight: 500;
             font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        button:hover { background-color: #f2f2f2; }
+        button:hover { background-color: #f5f5f5; }
 
         #submit-btn {
             border: 1px solid #7f7f7f;
@@ -201,59 +278,99 @@
             background-color: #000000 !important;
             color: #ffffff !important;
             border-color: #000000 !important;
+            font-weight: 600;
             cursor: pointer;
         }
 
-        #submit-btn.active:hover { opacity: 0.9; }
+        /* --- MODALE AIDE --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 2000;
+            display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+        .modal-content {
+            background: #fff; padding: 30px; border: 1px solid #ccc;
+            max-width: 500px; width: 100%; border-radius: 8px;
+            position: relative; overflow-y: auto; max-height: 90vh;
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; border: none; background: none; cursor: pointer;}
+        
+        .difficulty-scale { display: flex; gap: 15px; margin-top: 20px; background: #f7f7f7; padding: 15px; border-radius: 8px; }
+        .colors-column { display: flex; flex-direction: column; gap: 4px; }
+        .color-box { width: 25px; height: 25px; border-radius: 4px; }
+        .labels-column { display: flex; flex-direction: column; justify-content: space-between; font-size: 12px; font-weight: 600; padding: 5px 0; }
+        .arrow-down { width: 1px; background: #000; flex-grow: 1; margin: 5px 0 5px 2px; position: relative; }
+        .arrow-down::after { content: ''; position: absolute; bottom: 0; left: -3px; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 5px solid #000; }
 
+        /* --- NOTIFICATION --- */
         #message {
-            position: fixed;
-            top: 12%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #000;
-            color: #fff;
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
-            display: none;
-            z-index: 1000;
+            position: fixed; top: 12%; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; padding: 12px 20px;
+            border-radius: 20px; font-weight: 600; font-size: 14px;
+            display: none; z-index: 1000;
         }
 
+        /* --- ANIMATIONS --- */
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        /* Mobile adaptation */
+        @media (max-width: 600px) {
+            h1 { font-size: 30px; }
+            .date { display: block; margin-left: 0; margin-top: 5px; }
+            .game-header-container { margin-top: 60px; }
+            .toolbar { padding-right: 20px; } /* Moins de décalage sur mobile */
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-left">
-            <h1>Quatuors</h1>
-            <div class="date" id="date-display"></div>
+    <!-- BARRE NAVIGATEUR -->
+    <nav class="nyt-nav">
+        <div class="nav-left">
+            <div class="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <span style="margin-left: 10px;">Games</span>
         </div>
-        <div class="header-icons">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="3" width="4" height="18" rx="1"/><rect x="10" y="8" width="4" height="13" rx="1"/><rect x="2" y="13" width="4" height="8" rx="1"/></svg>
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div class="nav-right">
+            <a href="#" class="nav-btn btn-subscribe">Subscribe</a>
+            <a href="#" class="nav-btn btn-login">Log In</a>
         </div>
-    </header>
+    </nav>
 
+    <!-- EN-TÊTE -->
+    <div class="game-header-container">
+        <h1>Quatuors</h1>
+        <div class="date" id="date-display"></div>
+    </div>
+
+    <!-- BARRE D'OUTILS LARGEUR TOTALE + ICONE 3/4 DROITE + TRAIT FIN -->
+    <div class="toolbar">
+        <svg class="icon" onclick="toggleHelp()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+    </div>
+
+    <!-- JEU -->
     <div class="game-container">
         <div class="instructions">Créez 4 groupes de 4 mots !</div>
         
         <div id="grid-container">
-            <!-- Loader au cas où la connexion est lente -->
-            <div style="grid-column: span 4; text-align: center; padding: 20px;">Chargement...</div>
+            <div style="grid-column: span 4; text-align: center; padding: 40px; color: #999;">Chargement des données...</div>
         </div>
 
         <div class="mistakes-container">
             Erreurs restantes :
-            <div id="dots" style="display: flex; gap: 8px; margin-left:5px;">
+            <div id="dots" style="display: flex; gap: 8px; margin-left:10px;">
                 <span class="dot"></span>
                 <span class="dot"></span>
                 <span class="dot"></span>
@@ -270,35 +387,68 @@
 
     <div id="message"></div>
 
+    <!-- FENÊTRE D'AIDE -->
+    <div id="help-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="toggleHelp()">×</button>
+            <h2 style="font-family:'Zilla Slab',serif; text-align:center;">Comment jouer</h2>
+            <p style="text-align:center; margin-bottom:20px;">Trouvez des groupes de quatre éléments qui partagent un point commun.</p>
+            <ul style="padding-left:20px; line-height:1.5; font-size:14px;">
+                <li>Sélectionnez quatre éléments et appuyez sur <strong>Soumettre</strong> pour vérifier.</li>
+                <li>Trouvez les groupes sans faire plus de 4 erreurs !</li>
+            </ul>
+            <h3 style="font-family:'Zilla Slab',serif; margin-top:20px;">Exemples de catégories</h3>
+            <ul style="padding-left:20px; line-height:1.5; font-size:14px;">
+                <li><strong>POISSONS :</strong> Bar, Colin, Saumon, Truite</li>
+                <li><strong>POMME DE ___ :</strong> Pin, Terre, Douche, Discorde</li>
+            </ul>
+            <div class="difficulty-scale">
+                <div class="colors-column">
+                    <div class="color-box" style="background:var(--color-yellow);"></div>
+                    <div class="color-box" style="background:var(--color-green);"></div>
+                    <div class="color-box" style="background:var(--color-blue);"></div>
+                    <div class="color-box" style="background:var(--color-purple);"></div>
+                </div>
+                <div class="labels-column">
+                    <span>Facile</span>
+                    <div class="arrow-down"></div>
+                    <span>Difficile</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let gameData = []; // Vide au départ, sera rempli par le JSON
+        let gameData = [];
         let gridItems = [];
         let selectedItems = [];
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
 
-        // Fonction pour afficher la date du jour
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('date-display').innerText = new Date().toLocaleDateString('fr-FR', options);
+            const dateStr = new Date().toLocaleDateString('fr-FR', options);
+            document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
         }
 
-        // Chargement des données JSON externe
+        function toggleHelp() {
+            const modal = document.getElementById('help-modal');
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+        }
+        document.getElementById('help-modal').addEventListener('click', function(e) {
+            if(e.target === this) toggleHelp();
+        });
+
         async function loadGameData() {
             try {
-                // Fetch va chercher le fichier data.json à la racine du site
                 const response = await fetch('data.json');
-                if (!response.ok) {
-                    throw new Error('Erreur réseau lors du chargement du JSON');
-                }
+                if (!response.ok) throw new Error('Erreur');
                 gameData = await response.json();
-                
-                // Une fois chargé, on initialise le jeu
                 initGame();
             } catch (error) {
-                console.error("Impossible de charger les données :", error);
-                document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center'>Erreur de chargement des données.</div>";
+                console.error(error);
+                document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center; padding:20px; color:red;'>Erreur chargement data.json</div>";
             }
         }
 
@@ -309,7 +459,6 @@
             gridItems = [];
             selectedItems = [];
 
-            // Création des items de grille à partir du JSON
             gameData.forEach(group => {
                 group.items.forEach(word => {
                     gridItems.push({ word: word, category: group.category, color: group.color, solved: false, element: null });
@@ -427,14 +576,12 @@
             else container.appendChild(banner);
 
             const targetRect = banner.getBoundingClientRect();
-            
             const promises = selectedItems.map((item) => {
                 return new Promise(resolve => {
                     const card = item.element;
                     const startRect = card.getBoundingClientRect();
                     const deltaX = targetRect.left - startRect.left;
                     const deltaY = targetRect.top - startRect.top;
-                    
                     card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
                     card.classList.add('animating');
                     setTimeout(resolve, 600);
@@ -483,8 +630,7 @@
             setTimeout(() => { msg.style.display = 'none'; }, 2500);
         }
 
-        // DÉMARRAGE DU JEU
-        loadGameData(); // Appelle le JSON
+        loadGameData();
     </script>
 </body>
 </html>
