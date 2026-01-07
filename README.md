@@ -3,6 +3,9 @@
 Une adaptation en français du célèbre jeu de logique **Connections**.
 Trouvez les 4 groupes de 4 mots liés par un thème commun !
 
+<img width="608" height="545" alt="image" src="https://github.com/user-attachments/assets/6e1f0d27-3da9-4846-a0fb-e79dcfe607bc" />
+
+
 ## 🔗 Jouer en ligne
 👉 **[Accéder au jeu (Site Web)](https://h1sb3r.github.io/Quatuors/)**
 
