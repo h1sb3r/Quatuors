@@ -56,7 +56,7 @@
           "items": [
             "ROUGE",
             "VERT",
-            "BLEU",
+            "ROUGE",
             "JAUNE"
           ]
         },
@@ -71,12 +71,12 @@
           ]
         },
         {
-          "category": "SUIVIS DE \"MARIN\"",
+          "category": "SUIVIS DE \"MARIN / MARINE\"",
           "color": "#b0c4ef",
           "items": [
             "BLEU",
-            "CORPS",
-            "LOUPE",
+            "CORPS DE",
+            "SEL",
             "PIED"
           ]
         },
@@ -272,6 +272,98 @@
             "ESTOMAC",
             "PORC",
             "TRONC"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-14",
+      "title": "Jeu du 14 jan 2026 — Moyen",
+      "groups": [
+        {
+          "category": "ARGENT DONNE EN PLUS",
+          "color": "#f9df6d",
+          "items": [
+            "POURBOIRE",
+            "GRATIFICATION",
+            "POURLICHE",
+            "ETRENNES"
+          ]
+        },
+        {
+          "category": "TITRES DE TRANSPORT",
+          "color": "#a0c35a",
+          "items": [
+            "BILLET",
+            "TICKET",
+            "CARTE",
+            "ABONNEMENT"
+          ]
+        },
+        {
+          "category": "FAIRE LA ___",
+          "color": "#b0c4ef",
+          "items": [
+            "QUEUE",
+            "PAIX",
+            "FETE",
+            "MORALE"
+          ]
+        },
+        {
+          "category": "TYPES DE LIGNES",
+          "color": "#ba81c5",
+          "items": [
+            "DROITE",
+            "COURBE",
+            "BRISEE",
+            "PARALLELE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-15",
+      "title": "Jeu du 15 jan 2026 — Expert",
+      "groups": [
+        {
+          "category": "HOMOPHONES (A L'ORAL)",
+          "color": "#f9df6d",
+          "items": [
+            "VERRE",
+            "VERS",
+            "VERT",
+            "VAIR"
+          ]
+        },
+        {
+          "category": "___ DE CHASSE",
+          "color": "#a0c35a",
+          "items": [
+            "CABANE",
+            "POSTE",
+            "CHIEN",
+            "FUSIL"
+          ]
+        },
+        {
+          "category": "SUIVIS DE \"NOIR\"",
+          "color": "#b0c4ef",
+          "items": [
+            "MAGIE",
+            "MARBRE",
+            "PAIN",
+            "HUMOUR"
+          ]
+        },
+        {
+          "category": "MOTS QUI PEUVENT ETRE VERBE OU NOM",
+          "color": "#ba81c5",
+          "items": [
+            "MARQUE",
+            "PLACE",
+            "PORTE",
+            "COMPTE"
           ]
         }
       ]
