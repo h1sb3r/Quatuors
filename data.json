@@ -229,6 +229,52 @@
           ]
         }
       ]
+    },
+    {
+      "id": "2026-01-13",
+      "title": "Jeu du 13 jan 2026",
+      "groups": [
+        {
+          "category": "ANIMAUX DE LA FERME",
+          "color": "#f9df6d",
+          "items": [
+            "CHEVAL",
+            "MOUTON",
+            "POULE",
+            "VACHE"
+          ]
+        },
+        {
+          "category": "COULEURS BASIQUES",
+          "color": "#a0c35a",
+          "items": [
+            "BLEU",
+            "JAUNE",
+            "ROUGE",
+            "VERT"
+          ]
+        },
+        {
+          "category": "PARTIES DE L'ARBRE",
+          "color": "#b0c4ef",
+          "items": [
+            "BRANCHE",
+            "ÉCORCE",
+            "FEUILLE",
+            "RACINE"
+          ]
+        },
+        {
+          "category": "MOTS FINISSANT PAR UN \"C\" MUET",
+          "color": "#ba81c5",
+          "items": [
+            "BLANC",
+            "ESTOMAC",
+            "PORC",
+            "TRONC"
+          ]
+        }
+      ]
     }
   ]
 }

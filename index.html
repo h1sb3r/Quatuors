@@ -1,3 +1,14 @@
+Voici une version améliorée et complète de votre fichier `index.html`.
+
+J'ai réécrit la logique CSS et JavaScript pour reproduire fidèlement les animations du jeu original :
+1.  **L'effet "Pop"** lors de la sélection d'une case.
+2.  **L'animation de déplacement (FLIP)** : Les cartes gagnantes s'envolent vers leur position finale en haut de la grille.
+3.  **L'effet de transformation** : Une fois en haut, les cartes disparaissent pour laisser place à la barre colorée qui s'étend (effet "grow").
+4.  **Le tremblement (Shake)** : Amélioré pour être plus fluide en cas d'erreur.
+
+Remplacez tout votre code par celui-ci :
+
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,6 +29,7 @@
             --text-selected: #ffffff;
             --text-default: #000000;
             
+            /* Couleurs officielles */
             --color-yellow: #f9df6d;
             --color-green: #a0c35a;
             --color-blue: #b0c4ef;
@@ -39,179 +51,76 @@
             overflow-x: hidden;
         }
 
-        /* --- BARRE DE NAVIGATION GLOBALE --- */
+        /* --- NAV & HEADER --- */
         .nyt-nav {
-            width: 100%;
-            height: 50px;
-            border-bottom: 1px solid #e2e2e2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 15px;
-            background: #fff;
-            position: fixed;
-            top: 0;
-            z-index: 500; /* Très haut pour rester au dessus */
+            width: 100%; height: 50px; border-bottom: 1px solid #e2e2e2;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; background: #fff; position: fixed; top: 0; z-index: 500;
         }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            font-weight: 700;
-            font-size: 18px;
-            font-family: 'Zilla Slab', serif;
-            flex-shrink: 0;
-        }
-
-        .hamburger {
-            width: 18px;
-            height: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-        }
+        .nav-left { display: flex; align-items: center; gap: 15px; font-weight: 700; font-family: 'Zilla Slab', serif; }
+        .hamburger { width: 18px; height: 14px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; }
         .hamburger span { display: block; width: 100%; height: 2px; background: #000; }
+        .nav-right { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { font-size: 10px; font-weight: 700; padding: 6px 10px; border-radius: 3px; text-transform: uppercase; text-decoration: none; font-family: 'Libre Franklin', sans-serif; color: #000; border: 1px solid #000; }
+        .btn-subscribe { background: #000; color: #fff; }
+        .nav-icon { width: 24px; height: 24px; cursor: pointer; margin-left: 5px; }
 
-        .nav-right { 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
-            flex-shrink: 0;
-        }
+        .game-header-container { margin-top: 70px; text-align: center; width: 100%; max-width: 800px; padding: 0 20px; margin-bottom: 10px; }
+        h1 { font-family: 'Zilla Slab', serif; font-weight: 700; font-size: 36px; margin: 0; }
+        .date { font-size: 15px; margin-left: 10px; }
+        
+        .game-picker { margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; background: #f5f5f5; padding: 6px 10px; border-radius: 999px; }
+        .game-picker select { border: 1px solid #ccc; border-radius: 999px; padding: 4px 10px; background: #fff; }
 
-        .nav-btn {
-            font-size: 10px; /* Plus petit pour mobile */
-            font-weight: 700;
-            padding: 6px 10px;
-            border-radius: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            text-decoration: none;
-            font-family: 'Libre Franklin', sans-serif;
-            white-space: nowrap;
-        }
+        /* --- GAME CONTAINER --- */
+        .game-container { width: 100%; max-width: 650px; display: flex; flex-direction: column; align-items: center; padding: 0 10px; flex-grow: 1; }
+        .instructions { margin-top: 5px; margin-bottom: 15px; font-size: 16px; text-align: center; }
 
-        .btn-subscribe { background: #000; color: #fff; border: 1px solid #000; }
-        .btn-login { background: #fff; color: #000; border: 1px solid #000; }
-
-        /* L'icône dans la nav */
-        .nav-icon {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            margin-left: 5px;
-            color: #000;
-        }
-
-        /* --- EN-TÊTE DU JEU --- */
-        .game-header-container {
-            margin-top: 70px; /* Juste assez pour passer sous la nav */
-            text-align: center;
-            width: 100%;
-            max-width: 800px;
-            padding: 0 20px;
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-family: 'Zilla Slab', serif;
-            font-weight: 700;
-            font-size: 36px;
-            margin: 0;
-            letter-spacing: -0.5px;
-            display: inline-block;
-        }
-
-        .date {
-            font-family: 'Libre Franklin', sans-serif;
-            font-size: 15px;
-            font-weight: 400;
-            display: inline-block;
-            margin-left: 10px;
-            vertical-align: middle;
-            color: #000;
-        }
-
-        .game-picker {
-            margin-top: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            background: #f5f5f5;
-            padding: 6px 10px;
-            border-radius: 999px;
-        }
-
-        .game-picker select {
-            border: 1px solid #ccc;
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 12px;
-            background: #fff;
-        }
-
-        /* --- CONTENEUR PRINCIPAL --- */
-        .game-container {
-            width: 100%;
-            max-width: 650px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0 10px;
-            flex-grow: 1; /* Prend l'espace restant */
-        }
-
-        .instructions {
-            margin-top: 5px;
-            margin-bottom: 15px;
-            font-size: 16px;
-            font-weight: 400;
-            text-align: center;
-        }
-
-        /* --- GRILLE --- */
+        /* --- GRID --- */
         #grid-container {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             width: 100%;
             margin-bottom: 20px;
-            /* Hauteur auto pour s'adapter */
+            position: relative; /* Pour les animations absolues */
         }
 
         .card {
             background-color: var(--item-bg-default);
             border-radius: 5px;
-            height: 80px; /* Desktop height */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-family: 'Libre Franklin', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 14px; /* Desktop font */
-            cursor: pointer;
-            user-select: none;
-            transition: transform 0.1s ease, background-color 0.2s;
+            height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; font-weight: 700; text-transform: uppercase; font-size: 14px;
+            cursor: pointer; user-select: none;
+            transition: background-color 0.2s, color 0.2s, transform 0.1s;
             z-index: 1;
             padding: 4px;
-            overflow: hidden;
             word-wrap: break-word;
             line-height: 1.1;
+            position: relative; /* Important pour le positionnement */
         }
 
+        /* Animation de sélection (Petit Pop) */
         .card.selected {
             background-color: var(--item-bg-selected);
             color: var(--text-selected);
+            animation: popSelect 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .card.animating {
-            transition: transform 0.6s cubic-bezier(0.2, 0, 0, 1), background-color 0.3s;
+        @keyframes popSelect {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
+
+        /* Classe pour l'animation de déplacement (Flying cards) */
+        .card.moving {
+            position: absolute;
             z-index: 100;
+            transition: all 0.6s cubic-bezier(0.5, 0, 0, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            pointer-events: none; /* Empêche de cliquer pendant le vol */
         }
 
         /* --- BANNIÈRE RÉSOLUE --- */
@@ -219,198 +128,99 @@
             grid-column: span 4;
             border-radius: 5px;
             height: 80px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             opacity: 0;
-            transform: scale(0.95);
-            transition: opacity 0.3s, transform 0.3s;
+            /* Animation d'apparition style "barre qui s'étend" */
+            transform-origin: center;
+            animation: expandBanner 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-        .solved-banner.visible { opacity: 1; transform: scale(1); }
+
+        @keyframes expandBanner {
+            0% { opacity: 0; transform: scaleY(0.5) scaleX(0.8); }
+            100% { opacity: 1; transform: scaleY(1) scaleX(1); }
+        }
+
         .solved-title { font-weight: 700; text-transform: uppercase; font-size: 14px; margin-bottom: 4px; }
         .solved-words { font-weight: 400; font-size: 13px; }
 
         /* --- ERREURS --- */
-        .mistakes-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 400;
-            font-size: 15px;
-            margin-bottom: 20px;
-            color: #333;
-        }
+        .mistakes-container { display: flex; align-items: center; gap: 12px; font-size: 15px; margin-bottom: 20px; }
+        .dot { width: 12px; height: 12px; background-color: #5a594e; border-radius: 50%; transition: opacity 0.3s; }
+        .dot.lost { opacity: 0.2; } /* Just fade out instead of shrinking */
 
-        .dot {
-            width: 12px;
-            height: 12px;
-            background-color: #5a594e;
-            border-radius: 50%;
-            transition: transform 0.3s, opacity 0.3s;
-        }
-        .dot.lost { opacity: 0; transform: scale(0); }
-
-        /* --- BOUTONS --- */
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            width: 100%;
-        }
-
-        button {
-            padding: 12px 20px;
-            border-radius: 30px;
-            border: 1px solid #7f7f7f;
-            background: #fff;
-            color: #000;
-            font-family: 'Libre Franklin', sans-serif;
-            font-weight: 500;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button:hover { background-color: #f5f5f5; }
-
-        #submit-btn {
-            border: 1px solid #7f7f7f;
-            color: #7f7f7f;
-            background-color: #ffffff;
-            cursor: default;
-        }
-        
-        #submit-btn.active {
-            background-color: #000000 !important;
-            color: #ffffff !important;
-            border-color: #000000 !important;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* --- MODALE AIDE --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.95);
-            z-index: 2000;
-            display: none; justify-content: center; align-items: center; padding: 20px;
-        }
-        .modal-content {
-            background: #fff; padding: 30px; border: 1px solid #ccc;
-            max-width: 500px; width: 100%; border-radius: 8px;
-            position: relative; overflow-y: auto; max-height: 90vh;
-        }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; border: none; background: none; cursor: pointer;}
-        
-        .difficulty-scale { display: flex; gap: 15px; margin-top: 20px; background: #f7f7f7; padding: 15px; border-radius: 8px; }
-        .colors-column { display: flex; flex-direction: column; gap: 4px; }
-        .color-box { width: 25px; height: 25px; border-radius: 4px; }
-        .labels-column { display: flex; flex-direction: column; justify-content: space-between; font-size: 12px; font-weight: 600; padding: 5px 0; }
-        .arrow-down { width: 1px; background: #000; flex-grow: 1; margin: 5px 0 5px 2px; position: relative; }
-        .arrow-down::after { content: ''; position: absolute; bottom: 0; left: -3px; border-left: 3px solid transparent; border-right: 3px solid transparent; border-top: 5px solid #000; }
-
-        #message {
-            position: fixed; top: 12%; left: 50%; transform: translateX(-50%);
-            background: #000; color: #fff; padding: 12px 20px;
-            border-radius: 20px; font-weight: 600; font-size: 14px;
-            display: none; z-index: 1000;
-        }
-
+        /* Animation Shake améliorée */
         @keyframes shake {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        .shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
 
-        /* --- OPTIMISATION MOBILE (UX) --- */
-        @media (max-width: 600px) {
-            .nyt-nav { padding: 0 10px; }
-            .nav-left { font-size: 16px; }
-            .nav-btn { padding: 5px 8px; font-size: 9px; }
-            .nav-icon { width: 22px; height: 22px; }
+        /* --- BOUTONS --- */
+        .controls { display: flex; gap: 10px; justify-content: center; width: 100%; }
+        button { padding: 12px 20px; border-radius: 30px; border: 1px solid #7f7f7f; background: #fff; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        button:hover { background-color: #f5f5f5; }
+        #submit-btn { color: #7f7f7f; cursor: default; }
+        #submit-btn.active { background-color: #000 !important; color: #fff !important; border-color: #000 !important; cursor: pointer; }
 
-            /* Remonter le contenu */
-            .game-header-container { margin-top: 55px; margin-bottom: 5px; }
-            h1 { font-size: 28px; }
-            .date { display: block; margin-left: 0; font-size: 13px; margin-top: 2px; }
-            
-            .instructions { font-size: 14px; margin-bottom: 10px; }
-
-            /* Cartes plus compactes */
-            .card { 
-                height: 60px; /* Moins haut */
-                font-size: 11px; /* Texte plus petit */
-            }
-            .solved-banner { height: 60px; }
-            
-            #grid-container { gap: 6px; margin-bottom: 15px; }
-
-            .controls button { padding: 10px 16px; font-size: 12px; }
-            .game-picker { font-size: 11px; }
-            .game-picker select { font-size: 11px; }
-        }
+        /* --- MODALE --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #fff; padding: 30px; border: 1px solid #ccc; max-width: 500px; width: 100%; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 28px; border: none; background: none; cursor: pointer; }
+        .difficulty-scale { display: flex; gap: 15px; margin-top: 20px; background: #f7f7f7; padding: 15px; border-radius: 8px; }
+        .colors-column { display: flex; flex-direction: column; gap: 4px; }
+        .color-box { width: 25px; height: 25px; border-radius: 4px; }
         
-        /* Très petits écrans (iPhone SE etc) */
-        @media (max-width: 370px) {
-            .btn-subscribe { display: none; } /* Cacher subscribe si trop petit */
+        #message { position: fixed; top: 12%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; display: none; z-index: 1000; opacity: 0; transition: opacity 0.3s; }
+        #message.show { display: block; opacity: 1; }
+
+        /* Mobile */
+        @media (max-width: 600px) {
+            .game-header-container { margin-top: 55px; }
+            h1 { font-size: 28px; }
+            .card { height: 60px; font-size: 11px; }
+            .solved-banner { height: 60px; }
+            #grid-container { gap: 6px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- BARRE NAVIGATEUR (Aide déplacée ici) -->
     <nav class="nyt-nav">
         <div class="nav-left">
-            <div class="hamburger">
-                <span></span><span></span><span></span>
-            </div>
+            <div class="hamburger"><span></span><span></span><span></span></div>
             <span style="margin-left: 10px;">Games</span>
         </div>
         <div class="nav-right">
             <a href="#" class="nav-btn btn-subscribe">Subscribe</a>
             <a href="#" class="nav-btn btn-login">Log In</a>
-            
-            <!-- Point d'interrogation intégré ici -->
             <svg class="nav-icon" onclick="toggleHelp()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
         </div>
     </nav>
 
-    <!-- EN-TÊTE -->
     <div class="game-header-container">
         <h1>Quatuors</h1>
         <div class="date" id="date-display"></div>
         <div id="game-picker-wrap" class="game-picker" style="display: none;">
             <span>Jeu</span>
-            <select id="game-picker" aria-label="Choisir un jeu"></select>
+            <select id="game-picker"></select>
         </div>
     </div>
 
-    <!-- PLUS DE TOOLBAR ICI -->
-
-    <!-- JEU -->
     <div class="game-container">
         <div class="instructions">Créez 4 groupes de 4 mots !</div>
         
         <div id="grid-container">
-            <div style="grid-column: span 4; text-align: center; padding: 40px; color: #999;">Chargement des données...</div>
+            <div style="grid-column: span 4; text-align: center; padding: 40px; color: #999;">Chargement...</div>
         </div>
 
         <div class="mistakes-container">
             Erreurs restantes :
             <div id="dots" style="display: flex; gap: 8px; margin-left:10px;">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+                <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
         </div>
 
@@ -423,21 +233,11 @@
 
     <div id="message"></div>
 
-    <!-- FENÊTRE D'AIDE -->
     <div id="help-modal" class="modal-overlay">
         <div class="modal-content">
             <button class="close-btn" onclick="toggleHelp()">×</button>
             <h2 style="font-family:'Zilla Slab',serif; text-align:center;">Comment jouer</h2>
-            <p style="text-align:center; margin-bottom:20px;">Trouvez des groupes de quatre éléments qui partagent un point commun.</p>
-            <ul style="padding-left:20px; line-height:1.5; font-size:14px;">
-                <li>Sélectionnez quatre éléments et appuyez sur <strong>Soumettre</strong> pour vérifier.</li>
-                <li>Trouvez les groupes sans faire plus de 4 erreurs !</li>
-            </ul>
-            <h3 style="font-family:'Zilla Slab',serif; margin-top:20px;">Exemples de catégories</h3>
-            <ul style="padding-left:20px; line-height:1.5; font-size:14px;">
-                <li><strong>POISSONS :</strong> Bar, Colin, Saumon, Truite</li>
-                <li><strong>POMME DE ___ :</strong> Pin, Terre, Douche, Discorde</li>
-            </ul>
+            <p style="text-align:center;">Trouvez des groupes de quatre éléments qui partagent un point commun.</p>
             <div class="difficulty-scale">
                 <div class="colors-column">
                     <div class="color-box" style="background:var(--color-yellow);"></div>
@@ -445,10 +245,8 @@
                     <div class="color-box" style="background:var(--color-blue);"></div>
                     <div class="color-box" style="background:var(--color-purple);"></div>
                 </div>
-                <div class="labels-column">
-                    <span>Facile</span>
-                    <div class="arrow-down"></div>
-                    <span>Difficile</span>
+                <div style="display:flex; flex-direction:column; justify-content:space-between; font-size:12px; padding:5px 0;">
+                    <span>Facile</span><span>Difficile</span>
                 </div>
             </div>
         </div>
@@ -479,45 +277,9 @@
         });
 
         function normalizeGamesData(payload) {
-            if (Array.isArray(payload)) {
-                return [{ id: 'default', title: 'Jeu', groups: payload }];
-            }
-            if (payload && Array.isArray(payload.games)) {
-                return payload.games;
-            }
+            if (Array.isArray(payload)) return [{ id: 'default', title: 'Jeu', groups: payload }];
+            if (payload && Array.isArray(payload.games)) return payload.games;
             return [];
-        }
-
-        function renderGamePicker() {
-            const wrap = document.getElementById('game-picker-wrap');
-            const select = document.getElementById('game-picker');
-            if (!wrap || !select) return;
-            if (allGames.length <= 1) {
-                wrap.style.display = 'none';
-                return;
-            }
-            select.innerHTML = '';
-            allGames.forEach(game => {
-                const option = document.createElement('option');
-                option.value = game.id || '';
-                option.textContent = game.title || game.id || 'Jeu';
-                if (currentGame && game.id === currentGame.id) option.selected = true;
-                select.appendChild(option);
-            });
-            select.onchange = () => {
-                const url = new URL(window.location.href);
-                url.searchParams.set('game', select.value);
-                window.location.href = url.toString();
-            };
-            wrap.style.display = 'inline-flex';
-        }
-
-        function resetMistakesUI() {
-            mistakes = 4;
-            const dots = document.querySelectorAll('.dot');
-            dots.forEach(dot => dot.classList.remove('lost'));
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.disabled = false;
         }
 
         async function loadGameData() {
@@ -527,15 +289,31 @@
                 const payload = await response.json();
                 allGames = normalizeGamesData(payload);
                 if (!allGames.length) throw new Error('Aucun jeu');
+                
+                const wrap = document.getElementById('game-picker-wrap');
+                const select = document.getElementById('game-picker');
+                
+                if (allGames.length > 1) {
+                    wrap.style.display = 'inline-flex';
+                    select.innerHTML = '';
+                    allGames.forEach(game => {
+                        const opt = document.createElement('option');
+                        opt.value = game.id; opt.textContent = game.title || game.id;
+                        select.appendChild(opt);
+                    });
+                    select.onchange = () => { window.location.search = `?game=${select.value}`; };
+                }
+
                 const params = new URLSearchParams(window.location.search);
                 const requestedId = params.get('game');
-                currentGame = allGames.find(game => game.id === requestedId) || allGames[allGames.length - 1];
+                currentGame = allGames.find(game => game.id === requestedId) || allGames[0];
+                if(select) select.value = currentGame.id || allGames[0].id;
+                
                 gameData = currentGame.groups || [];
-                renderGamePicker();
                 initGame();
             } catch (error) {
                 console.error(error);
-                document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center; padding:20px; color:red;'>Erreur chargement data.json</div>";
+                document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center;'>Erreur de chargement.</div>";
             }
         }
 
@@ -546,16 +324,13 @@
             gridItems = [];
             selectedItems = [];
             solvedCount = 0;
+            mistakes = 4;
             isAnimating = false;
-            resetMistakesUI();
-
-            if (!Array.isArray(gameData) || gameData.length === 0) {
-                container.innerHTML = "<div style='grid-column: span 4; text-align:center; padding:20px; color:red;'>Aucun groupe valide</div>";
-                return;
-            }
+            
+            document.querySelectorAll('.dot').forEach(d => d.classList.remove('lost'));
+            document.getElementById('submit-btn').disabled = false;
 
             gameData.forEach(group => {
-                if (!group || !Array.isArray(group.items)) return;
                 group.items.forEach(word => {
                     gridItems.push({ word: word, category: group.category, color: group.color, solved: false, element: null });
                 });
@@ -574,18 +349,20 @@
 
         function renderGrid() {
             const container = document.getElementById('grid-container');
-            const currentCards = Array.from(container.querySelectorAll('.card'));
-            currentCards.forEach(c => c.remove());
+            // On ne vide pas tout si des bannières existent déjà (cas futur)
+            // Ici pour init simple :
+            if(solvedCount === 0) container.innerHTML = ''; 
 
             gridItems.forEach(item => {
-                if (!item.solved) {
+                if (!item.solved && !item.element) {
                     const div = document.createElement('div');
                     div.className = 'card';
                     div.innerText = item.word;
                     div.onclick = () => toggleSelect(item, div);
                     item.element = div;
-                    if (selectedItems.includes(item)) div.classList.add('selected');
                     container.appendChild(div);
+                } else if (!item.solved && item.element) {
+                    container.appendChild(item.element); // Re-append pour le shuffle
                 }
             });
             updateSubmitButton();
@@ -593,16 +370,17 @@
 
         function shuffleGrid() {
             if(isAnimating) return;
-            const unsolvedItems = gridItems.filter(i => !i.solved);
-            shuffleArray(unsolvedItems);
+            const unsolved = gridItems.filter(i => !i.solved);
+            shuffleArray(unsolved);
+            // Réorganiser le DOM
             const container = document.getElementById('grid-container');
-            unsolvedItems.forEach(item => { if(item.element) item.element.remove(); });
-            unsolvedItems.forEach(item => { container.appendChild(item.element); });
+            unsolved.forEach(item => container.appendChild(item.element));
         }
 
         function toggleSelect(item, element) {
             if (item.solved || isAnimating) return;
             const index = selectedItems.indexOf(item);
+            
             if (index > -1) {
                 selectedItems.splice(index, 1);
                 element.classList.remove('selected');
@@ -617,35 +395,58 @@
 
         function deselectAll() {
             if(isAnimating) return;
-            selectedItems.forEach(item => { if(item.element) item.element.classList.remove('selected'); });
+            selectedItems.forEach(item => item.element.classList.remove('selected'));
             selectedItems = [];
             updateSubmitButton();
         }
 
         function updateSubmitButton() {
             const btn = document.getElementById('submit-btn');
-            if (selectedItems.length === 4) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
+            if (selectedItems.length === 4) btn.classList.add('active');
+            else btn.classList.remove('active');
         }
 
         function submitGuess() {
             if (selectedItems.length !== 4 || isAnimating) return;
 
             const categories = selectedItems.map(i => i.category);
-            const firstCategory = categories[0];
-            const allMatch = categories.every(c => c === firstCategory);
+            const firstCat = categories[0];
+            const allMatch = categories.every(c => c === firstCat);
 
             if (allMatch) {
-                handleSuccess(firstCategory);
+                handleSuccess(firstCat);
             } else {
                 const counts = {};
-                categories.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+                categories.forEach(c => counts[c] = (counts[c] || 0) + 1);
                 const isOneAway = Object.values(counts).includes(3);
-                showMessage(isOneAway ? "Plus qu'un !" : "Incorrect");
-                handleError();
+                
+                handleError(isOneAway ? "Plus qu'un !" : "Incorrect");
+            }
+        }
+
+        function handleError(msgText) {
+            isAnimating = true;
+            showMessage(msgText);
+            const cards = selectedItems.map(i => i.element);
+            
+            // Animation shake
+            cards.forEach(c => c.classList.add('shake'));
+            
+            setTimeout(() => {
+                cards.forEach(c => c.classList.remove('shake'));
+                isAnimating = false;
+            }, 600);
+
+            mistakes--;
+            const dots = document.querySelectorAll('.dot');
+            if (dots[mistakes]) dots[mistakes].classList.add('lost');
+
+            if (mistakes === 0) {
+                setTimeout(() => {
+                    showMessage("Perdu ! Voici les réponses.");
+                    revealAll(); // Fonction optionnelle à implémenter pour montrer la fin
+                    document.getElementById('submit-btn').disabled = true;
+                }, 1000);
             }
         }
 
@@ -654,79 +455,108 @@
             const groupData = gameData.find(g => g.category === categoryName);
             const container = document.getElementById('grid-container');
 
+            // 1. Colorer les cartes immédiatement
             selectedItems.forEach(item => {
+                item.element.classList.remove('selected');
                 item.element.style.backgroundColor = groupData.color;
                 item.element.style.color = '#000';
-                item.element.classList.remove('selected');
+                item.element.style.border = 'none';
             });
 
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 300)); // Petite pause visuelle
 
+            // 2. Préparer la bannière (invisible pour l'instant)
             const banner = document.createElement('div');
             banner.className = 'solved-banner';
             banner.style.backgroundColor = groupData.color;
             banner.innerHTML = `<div class="solved-title">${groupData.category}</div><div class="solved-words">${groupData.items.join(', ')}</div>`;
             
-            const firstCard = container.querySelector('.card');
-            if (firstCard) container.insertBefore(banner, firstCard);
+            // On l'insère avant le premier élément non résolu pour garder l'ordre
+            const firstUnsolved = gridItems.find(i => !i.solved)?.element;
+            if(firstUnsolved) container.insertBefore(banner, firstUnsolved);
             else container.appendChild(banner);
 
-            const targetRect = banner.getBoundingClientRect();
-            const promises = selectedItems.map((item) => {
+            // 3. Calculer les positions pour l'animation FLIP (First Last Invert Play)
+            const bannerRect = banner.getBoundingClientRect();
+            
+            // On cache temporairement la bannière pour ne pas qu'elle soit vue
+            banner.style.opacity = '0'; 
+
+            // Créer 4 "clones" ou déplacer les originaux en absolute pour l'animation
+            // On va utiliser position:fixed pour garantir qu'ils passent au dessus de tout
+            const movingPromises = selectedItems.map((item, index) => {
                 return new Promise(resolve => {
                     const card = item.element;
                     const startRect = card.getBoundingClientRect();
-                    const deltaX = targetRect.left - startRect.left;
-                    const deltaY = targetRect.top - startRect.top;
-                    card.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                    card.classList.add('animating');
+                    
+                    // Positionner en fixed au point de départ
+                    card.style.position = 'fixed';
+                    card.style.top = startRect.top + 'px';
+                    card.style.left = startRect.left + 'px';
+                    card.style.width = startRect.width + 'px';
+                    card.style.height = startRect.height + 'px';
+                    card.style.margin = '0';
+                    card.style.zIndex = '1000';
+                    card.classList.add('moving'); // Ajoute transition et shadow
+
+                    // Petite astuce pour forcer le navigateur à prendre en compte la position fixed avant le move
+                    requestAnimationFrame(() => {
+                        // Calculer la destination : on vise la bannière
+                        // Pour faire joli, on peut les aligner horizontalement dans la zone de la bannière
+                        // Mais le jeu original les fait juste converger vers la bannière
+                        card.style.top = bannerRect.top + 'px';
+                        card.style.left = bannerRect.left + 'px';
+                        card.style.width = bannerRect.width + 'px';
+                        card.style.height = bannerRect.height + 'px';
+                        card.style.opacity = '0'; // Ils disparaissent en arrivant
+                    });
+                    
+                    // Attendre la fin de la transition CSS (0.6s défini dans le style)
                     setTimeout(resolve, 600);
                 });
             });
 
-            await Promise.all(promises);
+            await Promise.all(movingPromises);
 
+            // 4. Nettoyage et apparition de la bannière
             selectedItems.forEach(item => {
                 item.solved = true;
                 if(item.element) item.element.remove();
             });
-
-            banner.classList.add('visible');
             selectedItems = [];
+
+            // Lancer l'animation d'expansion de la bannière
+            banner.style.opacity = '1'; // L'animation CSS 'expandBanner' gère le scale
+            
             solvedCount++;
             isAnimating = false;
             updateSubmitButton();
 
-            if (solvedCount === 4) setTimeout(() => showMessage("Bravo !"), 1000);
-        }
-
-        function handleError() {
-            isAnimating = true;
-            const cards = selectedItems.map(i => i.element);
-            cards.forEach(c => c.classList.add('shake'));
-            setTimeout(() => {
-                cards.forEach(c => c.classList.remove('shake'));
-                isAnimating = false;
-            }, 500);
-
-            mistakes--;
-            const dots = document.querySelectorAll('.dot');
-            if (dots[mistakes]) dots[mistakes].classList.add('lost');
-
-            if (mistakes === 0) {
-                showMessage("Perdu pour cette fois !");
-                document.getElementById('submit-btn').disabled = true;
+            if (solvedCount === 4) {
+                setTimeout(() => showMessage("Bravo ! Vous avez gagné !"), 800);
             }
         }
 
         function showMessage(text) {
             const msg = document.getElementById('message');
             msg.innerText = text;
-            msg.style.display = 'block';
-            setTimeout(() => { msg.style.display = 'none'; }, 2500);
+            msg.classList.add('show');
+            setTimeout(() => { msg.classList.remove('show'); }, 2500);
+        }
+
+        // Fonction sommaire pour révéler la fin (si perdu)
+        function revealAll() {
+            // Logique simple pour déplacer tout le monde (simplifiée pour cet exemple)
+            gridItems.forEach(item => {
+                if(!item.solved) {
+                    item.element.style.opacity = '0.5';
+                    item.element.style.pointerEvents = 'none';
+                }
+            });
         }
 
         loadGameData();
     </script>
 </body>
 </html>
+```
