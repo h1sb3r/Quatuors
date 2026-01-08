@@ -367,6 +367,190 @@
           ]
         }
       ]
+    },
+    {
+      "id": "2026-01-16",
+      "title": "Jeu du 16 jan 2026",
+      "groups": [
+        {
+          "category": "___ DE FER",
+          "color": "#f9df6d",
+          "items": [
+            "RIDEAU",
+            "MAIN",
+            "BARRE",
+            "POING"
+          ]
+        },
+        {
+          "category": "CARTES FIGURES",
+          "color": "#a0c35a",
+          "items": [
+            "AS",
+            "ROI",
+            "DAME",
+            "VALET"
+          ]
+        },
+        {
+          "category": "PATES ITALIENNES",
+          "color": "#b0c4ef",
+          "items": [
+            "PENNE",
+            "FUSILLI",
+            "SPAGHETTI",
+            "RAVIOLI"
+          ]
+        },
+        {
+          "category": "PARTIES D'UN ARBRE",
+          "color": "#ba81c5",
+          "items": [
+            "RACINE",
+            "TRONC",
+            "BRANCHE",
+            "ECORCE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-17",
+      "title": "Jeu du 17 jan 2026",
+      "groups": [
+        {
+          "category": "___ DE MER",
+          "color": "#f9df6d",
+          "items": [
+            "LOUP",
+            "FRUIT",
+            "MAL",
+            "CHEVAL"
+          ]
+        },
+        {
+          "category": "PIECES D'ECHECS",
+          "color": "#a0c35a",
+          "items": [
+            "TOUR",
+            "FOU",
+            "CAVALIER",
+            "PION"
+          ]
+        },
+        {
+          "category": "TYPES DE FONCTIONS",
+          "color": "#b0c4ef",
+          "items": [
+            "AFFINE",
+            "QUADRATIQUE",
+            "EXPONENTIELLE",
+            "LOGARITHMIQUE"
+          ]
+        },
+        {
+          "category": "SUIVIS DE \"ROUGE\"",
+          "color": "#ba81c5",
+          "items": [
+            "VIN",
+            "CARTE",
+            "FIL",
+            "CROIX"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-18",
+      "title": "Jeu du 18 jan 2026",
+      "groups": [
+        {
+          "category": "POINTS CARDINAUX",
+          "color": "#f9df6d",
+          "items": [
+            "NORD",
+            "SUD",
+            "EST",
+            "OUEST"
+          ]
+        },
+        {
+          "category": "VENTS",
+          "color": "#a0c35a",
+          "items": [
+            "MISTRAL",
+            "TRAMONTANE",
+            "SIROCCO",
+            "ALIZE"
+          ]
+        },
+        {
+          "category": "FORMES POETIQUES",
+          "color": "#b0c4ef",
+          "items": [
+            "SONNET",
+            "HAIKU",
+            "ODE",
+            "BALLADE"
+          ]
+        },
+        {
+          "category": "___ D'OR",
+          "color": "#ba81c5",
+          "items": [
+            "AGE",
+            "MONT",
+            "LINGOT",
+            "MEDAILLE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-01-19",
+      "title": "Jeu du 19 jan 2026",
+      "groups": [
+        {
+          "category": "SIGLES EN FRANCE",
+          "color": "#f9df6d",
+          "items": [
+            "SNCF",
+            "RATP",
+            "CNRS",
+            "INSEE"
+          ]
+        },
+        {
+          "category": "FORMES D'EMPLOI",
+          "color": "#a0c35a",
+          "items": [
+            "CDI",
+            "CDD",
+            "STAGE",
+            "INTERIM"
+          ]
+        },
+        {
+          "category": "ELEMENTS D'UN COURRIEL",
+          "color": "#b0c4ef",
+          "items": [
+            "OBJET",
+            "EXPEDITEUR",
+            "DESTINATAIRE",
+            "PIECE JOINTE"
+          ]
+        },
+        {
+          "category": "___ DE BOIS",
+          "color": "#ba81c5",
+          "items": [
+            "LANGUE",
+            "CHEVAL",
+            "JAMBE",
+            "TETE"
+          ]
+        }
+      ]
     }
   ]
 }
