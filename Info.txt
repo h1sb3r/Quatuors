@@ -4,3 +4,6 @@ python server.py
 
 
 http://localhost:8000/studio.html
+
+
+http://localhost:8000/index.html

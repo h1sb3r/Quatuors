@@ -268,6 +268,8 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
+        const clickSound = new Audio('Audio/Dong.mp3');
+        clickSound.preload = 'auto';
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -386,6 +388,7 @@
 
         function toggleSelect(item, element) {
             if (item.solved || isAnimating) return;
+            playClickSound();
             const index = selectedItems.indexOf(item);
             if (index > -1) {
                 selectedItems.splice(index, 1);
@@ -397,6 +400,14 @@
                 }
             }
             updateSubmitButton();
+        }
+
+        function playClickSound() {
+            clickSound.currentTime = 0;
+            const playPromise = clickSound.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {});
+            }
         }
 
         function deselectAll() {
