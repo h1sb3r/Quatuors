@@ -79,6 +79,8 @@
             word-wrap: break-word;
             line-height: 1.2;
             position: relative;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .card.selected {
@@ -268,8 +270,16 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
-        const clickSound = new Audio('Audio/Dong.mp3');
-        clickSound.preload = 'auto';
+        const CLICK_SOUND_URL = 'Audio/Dong.mp3';
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const clickSoundFallback = new Audio(CLICK_SOUND_URL);
+        let clickAudioContext = null;
+        let clickSoundBuffer = null;
+        let clickSoundLoadPromise = null;
+        let clickSoundUnlocked = false;
+
+        clickSoundFallback.preload = 'auto';
+        clickSoundFallback.playsInline = true;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -363,7 +373,7 @@
                     const div = document.createElement('div');
                     div.className = 'card';
                     div.innerText = item.word;
-                    div.onclick = () => toggleSelect(item, div);
+                    bindCardInteraction(div, item);
                     item.element = div;
                     container.appendChild(div);
                 } else if (!item.solved && item.element) {
@@ -402,12 +412,114 @@
             updateSubmitButton();
         }
 
-        function playClickSound() {
-            clickSound.currentTime = 0;
-            const playPromise = clickSound.play();
+        function bindCardInteraction(element, item) {
+            if (window.PointerEvent) {
+                element.addEventListener('pointerdown', (event) => {
+                    if (event.button !== undefined && event.button !== 0) return;
+                    event.preventDefault();
+                    toggleSelect(item, element);
+                }, { passive: false });
+                return;
+            }
+
+            // Fallback for very old browsers without pointer events.
+            element.addEventListener('click', () => toggleSelect(item, element));
+        }
+
+        function ensureAudioContext() {
+            if (!AudioContextClass) return null;
+            if (!clickAudioContext) {
+                clickAudioContext = new AudioContextClass({ latencyHint: 'interactive' });
+            }
+            return clickAudioContext;
+        }
+
+        async function loadClickSoundBuffer() {
+            if (!AudioContextClass) return null;
+            if (clickSoundBuffer) return clickSoundBuffer;
+            if (clickSoundLoadPromise) return clickSoundLoadPromise;
+
+            clickSoundLoadPromise = (async () => {
+                const ctx = ensureAudioContext();
+                const response = await fetch(CLICK_SOUND_URL, { cache: 'force-cache' });
+                if (!response.ok) throw new Error('Audio load failed');
+                const data = await response.arrayBuffer();
+                clickSoundBuffer = await ctx.decodeAudioData(data.slice(0));
+                return clickSoundBuffer;
+            })().catch((error) => {
+                clickSoundLoadPromise = null;
+                throw error;
+            });
+
+            return clickSoundLoadPromise;
+        }
+
+        async function unlockClickSound() {
+            if (clickSoundUnlocked) return;
+            if (!AudioContextClass) return;
+            try {
+                const ctx = ensureAudioContext();
+                if (ctx.state !== 'running') await ctx.resume();
+                await loadClickSoundBuffer();
+
+                // Prime the output path with a silent one-frame buffer.
+                const source = ctx.createBufferSource();
+                source.buffer = ctx.createBuffer(1, 1, 22050);
+                source.connect(ctx.destination);
+                source.start(0);
+                clickSoundUnlocked = true;
+            } catch (_) {
+                clickSoundUnlocked = false;
+            }
+        }
+
+        function installAudioUnlockHandlers() {
+            const onFirstGesture = () => { void unlockClickSound(); };
+            document.addEventListener('pointerdown', onFirstGesture, { passive: true });
+            document.addEventListener('touchstart', onFirstGesture, { passive: true });
+            document.addEventListener('mousedown', onFirstGesture, { passive: true });
+            document.addEventListener('keydown', onFirstGesture, { passive: true });
+        }
+
+        function initClickSound() {
+            clickSoundFallback.load();
+            if (AudioContextClass) {
+                ensureAudioContext();
+                void loadClickSoundBuffer();
+            }
+            installAudioUnlockHandlers();
+        }
+
+        async function playClickSoundWebAudio() {
+            const ctx = ensureAudioContext();
+            if (!ctx) return false;
+            if (ctx.state !== 'running') await ctx.resume();
+            const buffer = await loadClickSoundBuffer();
+            if (!buffer) return false;
+
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.start(0);
+            return true;
+        }
+
+        function playClickSoundFallback() {
+            clickSoundFallback.currentTime = 0;
+            const playPromise = clickSoundFallback.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch(() => {});
             }
+        }
+
+        function playClickSound() {
+            if (!AudioContextClass) {
+                playClickSoundFallback();
+                return;
+            }
+            playClickSoundWebAudio().catch(() => {
+                playClickSoundFallback();
+            });
         }
 
         function deselectAll() {
@@ -544,6 +656,7 @@
             setTimeout(() => { msg.classList.remove('show'); }, 2500);
         }
 
+        initClickSound();
         loadGameData();
     </script>
 </body>
