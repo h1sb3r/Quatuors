@@ -292,7 +292,8 @@
         let isAnimating = false;
         const CLICK_SOUND_URL = 'Audio/Typing.wav';
         const CLICK_SOUND_VOLUME = 0.5;
-        const BANNER_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
+        const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
+        const CORRECT_SELECTION_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
@@ -305,6 +306,9 @@
         const solvedBannerSound = new Audio(BANNER_SOUND_URL);
         solvedBannerSound.preload = 'auto';
         solvedBannerSound.playsInline = true;
+        const correctSelectionSound = new Audio(CORRECT_SELECTION_SOUND_URL);
+        correctSelectionSound.preload = 'auto';
+        correctSelectionSound.playsInline = true;
         const SOUND_PREF_KEY = 'quatuors_sound_enabled';
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
@@ -508,9 +512,18 @@
                     selectedItems.push(item);
                     element.classList.add('selected');
                     if (isSoundEnabled) playClickSound();
+                    if (selectedItems.length === 4 && isSelectionCorrect()) {
+                        playCorrectSelectionSound();
+                    }
                 }
             }
             updateSubmitButton();
+        }
+
+        function isSelectionCorrect() {
+            if (selectedItems.length !== 4) return false;
+            const firstCat = selectedItems[0].category;
+            return selectedItems.every(item => item.category === firstCat);
         }
 
         function getNextClickSound() {
@@ -589,6 +602,7 @@
                 try {
                     clickSounds.forEach(audio => audio.load());
                     solvedBannerSound.load();
+                    correctSelectionSound.load();
                 } catch (_) {}
 
                 try {
@@ -603,6 +617,18 @@
                     solvedBannerSound.muted = false;
                 } catch (_) {}
 
+                try {
+                    correctSelectionSound.muted = true;
+                    correctSelectionSound.currentTime = 0;
+                    const playPromise = correctSelectionSound.play();
+                    if (playPromise && typeof playPromise.then === 'function') {
+                        await playPromise;
+                    }
+                    correctSelectionSound.pause();
+                    correctSelectionSound.currentTime = 0;
+                    correctSelectionSound.muted = false;
+                } catch (_) {}
+
                 clickSoundUnlocked = true;
                 return true;
             })().finally(() => {
@@ -615,6 +641,7 @@
         function initClickSound() {
             clickSounds.forEach(audio => audio.load());
             solvedBannerSound.load();
+            correctSelectionSound.load();
         }
 
         function playClickSound() {
@@ -655,6 +682,24 @@
                     void unlockClickSoundIfNeeded().then(() => {
                         solvedBannerSound.currentTime = 0;
                         solvedBannerSound.play().catch(() => {});
+                    });
+                });
+            }
+        }
+
+        function playCorrectSelectionSound() {
+            if (!isSoundEnabled) return;
+            correctSelectionSound.currentTime = 0;
+            const playPromise = correctSelectionSound.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {
+                    if (navigator.userActivation && !navigator.userActivation.isActive) {
+                        armAudioUnlockOnFirstGesture();
+                        return;
+                    }
+                    void unlockClickSoundIfNeeded().then(() => {
+                        correctSelectionSound.currentTime = 0;
+                        correctSelectionSound.play().catch(() => {});
                     });
                 });
             }
