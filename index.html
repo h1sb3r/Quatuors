@@ -272,16 +272,16 @@
         let solvedCount = 0;
         let isAnimating = false;
         const CLICK_SOUND_URL = 'Audio/Dong.mp3';
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        const clickSoundFallback = new Audio(CLICK_SOUND_URL);
-        let clickAudioContext = null;
-        let clickSoundBuffer = null;
-        let clickSoundLoadPromise = null;
+        const CLICK_SOUND_POOL_SIZE = 4;
+        const clickSoundPool = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
+            const audio = new Audio(CLICK_SOUND_URL);
+            audio.preload = 'auto';
+            audio.playsInline = true;
+            return audio;
+        });
+        let clickSoundPoolIndex = 0;
         let clickSoundUnlocked = false;
-        let clickSoundFallbackReady = false;
-
-        clickSoundFallback.preload = 'auto';
-        clickSoundFallback.playsInline = true;
+        let clickSoundUnlocking = false;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -415,137 +415,73 @@
         }
 
         function bindCardInteraction(element, item) {
-            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-            if (isTouchDevice) {
-                element.addEventListener('touchstart', (event) => {
-                    event.preventDefault();
+            if (window.PointerEvent) {
+                element.addEventListener('pointerup', (event) => {
+                    if (event.pointerType === 'mouse' && event.button !== 0) return;
                     toggleSelect(item, element);
-                }, { passive: false });
+                });
                 return;
             }
 
             element.addEventListener('click', () => toggleSelect(item, element));
         }
 
-        function ensureAudioContext() {
-            if (!AudioContextClass) return null;
-            if (!clickAudioContext) {
-                clickAudioContext = new AudioContextClass({ latencyHint: 'interactive' });
-            }
-            return clickAudioContext;
-        }
-
-        async function loadClickSoundBuffer() {
-            if (!AudioContextClass) return null;
-            if (clickSoundBuffer) return clickSoundBuffer;
-            if (clickSoundLoadPromise) return clickSoundLoadPromise;
-
-            clickSoundLoadPromise = (async () => {
-                const ctx = ensureAudioContext();
-                const response = await fetch(CLICK_SOUND_URL, { cache: 'force-cache' });
-                if (!response.ok) throw new Error('Audio load failed');
-                const data = await response.arrayBuffer();
-                clickSoundBuffer = await ctx.decodeAudioData(data.slice(0));
-                return clickSoundBuffer;
-            })().catch((error) => {
-                clickSoundLoadPromise = null;
-                throw error;
-            });
-
-            return clickSoundLoadPromise;
-        }
-
-        async function warmupClickSoundFallback() {
-            if (clickSoundFallbackReady) return;
-            try {
-                clickSoundFallback.muted = true;
-                clickSoundFallback.currentTime = 0;
-                const playPromise = clickSoundFallback.play();
-                if (playPromise && typeof playPromise.then === 'function') await playPromise;
-                clickSoundFallback.pause();
-                clickSoundFallback.currentTime = 0;
-                clickSoundFallback.muted = false;
-                clickSoundFallbackReady = true;
-            } catch (_) {
-                clickSoundFallback.muted = false;
-            }
+        function getNextClickSound() {
+            const audio = clickSoundPool[clickSoundPoolIndex];
+            clickSoundPoolIndex = (clickSoundPoolIndex + 1) % clickSoundPool.length;
+            return audio;
         }
 
         async function unlockClickSound() {
-            if (clickSoundUnlocked) return;
-            await warmupClickSoundFallback();
-            if (!AudioContextClass) return;
+            if (clickSoundUnlocked || clickSoundUnlocking) return;
+            clickSoundUnlocking = true;
             try {
-                const ctx = ensureAudioContext();
-                if (ctx.state !== 'running') await ctx.resume();
-                await loadClickSoundBuffer();
-
-                // Prime the output path with a silent one-frame buffer.
-                const source = ctx.createBufferSource();
-                source.buffer = ctx.createBuffer(1, 1, 22050);
-                source.connect(ctx.destination);
-                source.start(0);
+                for (const audio of clickSoundPool) {
+                    audio.muted = true;
+                    audio.currentTime = 0;
+                    const playPromise = audio.play();
+                    if (playPromise && typeof playPromise.then === 'function') {
+                        await playPromise;
+                    }
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audio.muted = false;
+                }
                 clickSoundUnlocked = true;
             } catch (_) {
                 clickSoundUnlocked = false;
+            } finally {
+                clickSoundUnlocking = false;
             }
         }
 
         function installAudioUnlockHandlers() {
             const onFirstGesture = () => { void unlockClickSound(); };
-            document.addEventListener('pointerdown', onFirstGesture, { passive: true });
-            document.addEventListener('touchstart', onFirstGesture, { passive: true });
-            document.addEventListener('mousedown', onFirstGesture, { passive: true });
-            document.addEventListener('keydown', onFirstGesture, { passive: true });
+            document.addEventListener('pointerup', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('touchend', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('click', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('keydown', onFirstGesture, { passive: true, once: true });
         }
 
         function initClickSound() {
-            clickSoundFallback.load();
-            if (AudioContextClass) {
-                ensureAudioContext();
-                void loadClickSoundBuffer();
-            }
+            clickSoundPool.forEach(audio => audio.load());
             installAudioUnlockHandlers();
         }
 
-        async function playClickSoundWebAudio() {
-            const ctx = ensureAudioContext();
-            if (!ctx) return false;
-            if (ctx.state !== 'running') await ctx.resume();
-            const buffer = await loadClickSoundBuffer();
-            if (!buffer) return false;
-
-            const source = ctx.createBufferSource();
-            source.buffer = buffer;
-            source.connect(ctx.destination);
-            source.start(0);
-            return true;
-        }
-
-        function playClickSoundFallback() {
-            clickSoundFallback.currentTime = 0;
-            const playPromise = clickSoundFallback.play();
-            if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(() => {});
-            }
-        }
-
         function playClickSound() {
-            if (!AudioContextClass) {
-                playClickSoundFallback();
-                return;
+            const audio = getNextClickSound();
+            audio.currentTime = 0;
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {
+                    void unlockClickSound().then(() => {
+                        audio.currentTime = 0;
+                        audio.play().catch(() => {});
+                    });
+                });
             }
-
-            // Avoid first-tap silence: play HTMLAudio immediately while WebAudio warms up.
-            if (!clickSoundBuffer) {
-                playClickSoundFallback();
+            if (!clickSoundUnlocked) {
                 void unlockClickSound();
-                void loadClickSoundBuffer();
-                return;
-            }
-
-            playClickSoundWebAudio().catch(() => {
-                playClickSoundFallback();
             });
         }
 
