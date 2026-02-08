@@ -290,7 +290,8 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
-        const CLICK_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
+        const CLICK_SOUND_URL = 'Audio/Typing.wav';
+        const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
@@ -299,6 +300,9 @@
             audio.playsInline = true;
             return audio;
         });
+        const solvedBannerSound = new Audio(BANNER_SOUND_URL);
+        solvedBannerSound.preload = 'auto';
+        solvedBannerSound.playsInline = true;
         const SOUND_PREF_KEY = 'quatuors_sound_enabled';
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
@@ -562,6 +566,19 @@
 
                 try {
                     clickSounds.forEach(audio => audio.load());
+                    solvedBannerSound.load();
+                } catch (_) {}
+
+                try {
+                    solvedBannerSound.muted = true;
+                    solvedBannerSound.currentTime = 0;
+                    const playPromise = solvedBannerSound.play();
+                    if (playPromise && typeof playPromise.then === 'function') {
+                        await playPromise;
+                    }
+                    solvedBannerSound.pause();
+                    solvedBannerSound.currentTime = 0;
+                    solvedBannerSound.muted = false;
                 } catch (_) {}
 
                 clickSoundUnlocked = true;
@@ -575,6 +592,7 @@
 
         function initClickSound() {
             clickSounds.forEach(audio => audio.load());
+            solvedBannerSound.load();
         }
 
         function playClickSound() {
@@ -595,6 +613,20 @@
 
             if (!clickSoundUnlocked) {
                 void unlockClickSoundIfNeeded();
+            }
+        }
+
+        function playSolvedBannerSound() {
+            if (!isSoundEnabled) return;
+            solvedBannerSound.currentTime = 0;
+            const playPromise = solvedBannerSound.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(() => {
+                    void unlockClickSoundIfNeeded().then(() => {
+                        solvedBannerSound.currentTime = 0;
+                        solvedBannerSound.play().catch(() => {});
+                    });
+                });
             }
         }
 
@@ -715,6 +747,7 @@
             });
             selectedItems = [];
             banner.classList.add('reveal');
+            playSolvedBannerSound();
             
             solvedCount++;
             isAnimating = false;
