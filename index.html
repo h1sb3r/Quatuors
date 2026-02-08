@@ -140,7 +140,6 @@
             font-size: 15px;
             letter-spacing: 0.5px;
             cursor: pointer; user-select: none;
-            transition: background-color 0.2s, color 0.2s, transform 0.1s;
             z-index: 1;
             padding: 5px;
             word-wrap: break-word;
@@ -150,6 +149,19 @@
             -webkit-tap-highlight-color: transparent;
             will-change: transform;
             contain: layout paint style;
+            transition:
+                background-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+                font-size 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+                letter-spacing 0.2s ease;
+        }
+        @media (hover: hover) and (pointer: fine) {
+            .card:hover {
+                transform: translateY(-1px);
+                font-size: 15.8px;
+                letter-spacing: 0.55px;
+            }
         }
 
         .card.selected {
@@ -350,7 +362,7 @@
         }
         body.theme-glass .card:hover {
             transform: translateY(-1px);
-            font-size: 15.7px;
+            font-size: 16px;
             border-color: rgba(255, 228, 176, 0.9);
             box-shadow: 0 10px 22px rgba(0,0,0,0.22), 0 0 0 1px rgba(255, 216, 154, 0.3) inset;
             background: linear-gradient(145deg, rgba(255, 247, 229, 0.36), rgba(244, 251, 255, 0.2));
@@ -436,7 +448,7 @@
             .theme-option { max-width: 165px; font-size: 14px; padding-bottom: 8px; }
             .game-picker { max-width: calc(100vw - 40px); }
             .game-picker select { max-width: 54vw; }
-            .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.08s; }
+            .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.1s, font-size 0.14s; }
             .solved-banner { height: 65px; }
             #grid-container { gap: 6px; }
             .controls { gap: 8px; flex-wrap: wrap; }
@@ -556,7 +568,7 @@
         const CLICK_SOUND_URL = 'Audio/glass.wav';
         const CLICK_SOUND_VOLUME = 0.5;
         const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
-        const CORRECT_SELECTION_SOUND_URL = 'Audio/magic.wav';
+        const CORRECT_SELECTION_SOUND_URL = 'Audio/Magical.wav';
         const CORRECT_SELECTION_SOUND_VOLUME = 0.45;
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
