@@ -141,6 +141,44 @@
         #submit-btn.active { background-color: #000 !important; color: #fff !important; border-color: #000 !important; cursor: pointer; opacity: 1; }
         #submit-btn.active:hover { opacity: 0.9; }
 
+        .audio-gate {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.96);
+            z-index: 2100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .audio-gate-card {
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            padding: 24px 20px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+        .audio-gate-title {
+            margin: 0 0 10px 0;
+            font-family: 'Zilla Slab', serif;
+            font-size: 30px;
+            letter-spacing: -0.4px;
+        }
+        .audio-gate-text {
+            margin: 0 0 18px 0;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        .audio-gate-status {
+            min-height: 18px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #666;
+        }
+
         /* --- MODALE --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; }
         .modal-content { background: #fff; padding: 30px 25px; border: 1px solid #ccc; max-width: 550px; width: 100%; border-radius: 3px; position: relative; max-height: 95vh; overflow-y: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #000; }
@@ -224,6 +262,15 @@
         </div>
     </div>
 
+    <div id="audio-gate" class="audio-gate">
+        <div class="audio-gate-card">
+            <h2 class="audio-gate-title">Activer le son</h2>
+            <p class="audio-gate-text">Appuyez sur ce bouton avant de jouer pour garantir le son sur mobile.</p>
+            <button id="audio-enable-btn" type="button">Activer le son</button>
+            <div id="audio-gate-status" class="audio-gate-status"></div>
+        </div>
+    </div>
+
     <div id="message"></div>
 
     <div id="help-modal" class="modal-overlay">
@@ -278,7 +325,7 @@
         });
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
-        let clickSoundUnlocking = false;
+        let clickSoundUnlockPromise = null;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -294,6 +341,36 @@
         document.getElementById('help-modal').addEventListener('click', function(e) {
             if(e.target === this) toggleHelp();
         });
+
+        function setAudioGateStatus(text) {
+            const status = document.getElementById('audio-gate-status');
+            if (status) status.innerText = text;
+        }
+
+        function hideAudioGate() {
+            const gate = document.getElementById('audio-gate');
+            if (gate) gate.style.display = 'none';
+        }
+
+        function initAudioGate() {
+            const btn = document.getElementById('audio-enable-btn');
+            if (!btn) return;
+
+            btn.addEventListener('click', async () => {
+                btn.disabled = true;
+                setAudioGateStatus('Activation en cours...');
+                const unlocked = await unlockClickSoundIfNeeded();
+                if (unlocked) {
+                    setAudioGateStatus('');
+                    hideAudioGate();
+                    playClickSound();
+                    return;
+                }
+
+                setAudioGateStatus("Impossible d'activer le son. Retentez et verifiez le mode silencieux.");
+                btn.disabled = false;
+            });
+        }
 
         function normalizeGamesData(payload) {
             if (Array.isArray(payload)) return [{ id: 'default', title: 'Jeu', groups: payload }];
@@ -397,6 +474,10 @@
 
         function toggleSelect(item, element) {
             if (item.solved || isAnimating) return;
+            if (!clickSoundUnlocked) {
+                showMessage("Appuyez sur 'Activer le son' pour commencer.");
+                return;
+            }
             playClickSound();
             const index = selectedItems.indexOf(item);
             if (index > -1) {
@@ -418,58 +499,40 @@
         }
 
         async function unlockClickSoundIfNeeded() {
-            if (clickSoundUnlocked || clickSoundUnlocking) return;
-            clickSoundUnlocking = true;
-            try {
-                // Try to unlock playback on mobile using a muted warm-up play.
-                const unlockAudio = clickSounds[0];
-                unlockAudio.muted = true;
-                unlockAudio.currentTime = 0;
-                const playPromise = unlockAudio.play();
-                if (playPromise && typeof playPromise.then === 'function') {
-                    await playPromise;
+            if (clickSoundUnlocked) return true;
+            if (clickSoundUnlockPromise) return clickSoundUnlockPromise;
+
+            clickSoundUnlockPromise = (async () => {
+                try {
+                    // Try to unlock playback on mobile using a muted warm-up play.
+                    const unlockAudio = clickSounds[0];
+                    unlockAudio.muted = true;
+                    unlockAudio.currentTime = 0;
+                    const playPromise = unlockAudio.play();
+                    if (playPromise && typeof playPromise.then === 'function') {
+                        await playPromise;
+                    }
+                    unlockAudio.pause();
+                    unlockAudio.currentTime = 0;
+                    unlockAudio.muted = false;
+
+                    clickSounds.forEach(audio => audio.load());
+                    clickSoundUnlocked = true;
+                    hideAudioGate();
+                    return true;
+                } catch (_) {
+                    clickSoundUnlocked = false;
+                    return false;
+                } finally {
+                    clickSoundUnlockPromise = null;
                 }
-                unlockAudio.pause();
-                unlockAudio.currentTime = 0;
-                unlockAudio.muted = false;
+            })();
 
-                clickSounds.forEach(audio => audio.load());
-                clickSoundUnlocked = true;
-            } catch (_) {
-                clickSoundUnlocked = false;
-            } finally {
-                clickSoundUnlocking = false;
-            }
-        }
-
-        function installAudioUnlockHandlers() {
-            const onFirstGesture = () => { void unlockClickSoundIfNeeded(); };
-            document.addEventListener('pointerdown', onFirstGesture, { passive: true, once: true });
-            document.addEventListener('touchstart', onFirstGesture, { passive: true, once: true });
-            document.addEventListener('mousedown', onFirstGesture, { passive: true, once: true });
-            document.addEventListener('keydown', onFirstGesture, { passive: true, once: true });
+            return clickSoundUnlockPromise;
         }
 
         function initClickSound() {
             clickSounds.forEach(audio => audio.load());
-
-            // Best effort preload/decode on page display.
-            const warmAudio = clickSounds[0];
-            warmAudio.muted = true;
-            const warmPromise = warmAudio.play();
-            if (warmPromise && typeof warmPromise.then === 'function') {
-                warmPromise.then(() => {
-                    warmAudio.pause();
-                    warmAudio.currentTime = 0;
-                    warmAudio.muted = false;
-                }).catch(() => {
-                    warmAudio.muted = false;
-                });
-            } else {
-                warmAudio.muted = false;
-            }
-
-            installAudioUnlockHandlers();
         }
 
         function playClickSound() {
@@ -625,6 +688,7 @@
         }
 
         initClickSound();
+        initAudioGate();
         loadGameData();
     </script>
 </body>
