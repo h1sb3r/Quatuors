@@ -512,18 +512,9 @@
                     selectedItems.push(item);
                     element.classList.add('selected');
                     if (isSoundEnabled) playClickSound();
-                    if (selectedItems.length === 4 && isSelectionCorrect()) {
-                        playCorrectSelectionSound();
-                    }
                 }
             }
             updateSubmitButton();
-        }
-
-        function isSelectionCorrect() {
-            if (selectedItems.length !== 4) return false;
-            const firstCat = selectedItems[0].category;
-            return selectedItems.every(item => item.category === firstCat);
         }
 
         function getNextClickSound() {
@@ -724,6 +715,7 @@
             const firstCat = categories[0];
             const allMatch = categories.every(c => c === firstCat);
             if (allMatch) {
+                if (isSoundEnabled) playCorrectSelectionSound();
                 handleSuccess(firstCat);
             } else {
                 const counts = {};
