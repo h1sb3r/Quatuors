@@ -7,7 +7,6 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="Audio/Dong.mp3" as="audio">
     <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
 
     <style>
@@ -518,15 +517,6 @@
                 playClickSoundFallback();
                 return;
             }
-
-            // Avoid first-tap silence: play HTMLAudio immediately while WebAudio warms up.
-            if (!clickSoundBuffer) {
-                playClickSoundFallback();
-                void unlockClickSound();
-                void loadClickSoundBuffer();
-                return;
-            }
-
             playClickSoundWebAudio().catch(() => {
                 playClickSoundFallback();
             });
