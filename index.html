@@ -141,43 +141,20 @@
         #submit-btn.active { background-color: #000 !important; color: #fff !important; border-color: #000 !important; cursor: pointer; opacity: 1; }
         #submit-btn.active:hover { opacity: 0.9; }
 
-        .audio-gate {
-            position: fixed;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.96);
-            z-index: 2100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        .sound-option { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+        .sound-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .sound-switch input { opacity: 0; width: 0; height: 0; }
+        .sound-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #d9d9d9; transition: .2s; border-radius: 24px;
         }
-        .audio-gate-card {
-            width: 100%;
-            max-width: 420px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background: #fff;
-            padding: 24px 20px;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        .sound-slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; top: 3px;
+            background-color: #fff; transition: .2s; border-radius: 50%;
         }
-        .audio-gate-title {
-            margin: 0 0 10px 0;
-            font-family: 'Zilla Slab', serif;
-            font-size: 30px;
-            letter-spacing: -0.4px;
-        }
-        .audio-gate-text {
-            margin: 0 0 18px 0;
-            font-size: 15px;
-            line-height: 1.4;
-        }
-        .audio-gate-status {
-            min-height: 18px;
-            margin-top: 12px;
-            font-size: 13px;
-            color: #666;
-        }
+        .sound-switch input:checked + .sound-slider { background-color: #000; }
+        .sound-switch input:checked + .sound-slider:before { transform: translateX(20px); }
+        .sound-switch input:disabled + .sound-slider { opacity: 0.6; cursor: not-allowed; }
 
         /* --- MODALE --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 15px; }
@@ -244,6 +221,13 @@
     <div class="game-container">
         <div class="instructions">Créez 4 groupes de 4 mots !</div>
         
+        <div class="sound-option">
+            <span>Son</span>
+            <label class="sound-switch" for="sound-toggle">
+                <input id="sound-toggle" type="checkbox" aria-label="Activer le son">
+                <span class="sound-slider"></span>
+            </label>
+        </div>
         <div id="grid-container">
             <div style="grid-column: span 4; text-align: center; padding: 40px; color: #999;">Chargement...</div>
         </div>
@@ -259,15 +243,6 @@
             <button onclick="shuffleGrid()">Mélanger</button>
             <button onclick="deselectAll()">Désélectionner</button>
             <button id="submit-btn" onclick="submitGuess()">Soumettre</button>
-        </div>
-    </div>
-
-    <div id="audio-gate" class="audio-gate">
-        <div class="audio-gate-card">
-            <h2 class="audio-gate-title">Activer le son</h2>
-            <p class="audio-gate-text">Appuyez sur ce bouton avant de jouer pour garantir le son sur mobile.</p>
-            <button id="audio-enable-btn" type="button">Activer le son</button>
-            <div id="audio-gate-status" class="audio-gate-status"></div>
         </div>
     </div>
 
@@ -324,12 +299,14 @@
             audio.playsInline = true;
             return audio;
         });
+        const SOUND_PREF_KEY = 'quatuors_sound_enabled';
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
         let clickSoundUnlockPromise = null;
         let clickAudioContext = null;
         let clickAudioBuffer = null;
         let clickAudioReady = false;
+        let isSoundEnabled = false;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -346,34 +323,54 @@
             if(e.target === this) toggleHelp();
         });
 
-        function setAudioGateStatus(text) {
-            const status = document.getElementById('audio-gate-status');
-            if (status) status.innerText = text;
+        function setSoundEnabled(enabled) {
+            isSoundEnabled = !!enabled;
+            try {
+                localStorage.setItem(SOUND_PREF_KEY, isSoundEnabled ? '1' : '0');
+            } catch (_) {}
         }
 
-        function hideAudioGate() {
-            const gate = document.getElementById('audio-gate');
-            if (gate) gate.style.display = 'none';
-        }
+        function initSoundToggle() {
+            const toggle = document.getElementById('sound-toggle');
+            if (!toggle) return;
 
-        function initAudioGate() {
-            const btn = document.getElementById('audio-enable-btn');
-            if (!btn) return;
+            let savedEnabled = false;
+            try {
+                savedEnabled = localStorage.getItem(SOUND_PREF_KEY) === '1';
+            } catch (_) {}
 
-            btn.addEventListener('click', async () => {
-                btn.disabled = true;
-                setAudioGateStatus('Activation en cours...');
-                const unlocked = await unlockClickSoundIfNeeded();
-                if (unlocked) {
-                    setAudioGateStatus('');
-                    hideAudioGate();
-                    playClickSound();
+            toggle.checked = savedEnabled;
+            isSoundEnabled = savedEnabled;
+
+            toggle.addEventListener('change', async () => {
+                if (!toggle.checked) {
+                    setSoundEnabled(false);
                     return;
                 }
 
-                setAudioGateStatus("Impossible d'activer le son. Retentez et verifiez le mode silencieux.");
-                btn.disabled = false;
+                toggle.disabled = true;
+                const unlocked = await unlockClickSoundIfNeeded();
+                toggle.disabled = false;
+
+                if (!unlocked) {
+                    toggle.checked = false;
+                    setSoundEnabled(false);
+                    showMessage("Impossible d'activer le son. Verifiez le mode silencieux.");
+                    return;
+                }
+
+                setSoundEnabled(true);
+                playClickSound();
             });
+
+            if (savedEnabled) {
+                void unlockClickSoundIfNeeded().then((unlocked) => {
+                    if (!unlocked) {
+                        toggle.checked = false;
+                        setSoundEnabled(false);
+                    }
+                });
+            }
         }
 
         function normalizeGamesData(payload) {
@@ -478,11 +475,7 @@
 
         function toggleSelect(item, element) {
             if (item.solved || isAnimating) return;
-            if (!clickSoundUnlocked) {
-                showMessage("Appuyez sur 'Activer le son' pour commencer.");
-                return;
-            }
-            playClickSound();
+            if (isSoundEnabled) playClickSound();
             const index = selectedItems.indexOf(item);
             if (index > -1) {
                 selectedItems.splice(index, 1);
@@ -571,7 +564,6 @@
                 } catch (_) {}
 
                 clickSoundUnlocked = true;
-                hideAudioGate();
                 return true;
             })().finally(() => {
                 clickSoundUnlockPromise = null;
@@ -585,6 +577,7 @@
         }
 
         function playClickSound() {
+            if (!isSoundEnabled) return;
             if (playClickSoundWebAudio()) return;
 
             const audio = getNextClickSound();
@@ -739,7 +732,7 @@
         }
 
         initClickSound();
-        initAudioGate();
+        initSoundToggle();
         loadGameData();
     </script>
 </body>
