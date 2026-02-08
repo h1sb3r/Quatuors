@@ -278,6 +278,7 @@
         let clickSoundBuffer = null;
         let clickSoundLoadPromise = null;
         let clickSoundUnlocked = false;
+        let clickSoundFallbackReady = false;
 
         clickSoundFallback.preload = 'auto';
         clickSoundFallback.playsInline = true;
@@ -414,16 +415,15 @@
         }
 
         function bindCardInteraction(element, item) {
-            if (window.PointerEvent) {
-                element.addEventListener('pointerdown', (event) => {
-                    if (event.button !== undefined && event.button !== 0) return;
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            if (isTouchDevice) {
+                element.addEventListener('touchstart', (event) => {
                     event.preventDefault();
                     toggleSelect(item, element);
                 }, { passive: false });
                 return;
             }
 
-            // Fallback for very old browsers without pointer events.
             element.addEventListener('click', () => toggleSelect(item, element));
         }
 
@@ -455,8 +455,25 @@
             return clickSoundLoadPromise;
         }
 
+        async function warmupClickSoundFallback() {
+            if (clickSoundFallbackReady) return;
+            try {
+                clickSoundFallback.muted = true;
+                clickSoundFallback.currentTime = 0;
+                const playPromise = clickSoundFallback.play();
+                if (playPromise && typeof playPromise.then === 'function') await playPromise;
+                clickSoundFallback.pause();
+                clickSoundFallback.currentTime = 0;
+                clickSoundFallback.muted = false;
+                clickSoundFallbackReady = true;
+            } catch (_) {
+                clickSoundFallback.muted = false;
+            }
+        }
+
         async function unlockClickSound() {
             if (clickSoundUnlocked) return;
+            await warmupClickSoundFallback();
             if (!AudioContextClass) return;
             try {
                 const ctx = ensureAudioContext();
