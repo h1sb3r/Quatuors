@@ -70,9 +70,9 @@
 
         body.theme-glass {
             background:
-                radial-gradient(1400px 800px at -20% -30%, #ffb067 0%, transparent 62%),
-                radial-gradient(1200px 700px at 120% 120%, #ff8095 0%, transparent 62%),
-                linear-gradient(150deg, #2a1a15 0%, #3a231c 45%, #2a1a15 100%);
+                radial-gradient(1400px 820px at -20% -30%, #ffd775 0%, transparent 62%),
+                radial-gradient(1200px 740px at 120% 120%, #ff7fb3 0%, transparent 62%),
+                linear-gradient(150deg, #24163f 0%, #2f1f55 48%, #1f1a45 100%);
             color: var(--glass-text);
             font-family: 'Manrope', 'Libre Franklin', sans-serif;
         }
@@ -87,14 +87,14 @@
         }
         body.theme-glass::before {
             background:
-                radial-gradient(circle at 25% 20%, rgba(255, 199, 128, 0.45) 0%, rgba(255, 199, 128, 0) 46%),
-                radial-gradient(circle at 75% 70%, rgba(250, 146, 171, 0.38) 0%, rgba(250, 146, 171, 0) 50%);
+                radial-gradient(circle at 25% 20%, rgba(255, 215, 132, 0.42) 0%, rgba(255, 215, 132, 0) 46%),
+                radial-gradient(circle at 75% 70%, rgba(255, 139, 185, 0.36) 0%, rgba(255, 139, 185, 0) 50%);
             animation: glassGlowDrift 14s ease-in-out infinite;
         }
         body.theme-glass::after {
             background:
-                radial-gradient(circle at 70% 20%, rgba(255, 228, 156, 0.34) 0%, rgba(255, 228, 156, 0) 48%),
-                radial-gradient(circle at 30% 85%, rgba(255, 151, 110, 0.3) 0%, rgba(255, 151, 110, 0) 48%);
+                radial-gradient(circle at 70% 20%, rgba(126, 240, 218, 0.28) 0%, rgba(126, 240, 218, 0) 48%),
+                radial-gradient(circle at 30% 85%, rgba(128, 190, 255, 0.26) 0%, rgba(128, 190, 255, 0) 48%);
             animation: glassGlowDriftB 18s ease-in-out infinite;
         }
 
@@ -260,7 +260,7 @@
         .arrow-line::after { content: ''; position: absolute; bottom: 0; left: -3px; width: 0; height: 0; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 6px solid #000; }
 
         body.theme-glass .nyt-nav {
-            background: rgba(28, 20, 18, 0.66);
+            background: rgba(40, 30, 74, 0.62);
             border-bottom: 1px solid rgba(255,255,255,0.16);
             backdrop-filter: blur(14px) saturate(150%);
             box-shadow: 0 10px 28px rgba(0,0,0,0.35);
@@ -281,19 +281,19 @@
         body.theme-glass .nav-icon { color: var(--glass-text); stroke: var(--glass-text); border-color: rgba(228, 236, 255, 0.35); }
         body.theme-glass .hamburger span { background: var(--glass-text); }
         body.theme-glass .btn-subscribe {
-            background: linear-gradient(120deg, rgba(255, 187, 107, 0.88), rgba(236, 128, 145, 0.84));
-            color: #2a130f;
+            background: linear-gradient(120deg, rgba(255, 215, 118, 0.9), rgba(255, 126, 177, 0.88));
+            color: #2b1846;
             border: 1px solid rgba(228, 236, 255, 0.35);
         }
         body.theme-glass h1 {
             font-family: 'Syne', 'Zilla Slab', serif;
             font-weight: 800;
             color: var(--glass-strong-text);
-            text-shadow: 0 8px 30px rgba(255, 169, 102, 0.26);
+            text-shadow: 0 8px 30px rgba(255, 149, 204, 0.28);
             letter-spacing: 0.2px;
         }
         body.theme-glass .header-toolbar {
-            background: rgba(70, 42, 34, 0.44);
+            background: rgba(52, 38, 98, 0.4);
             border: 1px solid rgba(228, 236, 255, 0.17);
             box-shadow: 0 16px 48px rgba(0,0,0,0.35);
             backdrop-filter: blur(14px) saturate(130%);
@@ -323,39 +323,40 @@
         }
         body.theme-glass .game-picker select {
             border-color: rgba(228, 236, 255, 0.35);
-            background: rgba(81, 48, 39, 0.8);
+            background: rgba(54, 38, 102, 0.76);
             color: var(--glass-text);
         }
         body.theme-glass .sound-slider {
             background: rgba(255,255,255,0.2);
         }
         body.theme-glass .sound-switch input:checked + .sound-slider {
-            background: linear-gradient(120deg, #ffba73, #ec7f91);
+            background: linear-gradient(120deg, #ffd775, #ff7fb3);
         }
 
         body.theme-glass #grid-container {
-            background: rgba(66, 39, 32, 0.34);
+            background: rgba(46, 34, 86, 0.28);
             border: 1px solid rgba(228, 236, 255, 0.14);
             border-radius: 14px;
             padding: 10px;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
         }
         body.theme-glass .card {
-            background: linear-gradient(145deg, rgba(255, 231, 204, 0.28), rgba(255, 255, 255, 0.14));
-            border: 1px solid rgba(255, 225, 197, 0.4);
+            background: linear-gradient(145deg, rgba(255, 244, 221, 0.28), rgba(238, 248, 255, 0.14));
+            border: 1px solid rgba(255, 233, 194, 0.42);
             color: var(--glass-strong-text);
             box-shadow: 0 8px 22px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.28);
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-            transition: transform 0.16s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+            transition: transform 0.18s ease, font-size 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
         }
         body.theme-glass .card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 206, 150, 0.88);
-            box-shadow: 0 10px 24px rgba(0,0,0,0.24), 0 0 0 1px rgba(255, 201, 140, 0.32) inset;
-            background: linear-gradient(145deg, rgba(255, 238, 217, 0.34), rgba(255, 255, 255, 0.18));
+            transform: translateY(-1px);
+            font-size: 15.7px;
+            border-color: rgba(255, 228, 176, 0.9);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.22), 0 0 0 1px rgba(255, 216, 154, 0.3) inset;
+            background: linear-gradient(145deg, rgba(255, 247, 229, 0.36), rgba(244, 251, 255, 0.2));
         }
         body.theme-glass .card.selected {
-            background: linear-gradient(120deg, rgba(255, 182, 108, 0.9), rgba(235, 124, 144, 0.86));
+            background: linear-gradient(120deg, rgba(255, 207, 111, 0.92), rgba(255, 125, 176, 0.88));
             color: #f7fbff;
             border-color: rgba(228, 236, 255, 0.72);
         }
@@ -365,7 +366,7 @@
             color: #0a0f18;
             text-shadow: none;
         }
-        body.theme-glass .dot { background-color: #ffbe84; box-shadow: 0 0 10px rgba(255, 184, 122, 0.45); }
+        body.theme-glass .dot { background-color: #ffd47d; box-shadow: 0 0 10px rgba(255, 212, 125, 0.45); }
         body.theme-glass button {
             background: rgba(255,255,255,0.08);
             border-color: rgba(228,236,255,0.34);
@@ -373,20 +374,20 @@
         }
         body.theme-glass button:hover { background: rgba(255,255,255,0.16); }
         body.theme-glass #submit-btn.active {
-            background: linear-gradient(120deg, #ffba73, #ec7f91) !important;
-            color: #2a130f !important;
+            background: linear-gradient(120deg, #ffd775, #ff7fb3) !important;
+            color: #2b1846 !important;
             border-color: rgba(228,236,255,0.58) !important;
         }
         body.theme-glass #message {
-            background: rgba(31, 21, 18, 0.82);
+            background: rgba(41, 28, 78, 0.78);
             border: 1px solid rgba(228,236,255,0.22);
             box-shadow: 0 14px 40px rgba(0,0,0,0.35);
             backdrop-filter: blur(12px);
         }
 
-        body.theme-glass .modal-overlay { background: rgba(22, 15, 13, 0.74); backdrop-filter: blur(8px); }
+        body.theme-glass .modal-overlay { background: rgba(31, 23, 62, 0.72); backdrop-filter: blur(8px); }
         body.theme-glass .modal-content {
-            background: rgba(30, 22, 19, 0.88);
+            background: rgba(49, 34, 92, 0.84);
             border-color: rgba(228,236,255,0.2);
             color: var(--glass-text);
             box-shadow: 0 20px 50px rgba(0,0,0,0.45);
