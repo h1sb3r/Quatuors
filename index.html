@@ -267,9 +267,32 @@
             color: #101521;
             opacity: 0;
             transition: opacity 0.22s ease-out;
+            transform-origin: center center;
         }
 
         .solved-banner.reveal { opacity: 1; }
+        .solved-banner.grand-fuse { animation: bannerGrandFuse 700ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes bannerGrandFuse {
+            0% {
+                opacity: 0.18;
+                transform: translateY(4px) scale(0.84, 0.8);
+                filter: brightness(1.08) saturate(1.08);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-8px) scale(1.22, 1.42);
+                filter: brightness(1.2) saturate(1.18);
+            }
+            58% {
+                transform: translateY(-3px) scale(1.12, 1.2);
+                filter: brightness(1.12) saturate(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1, 1);
+                filter: brightness(1) saturate(1);
+            }
+        }
 
         .solved-title { font-weight: 700; text-transform: uppercase; font-size: 15px; margin-bottom: 4px; letter-spacing: 0.5px; }
         .solved-words { font-weight: 400; font-size: 14px; }
@@ -490,6 +513,7 @@
             body.theme-glass-enter .header-toolbar,
             body.theme-glass-enter .game-container,
             body.theme-glass .card.glass-enter,
+            .solved-banner.grand-fuse,
             .card.magic-ignite,
             .card.magic-burst,
             #grid-container.magic-flash::after {
@@ -1290,16 +1314,19 @@
             // 5. APPARITION FINALE (fusion)
             void banner.offsetWidth;
             banner.classList.add('reveal');
+            banner.classList.add('grand-fuse');
             banner.style.opacity = '1';
+            await new Promise(r => setTimeout(r, 90));
             const fadePromises = flightCards.map(f => {
                 const fade = f.ghost.animate(
                     [{ opacity: 1 }, { opacity: 0 }],
-                    { duration: 180, easing: 'ease-out', fill: 'forwards' }
+                    { duration: 230, easing: 'ease-out', fill: 'forwards' }
                 );
                 return fade.finished.catch(() => {});
             });
             await Promise.all(fadePromises);
             flightCards.forEach(f => f.ghost.remove());
+            setTimeout(() => banner.classList.remove('grand-fuse'), 710);
 
             selectedItems.forEach(item => {
                 item.solved = true;
