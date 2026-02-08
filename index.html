@@ -7,7 +7,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700&family=Zilla+Slab:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;700&family=Zilla+Slab:wght@700&family=Manrope:wght@500;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -21,6 +21,11 @@
             --color-green: #a0c35a;
             --color-blue: #b0c4ef;
             --color-purple: #ba81c5;
+            --glass-bg: #070d1a;
+            --glass-text: #eaf2ff;
+            --glass-soft-text: #b6c6e6;
+            --glass-strong-text: #f8fbff;
+            --glass-muted: #9ab0d5;
         }
 
         * { box-sizing: border-box; }
@@ -29,6 +34,68 @@
             font-family: 'Libre Franklin', sans-serif;
             margin: 0; padding: 0; background-color: var(--bg-color); color: #000;
             min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
+            transition: background-color 0.35s ease, color 0.35s ease;
+            position: relative;
+        }
+        body > * { position: relative; z-index: 1; }
+
+        @keyframes glassGlowDrift {
+            0% { transform: translate3d(-8%, -8%, 0) scale(1); opacity: 0.42; }
+            50% { transform: translate3d(8%, 8%, 0) scale(1.06); opacity: 0.65; }
+            100% { transform: translate3d(-8%, -8%, 0) scale(1); opacity: 0.42; }
+        }
+        @keyframes glassGlowDriftB {
+            0% { transform: translate3d(10%, 10%, 0) scale(1.08); opacity: 0.36; }
+            50% { transform: translate3d(-8%, -6%, 0) scale(1); opacity: 0.58; }
+            100% { transform: translate3d(10%, 10%, 0) scale(1.08); opacity: 0.36; }
+        }
+        @keyframes glassSheen {
+            0% { background-position: -180% 0; }
+            100% { background-position: 180% 0; }
+        }
+        @keyframes glassSceneIn {
+            0% { opacity: 0; transform: translateY(18px) scale(0.985); filter: blur(4px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes glassCardIn {
+            0% { opacity: 0; transform: translateY(14px) scale(0.94); filter: blur(2px); }
+            68% { opacity: 1; transform: translateY(-2px) scale(1.01); filter: blur(0); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        @keyframes glassNavSheen {
+            0% { opacity: 0; transform: translateX(-120%); }
+            45% { opacity: 0.35; }
+            100% { opacity: 0; transform: translateX(180%); }
+        }
+
+        body.theme-glass {
+            background:
+                radial-gradient(1400px 800px at -20% -30%, #ffb067 0%, transparent 62%),
+                radial-gradient(1200px 700px at 120% 120%, #ff8095 0%, transparent 62%),
+                linear-gradient(150deg, #2a1a15 0%, #3a231c 45%, #2a1a15 100%);
+            color: var(--glass-text);
+            font-family: 'Manrope', 'Libre Franklin', sans-serif;
+        }
+        body.theme-glass::before,
+        body.theme-glass::after {
+            content: "";
+            position: fixed;
+            inset: -20%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(60px);
+        }
+        body.theme-glass::before {
+            background:
+                radial-gradient(circle at 25% 20%, rgba(255, 199, 128, 0.45) 0%, rgba(255, 199, 128, 0) 46%),
+                radial-gradient(circle at 75% 70%, rgba(250, 146, 171, 0.38) 0%, rgba(250, 146, 171, 0) 50%);
+            animation: glassGlowDrift 14s ease-in-out infinite;
+        }
+        body.theme-glass::after {
+            background:
+                radial-gradient(circle at 70% 20%, rgba(255, 228, 156, 0.34) 0%, rgba(255, 228, 156, 0) 48%),
+                radial-gradient(circle at 30% 85%, rgba(255, 151, 110, 0.3) 0%, rgba(255, 151, 110, 0) 48%);
+            animation: glassGlowDriftB 18s ease-in-out infinite;
         }
 
         /* --- NAV --- */
@@ -110,7 +177,16 @@
             transition: all 0.7s cubic-bezier(0.5, 0, 0, 1);
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             pointer-events: none;
-            opacity: 1 !important;
+            opacity: 1;
+        }
+        .card.flight-ghost {
+            position: fixed;
+            z-index: 1400;
+            pointer-events: none;
+            margin: 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            transform-origin: top left;
+            will-change: transform, opacity;
         }
 
         .card.fade-in { animation: fadeIn 0.3s ease-in; }
@@ -122,11 +198,12 @@
             border-radius: 5px;
             height: 80px;
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-            opacity: 0; transform: scale(0.9);
+            color: #101521;
+            opacity: 0;
+            transition: opacity 0.22s ease-out;
         }
 
-        .solved-banner.reveal { animation: popBanner 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        @keyframes popBanner { 0% { opacity: 0; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        .solved-banner.reveal { opacity: 1; }
 
         .solved-title { font-weight: 700; text-transform: uppercase; font-size: 15px; margin-bottom: 4px; letter-spacing: 0.5px; }
         .solved-words { font-weight: 400; font-size: 14px; }
@@ -146,6 +223,7 @@
         #submit-btn.active:hover { opacity: 0.9; }
 
         .sound-option { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 600; border-bottom: 1px solid #ddd; padding: 0 0 10px; width: 100%; max-width: 150px; }
+        .theme-option { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 600; border-bottom: 1px solid #ddd; padding: 0 0 10px; width: 100%; max-width: 180px; }
         .sound-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .sound-switch input { opacity: 0; width: 0; height: 0; }
         .sound-slider {
@@ -181,14 +259,180 @@
         .arrow-line { position: absolute; left: 5px; top: 5px; bottom: 5px; width: 1px; background: #000; }
         .arrow-line::after { content: ''; position: absolute; bottom: 0; left: -3px; width: 0; height: 0; border-left: 3.5px solid transparent; border-right: 3.5px solid transparent; border-top: 6px solid #000; }
 
+        body.theme-glass .nyt-nav {
+            background: rgba(28, 20, 18, 0.66);
+            border-bottom: 1px solid rgba(255,255,255,0.16);
+            backdrop-filter: blur(14px) saturate(150%);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+        body.theme-glass .nyt-nav::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 45%;
+            background: linear-gradient(105deg, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+            animation: glassNavSheen 6.5s ease-in-out infinite;
+            pointer-events: none;
+        }
+        body.theme-glass .nav-left,
+        body.theme-glass .nav-btn,
+        body.theme-glass .nav-icon { color: var(--glass-text); stroke: var(--glass-text); border-color: rgba(228, 236, 255, 0.35); }
+        body.theme-glass .hamburger span { background: var(--glass-text); }
+        body.theme-glass .btn-subscribe {
+            background: linear-gradient(120deg, rgba(255, 187, 107, 0.88), rgba(236, 128, 145, 0.84));
+            color: #2a130f;
+            border: 1px solid rgba(228, 236, 255, 0.35);
+        }
+        body.theme-glass h1 {
+            font-family: 'Syne', 'Zilla Slab', serif;
+            font-weight: 800;
+            color: var(--glass-strong-text);
+            text-shadow: 0 8px 30px rgba(255, 169, 102, 0.26);
+            letter-spacing: 0.2px;
+        }
+        body.theme-glass .header-toolbar {
+            background: rgba(70, 42, 34, 0.44);
+            border: 1px solid rgba(228, 236, 255, 0.17);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+            backdrop-filter: blur(14px) saturate(130%);
+            border-radius: 16px;
+        }
+        body.theme-glass .header-toolbar { padding: 10px 12px; }
+        body.theme-glass .game-container {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            flex-grow: 0;
+            padding: 0 10px;
+        }
+        body.theme-glass .instructions,
+        body.theme-glass .mistakes-container { color: var(--glass-soft-text); font-weight: 600; }
+
+        body.theme-glass .sound-option,
+        body.theme-glass .theme-option,
+        body.theme-glass .game-picker {
+            border: 1px solid rgba(228, 236, 255, 0.2);
+            border-bottom-color: rgba(228, 236, 255, 0.2);
+            background: rgba(255,255,255,0.06);
+            border-radius: 999px;
+            padding: 6px 12px;
+            color: var(--glass-text);
+        }
+        body.theme-glass .game-picker select {
+            border-color: rgba(228, 236, 255, 0.35);
+            background: rgba(81, 48, 39, 0.8);
+            color: var(--glass-text);
+        }
+        body.theme-glass .sound-slider {
+            background: rgba(255,255,255,0.2);
+        }
+        body.theme-glass .sound-switch input:checked + .sound-slider {
+            background: linear-gradient(120deg, #ffba73, #ec7f91);
+        }
+
+        body.theme-glass #grid-container {
+            background: rgba(66, 39, 32, 0.34);
+            border: 1px solid rgba(228, 236, 255, 0.14);
+            border-radius: 14px;
+            padding: 10px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        body.theme-glass .card {
+            background: linear-gradient(145deg, rgba(255, 231, 204, 0.28), rgba(255, 255, 255, 0.14));
+            border: 1px solid rgba(255, 225, 197, 0.4);
+            color: var(--glass-strong-text);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.28);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+            transition: transform 0.16s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+        body.theme-glass .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 206, 150, 0.88);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.24), 0 0 0 1px rgba(255, 201, 140, 0.32) inset;
+            background: linear-gradient(145deg, rgba(255, 238, 217, 0.34), rgba(255, 255, 255, 0.18));
+        }
+        body.theme-glass .card.selected {
+            background: linear-gradient(120deg, rgba(255, 182, 108, 0.9), rgba(235, 124, 144, 0.86));
+            color: #f7fbff;
+            border-color: rgba(228, 236, 255, 0.72);
+        }
+        body.theme-glass .solved-banner {
+            border: 1px solid rgba(228, 236, 255, 0.34);
+            box-shadow: 0 16px 34px rgba(0,0,0,0.34);
+            color: #0a0f18;
+            text-shadow: none;
+        }
+        body.theme-glass .dot { background-color: #ffbe84; box-shadow: 0 0 10px rgba(255, 184, 122, 0.45); }
+        body.theme-glass button {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(228,236,255,0.34);
+            color: var(--glass-text);
+        }
+        body.theme-glass button:hover { background: rgba(255,255,255,0.16); }
+        body.theme-glass #submit-btn.active {
+            background: linear-gradient(120deg, #ffba73, #ec7f91) !important;
+            color: #2a130f !important;
+            border-color: rgba(228,236,255,0.58) !important;
+        }
+        body.theme-glass #message {
+            background: rgba(31, 21, 18, 0.82);
+            border: 1px solid rgba(228,236,255,0.22);
+            box-shadow: 0 14px 40px rgba(0,0,0,0.35);
+            backdrop-filter: blur(12px);
+        }
+
+        body.theme-glass .modal-overlay { background: rgba(22, 15, 13, 0.74); backdrop-filter: blur(8px); }
+        body.theme-glass .modal-content {
+            background: rgba(30, 22, 19, 0.88);
+            border-color: rgba(228,236,255,0.2);
+            color: var(--glass-text);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+        }
+        body.theme-glass .close-btn,
+        body.theme-glass .modal-note,
+        body.theme-glass .modal-subtitle,
+        body.theme-glass .modal-list,
+        body.theme-glass .modal-examples,
+        body.theme-glass .legend-labels { color: var(--glass-soft-text); }
+        body.theme-glass .arrow-line { background: rgba(228,236,255,0.6); }
+        body.theme-glass .arrow-line::after { border-top-color: rgba(228,236,255,0.8); }
+        body.theme-glass-enter .game-header-container,
+        body.theme-glass-enter .header-toolbar,
+        body.theme-glass-enter .game-container {
+            animation: glassSceneIn 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        body.theme-glass-enter .header-toolbar { animation-delay: 70ms; }
+        body.theme-glass-enter .game-container { animation-delay: 120ms; }
+        body.theme-glass .card.glass-enter {
+            opacity: 0;
+            animation: glassCardIn 540ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: calc(var(--glass-stagger, 0) * 28ms);
+        }
+
         #message { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 12px 20px; border-radius: 4px; font-weight: 600; font-size: 14px; display: none; z-index: 3000; opacity: 0; transition: opacity 0.3s; }
         #message.show { display: block; opacity: 1; }
+
+        @media (prefers-reduced-motion: reduce) {
+            body.theme-glass::before,
+            body.theme-glass::after,
+            body.theme-glass .nyt-nav::after,
+            body.theme-glass-enter .game-header-container,
+            body.theme-glass-enter .header-toolbar,
+            body.theme-glass-enter .game-container,
+            body.theme-glass .card.glass-enter {
+                animation: none !important;
+            }
+        }
 
         @media (max-width: 600px) {
             .game-header-container { margin-top: 60px; }
             h1 { font-size: 32px; }
             .header-toolbar { gap: 8px; }
             .sound-option { max-width: 130px; font-size: 14px; padding-bottom: 8px; }
+            .theme-option { max-width: 165px; font-size: 14px; padding-bottom: 8px; }
             .game-picker { max-width: calc(100vw - 40px); }
             .game-picker select { max-width: 54vw; }
             .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.08s; }
@@ -226,6 +470,13 @@
                 <span>Son</span>
                 <label class="sound-switch" for="sound-toggle">
                     <input id="sound-toggle" type="checkbox" aria-label="Activer le son">
+                    <span class="sound-slider"></span>
+                </label>
+            </div>
+            <div class="theme-option">
+                <span>Style Glass</span>
+                <label class="sound-switch" for="theme-toggle">
+                    <input id="theme-toggle" type="checkbox" aria-label="Activer le style glass">
                     <span class="sound-slider"></span>
                 </label>
             </div>
@@ -304,7 +555,7 @@
         const CLICK_SOUND_URL = 'Audio/glass.wav';
         const CLICK_SOUND_VOLUME = 0.5;
         const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
-        const CORRECT_SELECTION_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
+        const CORRECT_SELECTION_SOUND_URL = 'Audio/magic.wav';
         const CORRECT_SELECTION_SOUND_VOLUME = 0.45;
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
@@ -323,6 +574,7 @@
         correctSelectionSound.playsInline = true;
         correctSelectionSound.volume = CORRECT_SELECTION_SOUND_VOLUME;
         const SOUND_PREF_KEY = 'quatuors_sound_enabled';
+        const THEME_PREF_KEY = 'quatuors_theme';
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
         let clickSoundUnlockPromise = null;
@@ -336,6 +588,7 @@
         let audioUnlockGestureArmed = false;
         let audioPrimeGestureArmed = false;
         let isSoundEnabled = false;
+        let glassSceneTimeout = null;
 
         function toggleHelp() {
             const modal = document.getElementById('help-modal');
@@ -413,6 +666,64 @@
             });
 
             if (savedEnabled) armAudioUnlockOnFirstGesture();
+        }
+
+        function applyGlassCardStagger() {
+            if (!document.body.classList.contains('theme-glass')) return;
+            const cards = document.querySelectorAll('#grid-container .card');
+            cards.forEach((card, index) => {
+                card.style.setProperty('--glass-stagger', String(index));
+                card.classList.remove('glass-enter');
+                void card.offsetWidth;
+                card.classList.add('glass-enter');
+            });
+        }
+
+        function triggerGlassSceneIntro() {
+            if (!document.body.classList.contains('theme-glass')) return;
+            document.body.classList.remove('theme-glass-enter');
+            void document.body.offsetWidth;
+            document.body.classList.add('theme-glass-enter');
+            if (glassSceneTimeout) clearTimeout(glassSceneTimeout);
+            glassSceneTimeout = setTimeout(() => {
+                document.body.classList.remove('theme-glass-enter');
+                glassSceneTimeout = null;
+            }, 900);
+            applyGlassCardStagger();
+        }
+
+        function setVisualTheme(themeName) {
+            const normalized = themeName === 'glass' ? 'glass' : 'classic';
+            const enableGlass = normalized === 'glass';
+            document.body.classList.toggle('theme-glass', enableGlass);
+            if (enableGlass) {
+                triggerGlassSceneIntro();
+            } else {
+                document.body.classList.remove('theme-glass-enter');
+                document.querySelectorAll('#grid-container .card').forEach(card => card.classList.remove('glass-enter'));
+            }
+            try {
+                localStorage.setItem(THEME_PREF_KEY, normalized);
+            } catch (_) {}
+        }
+
+        function initThemeToggle() {
+            const toggle = document.getElementById('theme-toggle');
+            if (!toggle) return;
+
+            let savedTheme = 'classic';
+            try {
+                const value = localStorage.getItem(THEME_PREF_KEY);
+                if (value === 'glass' || value === 'classic') savedTheme = value;
+            } catch (_) {}
+
+            const isGlass = savedTheme === 'glass';
+            toggle.checked = isGlass;
+            setVisualTheme(savedTheme);
+
+            toggle.addEventListener('change', () => {
+                setVisualTheme(toggle.checked ? 'glass' : 'classic');
+            });
         }
 
         function armAudioPrimeOnFirstGesture() {
@@ -514,6 +825,7 @@
                     container.appendChild(item.element);
                 }
             });
+            applyGlassCardStagger();
             updateSubmitButton();
         }
 
@@ -852,40 +1164,70 @@
             else container.appendChild(banner);
 
             const bannerRect = banner.getBoundingClientRect();
-            banner.style.opacity = '0'; 
 
-            // 4. VOL
-            const segmentWidth = bannerRect.width / 4;
-            const movingPromises = startPositions.map((pos, index) => {
-                return new Promise(resolve => {
-                    const card = pos.element;
-                    card.style.position = 'fixed';
-                    card.style.top = pos.top + 'px';
-                    card.style.left = pos.left + 'px';
-                    card.style.width = pos.width + 'px';
-                    card.style.height = pos.height + 'px';
-                    card.style.zIndex = '1000';
-                    card.classList.add('moving');
-                    void card.offsetWidth;
-                    requestAnimationFrame(() => {
-                        card.style.top = bannerRect.top + 'px';
-                        card.style.left = (bannerRect.left + (index * segmentWidth)) + 'px';
-                        card.style.width = (segmentWidth - 8) + 'px';
-                        card.style.height = bannerRect.height + 'px';
-                    });
-                    setTimeout(resolve, 700);
-                });
+            // 4. VOL (clones visibles pour une fusion continue vers la bannière)
+            const segmentGap = 8;
+            const segmentWidth = (bannerRect.width - (segmentGap * 3)) / 4;
+            const endPositions = startPositions.map((_, index) => ({
+                left: bannerRect.left + (index * (segmentWidth + segmentGap)),
+                top: bannerRect.top,
+                width: segmentWidth,
+                height: bannerRect.height
+            }));
+
+            const flightCards = startPositions.map((pos, index) => {
+                const end = endPositions[index];
+                const ghost = pos.element.cloneNode(true);
+                ghost.classList.remove('selected', 'jump', 'shake', 'moving', 'fade-in');
+                ghost.classList.add('flight-ghost');
+                ghost.style.top = pos.top + 'px';
+                ghost.style.left = pos.left + 'px';
+                ghost.style.width = pos.width + 'px';
+                ghost.style.height = pos.height + 'px';
+                ghost.style.opacity = '1';
+                document.body.appendChild(ghost);
+
+                pos.element.style.visibility = 'hidden';
+
+                const dx = end.left - pos.left;
+                const dy = end.top - pos.top;
+                const sx = end.width / pos.width;
+                const sy = end.height / pos.height;
+
+                const anim = ghost.animate(
+                    [
+                        { transform: 'translate(0px, 0px) scale(1, 1)', opacity: 1 },
+                        { transform: `translate(${dx * 0.72}px, ${(dy * 0.72) - 10}px) scale(${1 + ((sx - 1) * 0.72)}, ${1 + ((sy - 1) * 0.72)})`, opacity: 1, offset: 0.72 },
+                        { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, opacity: 1 }
+                    ],
+                    { duration: 820, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+                );
+
+                return { ghost, anim };
             });
 
-            await Promise.all(movingPromises);
+            await Promise.all(flightCards.map(f => f.anim.finished.catch(() => {})));
 
-            // 5. APPARITION FINALE
+            // 5. APPARITION FINALE (fusion)
+            void banner.offsetWidth;
+            banner.classList.add('reveal');
+            banner.style.opacity = '1';
+            const fadePromises = flightCards.map(f => {
+                const fade = f.ghost.animate(
+                    [{ opacity: 1 }, { opacity: 0 }],
+                    { duration: 180, easing: 'ease-out', fill: 'forwards' }
+                );
+                return fade.finished.catch(() => {});
+            });
+            await Promise.all(fadePromises);
+            flightCards.forEach(f => f.ghost.remove());
+
             selectedItems.forEach(item => {
                 item.solved = true;
                 if(item.element) item.element.remove();
             });
             selectedItems = [];
-            banner.classList.add('reveal');
+            applyGlassCardStagger();
             playSolvedBannerSound();
             
             solvedCount++;
@@ -906,6 +1248,7 @@
 
         initClickSound();
         initSoundToggle();
+        initThemeToggle();
         armAudioPrimeOnFirstGesture();
         loadGameData();
     </script>
