@@ -152,15 +152,12 @@
             transition:
                 background-color 0.2s ease,
                 color 0.2s ease,
-                transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
-                font-size 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-                letter-spacing 0.2s ease;
+                transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
         }
         @media (hover: hover) and (pointer: fine) {
             .card:hover {
                 transform: translateY(-1px) scale(1.018);
-                font-size: 15.8px;
-                letter-spacing: 0.55px;
+                background-color: #e8e4d8;
                 z-index: 2;
             }
         }
@@ -359,11 +356,10 @@
             color: var(--glass-strong-text);
             box-shadow: 0 8px 22px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.28);
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
-            transition: transform 0.18s ease, font-size 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
+            transition: transform 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
         }
         body.theme-glass .card:hover {
             transform: translateY(-1px) scale(1.018);
-            font-size: 16px;
             border-color: rgba(255, 228, 176, 0.9);
             box-shadow: 0 10px 22px rgba(0,0,0,0.22), 0 0 0 1px rgba(255, 216, 154, 0.3) inset;
             background: linear-gradient(145deg, rgba(255, 247, 229, 0.36), rgba(244, 251, 255, 0.2));
@@ -450,7 +446,7 @@
             .theme-option { max-width: 165px; font-size: 14px; padding-bottom: 8px; }
             .game-picker { max-width: calc(100vw - 40px); }
             .game-picker select { max-width: 54vw; }
-            .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.1s, font-size 0.14s; }
+            .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.1s; }
             .solved-banner { height: 65px; }
             #grid-container { gap: 6px; }
             .controls { gap: 8px; flex-wrap: wrap; }
