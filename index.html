@@ -79,6 +79,8 @@
             word-wrap: break-word;
             line-height: 1.2;
             position: relative;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .card.selected {
@@ -294,6 +296,7 @@
         const CLICK_SOUND_VOLUME = 0.5;
         const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
         const CORRECT_SELECTION_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
+        const CORRECT_SELECTION_SOUND_VOLUME = 0.45;
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
@@ -309,6 +312,7 @@
         const correctSelectionSound = new Audio(CORRECT_SELECTION_SOUND_URL);
         correctSelectionSound.preload = 'auto';
         correctSelectionSound.playsInline = true;
+        correctSelectionSound.volume = CORRECT_SELECTION_SOUND_VOLUME;
         const SOUND_PREF_KEY = 'quatuors_sound_enabled';
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
@@ -318,6 +322,7 @@
         let bannerAudioBuffer = null;
         let correctSelectionAudioBuffer = null;
         let clickAudioGain = null;
+        let correctSelectionAudioGain = null;
         let clickAudioReady = false;
         let audioUnlockGestureArmed = false;
         let isSoundEnabled = false;
@@ -479,7 +484,7 @@
                     const div = document.createElement('div');
                     div.className = 'card';
                     div.innerText = item.word;
-                    div.onclick = () => toggleSelect(item, div);
+                    div.addEventListener('pointerdown', (event) => onCardPointerDown(event, item, div), { passive: false });
                     item.element = div;
                     container.appendChild(div);
                 } else if (!item.solved && item.element) {
@@ -519,6 +524,12 @@
             updateSubmitButton();
         }
 
+        function onCardPointerDown(event, item, element) {
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            event.preventDefault();
+            toggleSelect(item, element);
+        }
+
         function getNextClickSound() {
             const audio = clickSounds[clickSoundIndex];
             clickSoundIndex = (clickSoundIndex + 1) % clickSounds.length;
@@ -532,6 +543,9 @@
                 clickAudioGain = clickAudioContext.createGain();
                 clickAudioGain.gain.value = CLICK_SOUND_VOLUME;
                 clickAudioGain.connect(clickAudioContext.destination);
+                correctSelectionAudioGain = clickAudioContext.createGain();
+                correctSelectionAudioGain.gain.value = CORRECT_SELECTION_SOUND_VOLUME;
+                correctSelectionAudioGain.connect(clickAudioContext.destination);
             }
             return clickAudioContext;
         }
@@ -581,11 +595,11 @@
             return clickAudioReady;
         }
 
-        function playWebAudioBuffer(buffer, useClickGain = false) {
+        function playWebAudioBuffer(buffer, gainNode = null) {
             if (!clickAudioContext || !buffer) return false;
             const source = clickAudioContext.createBufferSource();
             source.buffer = buffer;
-            const destination = (useClickGain && clickAudioGain) ? clickAudioGain : clickAudioContext.destination;
+            const destination = gainNode || clickAudioContext.destination;
             source.connect(destination);
             source.start(0);
             return true;
@@ -593,7 +607,7 @@
 
         function playClickSoundWebAudio() {
             if (!clickAudioReady) return false;
-            return playWebAudioBuffer(clickAudioBuffer, true);
+            return playWebAudioBuffer(clickAudioBuffer, clickAudioGain);
         }
 
         async function unlockClickSoundIfNeeded() {
@@ -714,7 +728,7 @@
 
         function playCorrectSelectionSound() {
             if (!isSoundEnabled) return;
-            if (playWebAudioBuffer(correctSelectionAudioBuffer)) return;
+            if (playWebAudioBuffer(correctSelectionAudioBuffer, correctSelectionAudioGain)) return;
             correctSelectionSound.currentTime = 0;
             const playPromise = correctSelectionSound.play();
             if (playPromise && typeof playPromise.catch === 'function') {
