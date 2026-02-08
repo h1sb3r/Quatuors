@@ -268,8 +268,17 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
-        const clickSound = new Audio('Audio/Dong.mp3');
-        clickSound.preload = 'auto';
+        const CLICK_SOUND_URL = 'Audio/Dong.mp3';
+        const CLICK_SOUND_POOL_SIZE = 4;
+        const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
+            const audio = new Audio(CLICK_SOUND_URL);
+            audio.preload = 'auto';
+            audio.playsInline = true;
+            return audio;
+        });
+        let clickSoundIndex = 0;
+        let clickSoundUnlocked = false;
+        let clickSoundUnlocking = false;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -402,11 +411,82 @@
             updateSubmitButton();
         }
 
+        function getNextClickSound() {
+            const audio = clickSounds[clickSoundIndex];
+            clickSoundIndex = (clickSoundIndex + 1) % clickSounds.length;
+            return audio;
+        }
+
+        async function unlockClickSoundIfNeeded() {
+            if (clickSoundUnlocked || clickSoundUnlocking) return;
+            clickSoundUnlocking = true;
+            try {
+                // Try to unlock playback on mobile using a muted warm-up play.
+                const unlockAudio = clickSounds[0];
+                unlockAudio.muted = true;
+                unlockAudio.currentTime = 0;
+                const playPromise = unlockAudio.play();
+                if (playPromise && typeof playPromise.then === 'function') {
+                    await playPromise;
+                }
+                unlockAudio.pause();
+                unlockAudio.currentTime = 0;
+                unlockAudio.muted = false;
+
+                clickSounds.forEach(audio => audio.load());
+                clickSoundUnlocked = true;
+            } catch (_) {
+                clickSoundUnlocked = false;
+            } finally {
+                clickSoundUnlocking = false;
+            }
+        }
+
+        function installAudioUnlockHandlers() {
+            const onFirstGesture = () => { void unlockClickSoundIfNeeded(); };
+            document.addEventListener('pointerdown', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('touchstart', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('mousedown', onFirstGesture, { passive: true, once: true });
+            document.addEventListener('keydown', onFirstGesture, { passive: true, once: true });
+        }
+
+        function initClickSound() {
+            clickSounds.forEach(audio => audio.load());
+
+            // Best effort preload/decode on page display.
+            const warmAudio = clickSounds[0];
+            warmAudio.muted = true;
+            const warmPromise = warmAudio.play();
+            if (warmPromise && typeof warmPromise.then === 'function') {
+                warmPromise.then(() => {
+                    warmAudio.pause();
+                    warmAudio.currentTime = 0;
+                    warmAudio.muted = false;
+                }).catch(() => {
+                    warmAudio.muted = false;
+                });
+            } else {
+                warmAudio.muted = false;
+            }
+
+            installAudioUnlockHandlers();
+        }
+
         function playClickSound() {
-            clickSound.currentTime = 0;
-            const playPromise = clickSound.play();
+            const audio = getNextClickSound();
+            audio.currentTime = 0;
+            const playPromise = audio.play();
             if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(() => {});
+                playPromise.catch(() => {
+                    void unlockClickSoundIfNeeded().then(() => {
+                        audio.currentTime = 0;
+                        audio.play().catch(() => {});
+                    });
+                });
+            }
+
+            if (!clickSoundUnlocked) {
+                void unlockClickSoundIfNeeded();
             }
         }
 
@@ -544,6 +624,7 @@
             setTimeout(() => { msg.classList.remove('show'); }, 2500);
         }
 
+        initClickSound();
         loadGameData();
     </script>
 </body>
