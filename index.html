@@ -194,6 +194,7 @@
         .card.jump { animation: jump 0.5s ease-in-out; z-index: 10; }
         @keyframes jump { 0% { transform: translateY(0); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0); } }
         .card.magic-ignite { animation: magicIgnite 180ms cubic-bezier(0.16, 1, 0.3, 1) both; z-index: 12; }
+        .card.magic-grow { animation: magicGrow 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards; z-index: 14; }
         .card.magic-burst {
             animation: magicBurst 430ms cubic-bezier(0.22, 1, 0.36, 1) both;
             z-index: 13;
@@ -220,6 +221,11 @@
             54% { transform: translate3d(-1.5px, 0, 0) scale(1); }
             72% { transform: translate3d(1px, 0, 0) scale(1.01); }
             100% { transform: translate3d(0, 0, 0) scale(0.99); filter: brightness(1.08); }
+        }
+        @keyframes magicGrow {
+            0% { transform: scale(1); filter: brightness(1); }
+            54% { transform: scale(1.16); filter: brightness(1.12); }
+            100% { transform: scale(1.08); filter: brightness(1.06); }
         }
         @keyframes magicBurst {
             0% { transform: translateY(0) scale(0.99); filter: brightness(1.05) saturate(1.05); box-shadow: 0 0 0 rgba(255, 220, 125, 0); }
@@ -513,6 +519,7 @@
             body.theme-glass-enter .header-toolbar,
             body.theme-glass-enter .game-container,
             body.theme-glass .card.glass-enter,
+            .card.magic-grow,
             .solved-banner.grand-fuse,
             .card.magic-ignite,
             .card.magic-burst,
@@ -1248,7 +1255,11 @@
                 item.element.style.backgroundColor = groupData.color;
                 item.element.style.color = '#000';
             });
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 120));
+
+            // 3. GROSSISSEMENT AVANT FUSION
+            successCards.forEach(card => card.classList.add('magic-grow'));
+            await new Promise(r => setTimeout(r, 240));
 
             // Capture positions
             const startPositions = selectedItems.map(item => {
@@ -1256,7 +1267,7 @@
                 return { left: rect.left, top: rect.top, width: rect.width, height: rect.height, element: item.element };
             });
 
-            // 3. INSÉRER BANNIÈRE (Invisible)
+            // 4. INSÉRER BANNIÈRE (Invisible)
             const banner = document.createElement('div');
             banner.className = 'solved-banner';
             banner.style.backgroundColor = groupData.color;
@@ -1268,7 +1279,7 @@
 
             const bannerRect = banner.getBoundingClientRect();
 
-            // 4. VOL (clones visibles pour une fusion continue vers la bannière)
+            // 5. VOL (clones visibles pour une fusion continue vers la bannière)
             const segmentGap = 8;
             const segmentWidth = (bannerRect.width - (segmentGap * 3)) / 4;
             const endPositions = startPositions.map((_, index) => ({
@@ -1281,7 +1292,7 @@
             const flightCards = startPositions.map((pos, index) => {
                 const end = endPositions[index];
                 const ghost = pos.element.cloneNode(true);
-                ghost.classList.remove('selected', 'jump', 'shake', 'moving', 'fade-in');
+                ghost.classList.remove('selected', 'jump', 'shake', 'moving', 'fade-in', 'magic-grow', 'magic-ignite', 'magic-burst');
                 ghost.classList.add('flight-ghost');
                 ghost.style.top = pos.top + 'px';
                 ghost.style.left = pos.left + 'px';
@@ -1311,7 +1322,7 @@
 
             await Promise.all(flightCards.map(f => f.anim.finished.catch(() => {})));
 
-            // 5. APPARITION FINALE (fusion)
+            // 6. APPARITION FINALE (fusion)
             void banner.offsetWidth;
             banner.classList.add('reveal');
             banner.classList.add('grand-fuse');
@@ -1330,6 +1341,7 @@
 
             selectedItems.forEach(item => {
                 item.solved = true;
+                if (item.element) item.element.classList.remove('magic-grow', 'magic-ignite', 'magic-burst');
                 if(item.element) item.element.remove();
             });
             selectedItems = [];
