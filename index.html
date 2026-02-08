@@ -518,12 +518,7 @@
             body.theme-glass-enter .game-header-container,
             body.theme-glass-enter .header-toolbar,
             body.theme-glass-enter .game-container,
-            body.theme-glass .card.glass-enter,
-            .card.magic-grow,
-            .solved-banner.grand-fuse,
-            .card.magic-ignite,
-            .card.magic-burst,
-            #grid-container.magic-flash::after {
+            body.theme-glass .card.glass-enter {
                 animation: none !important;
             }
         }
@@ -1258,8 +1253,25 @@
             await new Promise(r => setTimeout(r, 120));
 
             // 3. GROSSISSEMENT AVANT FUSION
-            successCards.forEach(card => card.classList.add('magic-grow'));
-            await new Promise(r => setTimeout(r, 320));
+            const growAnimations = successCards.map(card => {
+                if (!card || typeof card.animate !== 'function') return null;
+                const anim = card.animate(
+                    [
+                        { transform: 'scale(1)', filter: 'brightness(1)' },
+                        { transform: 'scale(1.58)', filter: 'brightness(1.24) saturate(1.12)', offset: 0.62 },
+                        { transform: 'scale(1.42)', filter: 'brightness(1.14) saturate(1.08)' }
+                    ],
+                    { duration: 360, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' }
+                );
+                return anim.finished.catch(() => {});
+            });
+            const hasWAAPIGrow = growAnimations.some(Boolean);
+            if (hasWAAPIGrow) {
+                await Promise.all(growAnimations.filter(Boolean));
+            } else {
+                successCards.forEach(card => card.classList.add('magic-grow'));
+                await new Promise(r => setTimeout(r, 320));
+            }
 
             // Capture positions
             const startPositions = selectedItems.map(item => {
