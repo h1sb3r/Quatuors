@@ -316,6 +316,7 @@
         let solvedCount = 0;
         let isAnimating = false;
         const CLICK_SOUND_URL = 'Audio/Dong.mp3';
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
             const audio = new Audio(CLICK_SOUND_URL);
@@ -326,6 +327,9 @@
         let clickSoundIndex = 0;
         let clickSoundUnlocked = false;
         let clickSoundUnlockPromise = null;
+        let clickAudioContext = null;
+        let clickAudioBuffer = null;
+        let clickAudioReady = false;
 
         function setDate() {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -498,34 +502,79 @@
             return audio;
         }
 
+        function ensureAudioContext() {
+            if (!AudioContextClass) return null;
+            if (!clickAudioContext) {
+                clickAudioContext = new AudioContextClass({ latencyHint: 'interactive' });
+            }
+            return clickAudioContext;
+        }
+
+        async function prepareWebAudioClickBuffer() {
+            const ctx = ensureAudioContext();
+            if (!ctx) return false;
+            if (ctx.state !== 'running') await ctx.resume();
+            if (!clickAudioBuffer) {
+                const response = await fetch(CLICK_SOUND_URL, { cache: 'force-cache' });
+                if (!response.ok) throw new Error('Audio buffer load failed');
+                const data = await response.arrayBuffer();
+                clickAudioBuffer = await ctx.decodeAudioData(data.slice(0));
+            }
+
+            // Prime output path once so first audible hit is instant.
+            const warmSource = ctx.createBufferSource();
+            warmSource.buffer = ctx.createBuffer(1, 1, 22050);
+            warmSource.connect(ctx.destination);
+            warmSource.start(0);
+            clickAudioReady = true;
+            return true;
+        }
+
+        function playClickSoundWebAudio() {
+            if (!clickAudioReady || !clickAudioContext || !clickAudioBuffer) return false;
+            const source = clickAudioContext.createBufferSource();
+            source.buffer = clickAudioBuffer;
+            source.connect(clickAudioContext.destination);
+            source.start(0);
+            return true;
+        }
+
         async function unlockClickSoundIfNeeded() {
             if (clickSoundUnlocked) return true;
             if (clickSoundUnlockPromise) return clickSoundUnlockPromise;
 
             clickSoundUnlockPromise = (async () => {
                 try {
-                    // Try to unlock playback on mobile using a muted warm-up play.
-                    const unlockAudio = clickSounds[0];
-                    unlockAudio.muted = true;
-                    unlockAudio.currentTime = 0;
-                    const playPromise = unlockAudio.play();
-                    if (playPromise && typeof playPromise.then === 'function') {
-                        await playPromise;
-                    }
-                    unlockAudio.pause();
-                    unlockAudio.currentTime = 0;
-                    unlockAudio.muted = false;
-
-                    clickSounds.forEach(audio => audio.load());
-                    clickSoundUnlocked = true;
-                    hideAudioGate();
-                    return true;
+                    // First choice: WebAudio buffer for very low-latency playback.
+                    await prepareWebAudioClickBuffer();
                 } catch (_) {
-                    clickSoundUnlocked = false;
-                    return false;
-                } finally {
-                    clickSoundUnlockPromise = null;
+                    // Fallback: HTMLAudio unlock path.
+                    try {
+                        const unlockAudio = clickSounds[0];
+                        unlockAudio.muted = true;
+                        unlockAudio.currentTime = 0;
+                        const playPromise = unlockAudio.play();
+                        if (playPromise && typeof playPromise.then === 'function') {
+                            await playPromise;
+                        }
+                        unlockAudio.pause();
+                        unlockAudio.currentTime = 0;
+                        unlockAudio.muted = false;
+                    } catch (_) {
+                        clickSoundUnlocked = false;
+                        return false;
+                    }
                 }
+
+                try {
+                    clickSounds.forEach(audio => audio.load());
+                } catch (_) {}
+
+                clickSoundUnlocked = true;
+                hideAudioGate();
+                return true;
+            })().finally(() => {
+                clickSoundUnlockPromise = null;
             })();
 
             return clickSoundUnlockPromise;
@@ -536,6 +585,8 @@
         }
 
         function playClickSound() {
+            if (playClickSoundWebAudio()) return;
+
             const audio = getNextClickSound();
             audio.currentTime = 0;
             const playPromise = audio.play();
