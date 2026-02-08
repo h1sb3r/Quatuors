@@ -315,6 +315,8 @@
         let clickSoundUnlockPromise = null;
         let clickAudioContext = null;
         let clickAudioBuffer = null;
+        let bannerAudioBuffer = null;
+        let correctSelectionAudioBuffer = null;
         let clickAudioGain = null;
         let clickAudioReady = false;
         let audioUnlockGestureArmed = false;
@@ -534,33 +536,64 @@
             return clickAudioContext;
         }
 
-        async function prepareWebAudioClickBuffer() {
+        async function fetchDecodedAudioBuffer(ctx, url) {
+            const response = await fetch(url, { cache: 'force-cache' });
+            if (!response.ok) throw new Error('Audio buffer load failed');
+            const data = await response.arrayBuffer();
+            return ctx.decodeAudioData(data.slice(0));
+        }
+
+        async function prepareWebAudioBuffers() {
             const ctx = ensureAudioContext();
             if (!ctx) return false;
             if (ctx.state !== 'running') await ctx.resume();
+
+            const decodePromises = [];
             if (!clickAudioBuffer) {
-                const response = await fetch(CLICK_SOUND_URL, { cache: 'force-cache' });
-                if (!response.ok) throw new Error('Audio buffer load failed');
-                const data = await response.arrayBuffer();
-                clickAudioBuffer = await ctx.decodeAudioData(data.slice(0));
+                decodePromises.push(
+                    fetchDecodedAudioBuffer(ctx, CLICK_SOUND_URL).then(buffer => {
+                        clickAudioBuffer = buffer;
+                    })
+                );
             }
+            if (!bannerAudioBuffer) {
+                decodePromises.push(
+                    fetchDecodedAudioBuffer(ctx, BANNER_SOUND_URL).then(buffer => {
+                        bannerAudioBuffer = buffer;
+                    })
+                );
+            }
+            if (!correctSelectionAudioBuffer) {
+                decodePromises.push(
+                    fetchDecodedAudioBuffer(ctx, CORRECT_SELECTION_SOUND_URL).then(buffer => {
+                        correctSelectionAudioBuffer = buffer;
+                    })
+                );
+            }
+            if (decodePromises.length) await Promise.all(decodePromises);
 
             // Prime output path once so first audible hit is instant.
             const warmSource = ctx.createBufferSource();
             warmSource.buffer = ctx.createBuffer(1, 1, 22050);
             warmSource.connect(clickAudioGain || ctx.destination);
             warmSource.start(0);
-            clickAudioReady = true;
+            clickAudioReady = !!clickAudioBuffer;
+            return clickAudioReady;
+        }
+
+        function playWebAudioBuffer(buffer, useClickGain = false) {
+            if (!clickAudioContext || !buffer) return false;
+            const source = clickAudioContext.createBufferSource();
+            source.buffer = buffer;
+            const destination = (useClickGain && clickAudioGain) ? clickAudioGain : clickAudioContext.destination;
+            source.connect(destination);
+            source.start(0);
             return true;
         }
 
         function playClickSoundWebAudio() {
-            if (!clickAudioReady || !clickAudioContext || !clickAudioBuffer) return false;
-            const source = clickAudioContext.createBufferSource();
-            source.buffer = clickAudioBuffer;
-            source.connect(clickAudioGain || clickAudioContext.destination);
-            source.start(0);
-            return true;
+            if (!clickAudioReady) return false;
+            return playWebAudioBuffer(clickAudioBuffer, true);
         }
 
         async function unlockClickSoundIfNeeded() {
@@ -570,7 +603,7 @@
             clickSoundUnlockPromise = (async () => {
                 try {
                     // First choice: WebAudio buffer for very low-latency playback.
-                    await prepareWebAudioClickBuffer();
+                    await prepareWebAudioBuffers();
                 } catch (_) {
                     // Fallback: HTMLAudio unlock path.
                     try {
@@ -662,6 +695,7 @@
 
         function playSolvedBannerSound() {
             if (!isSoundEnabled) return;
+            if (playWebAudioBuffer(bannerAudioBuffer)) return;
             solvedBannerSound.currentTime = 0;
             const playPromise = solvedBannerSound.play();
             if (playPromise && typeof playPromise.catch === 'function') {
@@ -680,6 +714,7 @@
 
         function playCorrectSelectionSound() {
             if (!isSoundEnabled) return;
+            if (playWebAudioBuffer(correctSelectionAudioBuffer)) return;
             correctSelectionSound.currentTime = 0;
             const playPromise = correctSelectionSound.play();
             if (playPromise && typeof playPromise.catch === 'function') {
