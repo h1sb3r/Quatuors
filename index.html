@@ -310,6 +310,7 @@
         let clickAudioContext = null;
         let clickAudioBuffer = null;
         let clickAudioReady = false;
+        let audioUnlockGestureArmed = false;
         let isSoundEnabled = false;
 
         function setDate() {
@@ -332,6 +333,28 @@
             try {
                 localStorage.setItem(SOUND_PREF_KEY, isSoundEnabled ? '1' : '0');
             } catch (_) {}
+        }
+
+        function requestAudioUnlock() {
+            if (clickSoundUnlocked) return;
+            if (navigator.userActivation && !navigator.userActivation.isActive) {
+                armAudioUnlockOnFirstGesture();
+                return;
+            }
+            void unlockClickSoundIfNeeded();
+        }
+
+        function armAudioUnlockOnFirstGesture() {
+            if (audioUnlockGestureArmed || clickSoundUnlocked || !isSoundEnabled) return;
+            audioUnlockGestureArmed = true;
+            const events = ['pointerdown', 'keydown', 'touchstart'];
+            const onFirstGesture = () => {
+                events.forEach(eventName => document.removeEventListener(eventName, onFirstGesture, true));
+                audioUnlockGestureArmed = false;
+                if (!isSoundEnabled) return;
+                void unlockClickSoundIfNeeded();
+            };
+            events.forEach(eventName => document.addEventListener(eventName, onFirstGesture, true));
         }
 
         function initSoundToggle() {
@@ -367,14 +390,7 @@
                 playClickSound();
             });
 
-            if (savedEnabled) {
-                void unlockClickSoundIfNeeded().then((unlocked) => {
-                    if (!unlocked) {
-                        toggle.checked = false;
-                        setSoundEnabled(false);
-                    }
-                });
-            }
+            if (savedEnabled) armAudioUnlockOnFirstGesture();
         }
 
         function normalizeGamesData(payload) {
@@ -604,6 +620,10 @@
             const playPromise = audio.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch(() => {
+                    if (navigator.userActivation && !navigator.userActivation.isActive) {
+                        armAudioUnlockOnFirstGesture();
+                        return;
+                    }
                     void unlockClickSoundIfNeeded().then(() => {
                         audio.currentTime = 0;
                         audio.play().catch(() => {});
@@ -612,7 +632,7 @@
             }
 
             if (!clickSoundUnlocked) {
-                void unlockClickSoundIfNeeded();
+                requestAudioUnlock();
             }
         }
 
@@ -622,6 +642,10 @@
             const playPromise = solvedBannerSound.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch(() => {
+                    if (navigator.userActivation && !navigator.userActivation.isActive) {
+                        armAudioUnlockOnFirstGesture();
+                        return;
+                    }
                     void unlockClickSoundIfNeeded().then(() => {
                         solvedBannerSound.currentTime = 0;
                         solvedBannerSound.play().catch(() => {});
