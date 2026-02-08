@@ -290,7 +290,7 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
-        const CLICK_SOUND_URL = 'Audio/Dong.mp3';
+        const CLICK_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
@@ -475,15 +475,16 @@
 
         function toggleSelect(item, element) {
             if (item.solved || isAnimating) return;
-            if (isSoundEnabled) playClickSound();
             const index = selectedItems.indexOf(item);
             if (index > -1) {
                 selectedItems.splice(index, 1);
                 element.classList.remove('selected');
+                if (isSoundEnabled) playClickSound();
             } else {
                 if (selectedItems.length < 4) {
                     selectedItems.push(item);
                     element.classList.add('selected');
+                    if (isSoundEnabled) playClickSound();
                 }
             }
             updateSubmitButton();
