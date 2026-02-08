@@ -158,9 +158,10 @@
         }
         @media (hover: hover) and (pointer: fine) {
             .card:hover {
-                transform: translateY(-1px);
+                transform: translateY(-1px) scale(1.018);
                 font-size: 15.8px;
                 letter-spacing: 0.55px;
+                z-index: 2;
             }
         }
 
@@ -361,11 +362,12 @@
             transition: transform 0.18s ease, font-size 0.18s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease, color 0.22s ease;
         }
         body.theme-glass .card:hover {
-            transform: translateY(-1px);
+            transform: translateY(-1px) scale(1.018);
             font-size: 16px;
             border-color: rgba(255, 228, 176, 0.9);
             box-shadow: 0 10px 22px rgba(0,0,0,0.22), 0 0 0 1px rgba(255, 216, 154, 0.3) inset;
             background: linear-gradient(145deg, rgba(255, 247, 229, 0.36), rgba(244, 251, 255, 0.2));
+            z-index: 2;
         }
         body.theme-glass .card.selected {
             background: linear-gradient(120deg, rgba(255, 207, 111, 0.92), rgba(255, 125, 176, 0.88));
