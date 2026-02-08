@@ -43,9 +43,8 @@
 
         .game-header-container { margin-top: 60px; text-align: center; width: 100%; max-width: 800px; padding: 0 20px; margin-bottom: 5px; }
         h1 { font-family: 'Zilla Slab', serif; font-weight: 700; font-size: 42px; margin: 0; letter-spacing: -0.5px; }
-        .date { font-size: 15px; font-weight: 500; margin-top: 5px; border-bottom: 1px solid #ddd; padding-bottom: 10px; display: inline-block; width: 100%; max-width: 150px; margin-bottom: 10px;}
-        
-        .game-picker { margin-top: 8px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; background: #f5f5f5; padding: 6px 10px; border-radius: 999px; }
+        .header-toolbar { margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .game-picker { margin-top: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; background: #f5f5f5; padding: 6px 10px; border-radius: 999px; }
         .game-picker select { border: 1px solid #ccc; border-radius: 999px; padding: 4px 10px; background: #fff; }
 
         .game-container { width: 100%; max-width: 650px; display: flex; flex-direction: column; align-items: center; padding: 0 10px; flex-grow: 1; }
@@ -59,6 +58,7 @@
             width: 100%;
             margin-bottom: 20px;
             position: relative;
+            contain: layout paint;
         }
 
         .card {
@@ -81,6 +81,8 @@
             position: relative;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
+            will-change: transform;
+            contain: layout paint style;
         }
 
         .card.selected {
@@ -143,7 +145,7 @@
         #submit-btn.active { background-color: #000 !important; color: #fff !important; border-color: #000 !important; cursor: pointer; opacity: 1; }
         #submit-btn.active:hover { opacity: 0.9; }
 
-        .sound-option { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+        .sound-option { display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 600; border-bottom: 1px solid #ddd; padding: 0 0 10px; width: 100%; max-width: 150px; }
         .sound-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .sound-switch input { opacity: 0; width: 0; height: 0; }
         .sound-slider {
@@ -185,9 +187,15 @@
         @media (max-width: 600px) {
             .game-header-container { margin-top: 60px; }
             h1 { font-size: 32px; }
-            .card { height: 65px; font-size: 12px; }
+            .header-toolbar { gap: 8px; }
+            .sound-option { max-width: 130px; font-size: 14px; padding-bottom: 8px; }
+            .game-picker { max-width: calc(100vw - 40px); }
+            .game-picker select { max-width: 54vw; }
+            .card { height: 65px; font-size: 12px; transition: background-color 0.12s, color 0.12s, transform 0.08s; }
             .solved-banner { height: 65px; }
             #grid-container { gap: 6px; }
+            .controls { gap: 8px; flex-wrap: wrap; }
+            button { min-height: 44px; padding: 12px 16px; }
             .modal-content { padding: 20px 15px; max-height: 100vh; border-radius: 0; }
             .modal-h2 { font-size: 26px; }
             .btn-subscribe { display: none; }
@@ -213,23 +221,24 @@
 
     <div class="game-header-container">
         <h1>Quatuors</h1>
-        <div class="date" id="date-display"></div>
-        <div id="game-picker-wrap" class="game-picker" style="display: none;">
-            <span>Jeu</span>
-            <select id="game-picker"></select>
+        <div class="header-toolbar">
+            <div class="sound-option">
+                <span>Son</span>
+                <label class="sound-switch" for="sound-toggle">
+                    <input id="sound-toggle" type="checkbox" aria-label="Activer le son">
+                    <span class="sound-slider"></span>
+                </label>
+            </div>
+            <div id="game-picker-wrap" class="game-picker" style="display: none;">
+                <span>Jeu</span>
+                <select id="game-picker"></select>
+            </div>
         </div>
     </div>
 
     <div class="game-container">
         <div class="instructions">Créez 4 groupes de 4 mots !</div>
         
-        <div class="sound-option">
-            <span>Son</span>
-            <label class="sound-switch" for="sound-toggle">
-                <input id="sound-toggle" type="checkbox" aria-label="Activer le son">
-                <span class="sound-slider"></span>
-            </label>
-        </div>
         <div id="grid-container">
             <div style="grid-column: span 4; text-align: center; padding: 40px; color: #999;">Chargement...</div>
         </div>
@@ -292,7 +301,7 @@
         let mistakes = 4;
         let solvedCount = 0;
         let isAnimating = false;
-        const CLICK_SOUND_URL = 'Audio/Typing.wav';
+        const CLICK_SOUND_URL = 'Audio/glass.wav';
         const CLICK_SOUND_VOLUME = 0.5;
         const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
         const CORRECT_SELECTION_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
@@ -325,13 +334,8 @@
         let correctSelectionAudioGain = null;
         let clickAudioReady = false;
         let audioUnlockGestureArmed = false;
+        let audioPrimeGestureArmed = false;
         let isSoundEnabled = false;
-
-        function setDate() {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            const dateStr = new Date().toLocaleDateString('fr-FR', options);
-            document.getElementById('date-display').innerText = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-        }
 
         function toggleHelp() {
             const modal = document.getElementById('help-modal');
@@ -383,6 +387,10 @@
             toggle.checked = savedEnabled;
             isSoundEnabled = savedEnabled;
 
+            toggle.addEventListener('pointerdown', () => {
+                if (!toggle.checked) requestAudioUnlock();
+            }, { passive: true });
+
             toggle.addEventListener('change', async () => {
                 if (!toggle.checked) {
                     setSoundEnabled(false);
@@ -407,10 +415,26 @@
             if (savedEnabled) armAudioUnlockOnFirstGesture();
         }
 
+        function armAudioPrimeOnFirstGesture() {
+            if (audioPrimeGestureArmed || clickSoundUnlocked) return;
+            audioPrimeGestureArmed = true;
+            const events = ['pointerdown', 'keydown', 'touchstart'];
+            const onPrime = () => {
+                events.forEach(eventName => document.removeEventListener(eventName, onPrime, true));
+                audioPrimeGestureArmed = false;
+                void unlockClickSoundIfNeeded();
+            };
+            events.forEach(eventName => document.addEventListener(eventName, onPrime, true));
+        }
+
         function normalizeGamesData(payload) {
             if (Array.isArray(payload)) return [{ id: 'default', title: 'Jeu', groups: payload }];
             if (payload && Array.isArray(payload.games)) return payload.games;
             return [];
+        }
+
+        function pickRandomGame(games) {
+            return games[Math.floor(Math.random() * games.length)];
         }
 
         async function loadGameData() {
@@ -437,7 +461,7 @@
                 }
                 const params = new URLSearchParams(window.location.search);
                 const requestedId = params.get('game');
-                currentGame = allGames.find(game => game.id === requestedId) || allGames[0];
+                currentGame = allGames.find(game => game.id === requestedId) || pickRandomGame(allGames);
                 if(select) select.value = currentGame.id || allGames[0].id;
                 gameData = currentGame.groups || [];
                 initGame();
@@ -448,7 +472,6 @@
         }
 
         function initGame() {
-            setDate();
             const container = document.getElementById('grid-container');
             container.innerHTML = '';
             gridItems = [];
@@ -883,6 +906,7 @@
 
         initClickSound();
         initSoundToggle();
+        armAudioPrimeOnFirstGesture();
         loadGameData();
     </script>
 </body>
