@@ -291,13 +291,15 @@
         let solvedCount = 0;
         let isAnimating = false;
         const CLICK_SOUND_URL = 'Audio/Typing.wav';
-        const BANNER_SOUND_URL = 'Audio/mixkit-game-ball-tap-2073.wav';
+        const CLICK_SOUND_VOLUME = 0.5;
+        const BANNER_SOUND_URL = 'Audio/mixkit-unlock-new-item-game-notification-254.wav';
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
             const audio = new Audio(CLICK_SOUND_URL);
             audio.preload = 'auto';
             audio.playsInline = true;
+            audio.volume = CLICK_SOUND_VOLUME;
             return audio;
         });
         const solvedBannerSound = new Audio(BANNER_SOUND_URL);
@@ -309,6 +311,7 @@
         let clickSoundUnlockPromise = null;
         let clickAudioContext = null;
         let clickAudioBuffer = null;
+        let clickAudioGain = null;
         let clickAudioReady = false;
         let audioUnlockGestureArmed = false;
         let isSoundEnabled = false;
@@ -520,6 +523,9 @@
             if (!AudioContextClass) return null;
             if (!clickAudioContext) {
                 clickAudioContext = new AudioContextClass({ latencyHint: 'interactive' });
+                clickAudioGain = clickAudioContext.createGain();
+                clickAudioGain.gain.value = CLICK_SOUND_VOLUME;
+                clickAudioGain.connect(clickAudioContext.destination);
             }
             return clickAudioContext;
         }
@@ -538,7 +544,7 @@
             // Prime output path once so first audible hit is instant.
             const warmSource = ctx.createBufferSource();
             warmSource.buffer = ctx.createBuffer(1, 1, 22050);
-            warmSource.connect(ctx.destination);
+            warmSource.connect(clickAudioGain || ctx.destination);
             warmSource.start(0);
             clickAudioReady = true;
             return true;
@@ -548,7 +554,7 @@
             if (!clickAudioReady || !clickAudioContext || !clickAudioBuffer) return false;
             const source = clickAudioContext.createBufferSource();
             source.buffer = clickAudioBuffer;
-            source.connect(clickAudioContext.destination);
+            source.connect(clickAudioGain || clickAudioContext.destination);
             source.start(0);
             return true;
         }
