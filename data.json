@@ -2,7 +2,7 @@
   "games": [
     {
       "id": "2026-01-08",
-      "title": "Jeu du 8 jan 2026",
+      "title": "1",
       "groups": [
         {
           "category": "POISSONS",
@@ -48,7 +48,7 @@
     },
     {
       "id": "2026-01-09",
-      "title": "Jeu du 9 jan 2026",
+      "title": "2",
       "groups": [
         {
           "category": "COULEURS",
@@ -56,7 +56,7 @@
           "items": [
             "ROUGE",
             "VERT",
-            "ROUGE",
+            "NOIR",
             "JAUNE"
           ]
         },
@@ -94,7 +94,7 @@
     },
     {
       "id": "2026-01-10",
-      "title": "Jeu du 10 jan 2026",
+      "title": "3",
       "groups": [
         {
           "category": "AGRUMES",
@@ -140,7 +140,7 @@
     },
     {
       "id": "2026-01-11",
-      "title": "Jeu du 11 jan 2026",
+      "title": "4",
       "groups": [
         {
           "category": "MEMBRES D'UN GROUPE DE ROCK",
@@ -186,7 +186,7 @@
     },
     {
       "id": "2026-01-12",
-      "title": "Jeu du 12 jan 2026",
+      "title": "5",
       "groups": [
         {
           "category": "INGRÉDIENTS DE LA RATATOUILLE",
@@ -232,7 +232,7 @@
     },
     {
       "id": "2026-01-13",
-      "title": "Jeu du 13 jan 2026",
+      "title": "6",
       "groups": [
         {
           "category": "ANIMAUX DE LA FERME",
@@ -278,7 +278,7 @@
     },
     {
       "id": "2026-01-14",
-      "title": "Jeu du 14 jan 2026",
+      "title": "7",
       "groups": [
         {
           "category": "ARGENT DONNE EN PLUS",
@@ -324,7 +324,7 @@
     },
     {
       "id": "2026-01-15",
-      "title": "Jeu du 15 jan 2026",
+      "title": "8",
       "groups": [
         {
           "category": "HOMOPHONES (A L'ORAL)",
@@ -370,7 +370,7 @@
     },
     {
       "id": "2026-01-16",
-      "title": "Jeu du 16 jan 2026",
+      "title": "9",
       "groups": [
         {
           "category": "___ DE FER",
@@ -416,7 +416,7 @@
     },
     {
       "id": "2026-01-17",
-      "title": "Jeu du 17 jan 2026",
+      "title": "10",
       "groups": [
         {
           "category": "___ DE MER",
@@ -462,7 +462,7 @@
     },
     {
       "id": "2026-01-18",
-      "title": "Jeu du 18 jan 2026",
+      "title": "11",
       "groups": [
         {
           "category": "POINTS CARDINAUX",
@@ -508,7 +508,7 @@
     },
     {
       "id": "2026-01-19",
-      "title": "Jeu du 19 jan 2026",
+      "title": "12",
       "groups": [
         {
           "category": "SIGLES EN FRANCE",
@@ -548,6 +548,98 @@
             "CHEVAL",
             "JAMBE",
             "TETE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-02-10",
+      "title": "13",
+      "groups": [
+        {
+          "category": "Pâtisseries françaises",
+          "color": "#f9df6d",
+          "items": [
+            "ÉCLAIR",
+            "FINANCIER",
+            "OPÉRA",
+            "MILLE-FEUILLE"
+          ]
+        },
+        {
+          "category": "Fruits",
+          "color": "#a0c35a",
+          "items": [
+            "PÊCHE",
+            "KIWI",
+            "CLÉMENTINE",
+            "TOMATE"
+          ]
+        },
+        {
+          "category": "Villes d'Espagne",
+          "color": "#b0c4ef",
+          "items": [
+            "VALENCE",
+            "SEVILLE",
+            "LÉON",
+            "GRENADE"
+          ]
+        },
+        {
+          "category": "Métiers du droit",
+          "color": "#ba81c5",
+          "items": [
+            "AVOCAT",
+            "JUGE",
+            "HUISSIER",
+            "MAGISTRAT"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-02-10-2",
+      "title": "14",
+      "groups": [
+        {
+          "category": "Mots suivant \"Chien de...\"",
+          "color": "#f9df6d",
+          "items": [
+            "GARDE",
+            "CHASSE",
+            "TRAÎNEAU",
+            "TÊTE"
+          ]
+        },
+        {
+          "category": "Types de lunettes",
+          "color": "#a0c35a",
+          "items": [
+            "SOLEIL",
+            "PROTECTION",
+            "PLONGÉE",
+            "TOILETTES"
+          ]
+        },
+        {
+          "category": "Types de chaussures",
+          "color": "#b0c4ef",
+          "items": [
+            "ESPADRILLE",
+            "TONG",
+            "SABOT",
+            "MULE"
+          ]
+        },
+        {
+          "category": "Noms d'insultes animales",
+          "color": "#ba81c5",
+          "items": [
+            "COCHON",
+            "ÂNE",
+            "BUSE",
+            "PERROQUET"
           ]
         }
       ]
