@@ -431,12 +431,132 @@
             .layout {
                 grid-template-columns: 1fr;
             }
+            .sidebar {
+                order: 2;
+            }
+            .editor {
+                order: 1;
+            }
         }
 
         @media (max-width: 640px) {
-            .topbar-inner { padding: 14px 16px; }
-            .layout { padding: 24px 16px 50px; }
-            .groups-grid { grid-template-columns: 1fr; }
+            .topbar-inner {
+                padding: 14px 16px;
+                align-items: flex-start;
+                flex-direction: column;
+            }
+            .brand {
+                width: 100%;
+                align-items: flex-start;
+            }
+            .brand h1 {
+                font-size: 24px;
+            }
+            .topbar-actions {
+                width: 100%;
+            }
+            .topbar-actions .btn,
+            .topbar-actions a.btn {
+                flex: 1 1 calc(50% - 8px);
+                text-align: center;
+            }
+            .layout {
+                padding: 20px 12px 40px;
+                gap: 16px;
+            }
+            .panel {
+                border-radius: 16px;
+            }
+            .sidebar,
+            .editor {
+                padding: 16px;
+            }
+            .sidebar-header,
+            .editor-header,
+            .footer-actions,
+            .commit-row {
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .field-group {
+                width: 100%;
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .field {
+                width: 100%;
+            }
+            .field input,
+            .field select,
+            .field textarea {
+                width: 100%;
+            }
+            .groups-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .group-card {
+                padding: 14px;
+            }
+            .group-head {
+                flex-wrap: wrap;
+            }
+            .group-head .group-category {
+                flex: 1 1 100%;
+            }
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+            .json-editor-wrap {
+                padding: 12px;
+            }
+            #json-editor {
+                min-height: 180px;
+            }
+            .json-actions,
+            .modal-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+            .json-actions .btn,
+            .modal-actions .btn,
+            .footer-actions .btn,
+            .commit-row .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .status {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .topbar-inner {
+                padding: 12px;
+            }
+            .layout {
+                padding: 16px 8px 28px;
+            }
+            .sidebar,
+            .editor {
+                padding: 12px;
+            }
+            .btn {
+                padding: 10px 12px;
+                font-size: 11px;
+            }
+            .brand h1 {
+                font-size: 22px;
+            }
+            .brand p,
+            .helper,
+            .status {
+                font-size: 11px;
+            }
+            input, select, textarea {
+                font-size: 12px;
+                padding: 9px 10px;
+            }
         }
     </style>
 </head>
