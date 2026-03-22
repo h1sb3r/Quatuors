@@ -14,6 +14,6 @@ start "Quatuors Studio Server (8081)" powershell -NoExit -ExecutionPolicy Bypass
 timeout /t 2 /nobreak >nul
 
 :open_browser
-start "" "http://localhost:%PORT%/studio.html"
+start "" "http://localhost:%PORT%/local/studio.html"
 
 endlocal

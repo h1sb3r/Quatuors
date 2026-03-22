@@ -1,31 +1,46 @@
-# 🎮 Quatuors
+# Quatuors
 
-Une adaptation en français du célèbre jeu de logique **Connections**.
-Trouvez les 4 groupes de 4 mots liés par un thème commun !
+Une adaptation en francais du jeu de logique Connections.
 
-<img width="608" height="545" alt="image" src="https://github.com/user-attachments/assets/6e1f0d27-3da9-4846-a0fb-e79dcfe607bc" />
+## Structure
 
+- `index.html` : jeu public statique
+- `data.json` : donnees des jeux
+- `Audio/` : sons utilises par le jeu
+- `local/studio.html` : studio d'edition, local uniquement
+- `local/server_impl.py` : serveur local et endpoints API
+- `server.py` : point d'entree compatible pour lancer le serveur local
 
-## 🔗 Jouer en ligne
-👉 **[Accéder au jeu (Site Web)](https://h1sb3r.github.io/Quatuors/)**
+## Jeu public
 
----
+Le jeu public repose uniquement sur :
 
-## 🛠 Fonctionnement technique
-Ce projet est un site statique léger + un petit serveur local pour éditer :
-*   **index.html** : Le jeu (HTML/CSS/JS).
-*   **studio.html** : L'éditeur pour créer/dupliquer des jeux.
-*   **data.json** : Contient tous les jeux (4 catégories x 4 mots).
-*   **server.py** : Serveur local + endpoints de sauvegarde/push.
+- `index.html`
+- `data.json`
+- `favicon.ico`
+- `Audio/`
 
-## 🧰 Studio local (édition + push)
-1. Lancez le serveur : `python server.py`
-2. Ouvrez `http://localhost:8000/studio.html`
-3. Ajoutez vos catégories et mots, puis cliquez sur **Sauvegarder**.
-4. Cliquez sur **Push GitHub** pour publier.
+Cette partie est compatible avec GitHub Pages et prete pour un deploiement Vercel.
 
-## 📝 Structure des données
-Chaque jeu contient exactement 4 catégories de 4 mots :
+## Studio local
+
+Le studio n'est pas concu pour etre publie.
+
+1. Lancez `launch-studio.cmd` ou `python server.py`
+2. Ouvrez `http://localhost:8081/local/studio.html` si vous utilisez `launch-studio.cmd`
+3. Sinon ouvrez `http://localhost:8000/local/studio.html`
+4. Ajoutez ou modifiez les jeux
+5. Cliquez sur `Sauvegarder`, puis `Push GitHub` si besoin
+
+## Lancement rapide
+
+- `launch_quatuors.bat` : ouvre le jeu local
+- `launch-studio.cmd` : ouvre le studio local
+
+## Structure des donnees
+
+Chaque jeu contient exactement 4 categories de 4 mots :
+
 ```json
 {
   "games": [
