@@ -5894,8 +5894,8 @@
                 solvedTextColor,
                 isMobileLayout,
                 timings: isMobileLayout
-                    ? { ghost: 540, banner: 340, flip: 360, settle: 80 }
-                    : { ghost: 480, banner: 320, flip: 320, settle: 70 }
+                    ? { ghost: 0, banner: 520, flip: 1100, settle: 0 }
+                    : { ghost: 0, banner: 460, flip: 920, settle: 0 }
             };
         }
 
@@ -5982,7 +5982,7 @@
             }));
         }
 
-        async function animateRemainingCardsFlip(measurement) {
+        async function animateRemainingCardsSwitch(measurement) {
             const animatedCards = [];
 
             measurement.remainingEntries.forEach(entry => {
@@ -6016,6 +6016,29 @@
                 element.style.removeProperty('transform');
                 element.style.removeProperty('will-change');
             });
+        }
+
+        async function revealSolvedBannerSlowly(banner, measurement) {
+            if (!banner || !banner.isConnected) return;
+
+            const duration = Math.max(220, measurement && measurement.timings ? measurement.timings.banner : 420);
+            banner.style.transition = 'none';
+            banner.style.opacity = '0';
+            banner.style.transform = 'translateY(10px)';
+
+            await nextFrame();
+
+            banner.classList.add('reveal');
+            banner.style.transition = [
+                `opacity ${duration}ms ease`,
+                `transform ${duration}ms cubic-bezier(0.22, 1, 0.36, 1)`
+            ].join(', ');
+            banner.style.opacity = '1';
+            banner.style.transform = 'none';
+
+            await waitForTransitionOrTimeout(banner, duration + 140);
+
+            banner.style.removeProperty('transition');
         }
 
         async function playSolveFlightPhase(measurement, overlay, banner) {
@@ -7761,7 +7784,6 @@
                 solvedTextColor
             };
             let measurement = null;
-            let overlay = null;
             let banner = null;
             let committed = false;
 
@@ -7784,23 +7806,14 @@
                     return;
                 }
 
-                overlay = buildSolveOverlay(measurement);
-                measurement.selection.forEach(item => {
-                    if (!item || !item.element) return;
-                    item.element.classList.add('anim-hidden');
-                });
-
                 banner = commitSolvedRow(container, measurement, { reveal: false, playSound: false });
                 committed = true;
 
-                const flipPromise = animateRemainingCardsFlip(measurement);
-                await playSolveFlightPhase(measurement, overlay, banner);
-                await flipPromise;
-                await playSolveFusePhase();
+                await Promise.all([
+                    revealSolvedBannerSlowly(banner, measurement),
+                    animateRemainingCardsSwitch(measurement)
+                ]);
                 playSolvedBannerSound();
-
-                overlay.destroy();
-                overlay = null;
 
                 if (solvedCount === 4) {
                     await transitionToNextGameAfterWin();
@@ -7820,9 +7833,7 @@
                     banner.classList.add('reveal');
                     banner.style.opacity = '1';
                     banner.style.transform = 'none';
-                }
-                if (overlay) {
-                    overlay.destroy();
+                    banner.style.removeProperty('transition');
                 }
                 isAnimating = false;
             }
