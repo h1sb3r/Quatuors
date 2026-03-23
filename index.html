@@ -3871,7 +3871,7 @@
         }
         @media (max-width: 600px) {
             body {
-                padding: 0 0 18px;
+                padding: 0 4px 18px;
             }
             .game-header-container,
             .game-container {
@@ -3879,12 +3879,14 @@
                 max-width: none !important;
             }
             .nyt-nav {
-                width: 100%;
+                width: calc(100% - 8px);
                 max-width: none;
                 min-height: 58px;
                 height: auto;
                 padding: 8px 14px;
                 gap: 10px;
+                left: 4px;
+                transform: none;
                 border-radius: 0 0 18px 18px;
                 border-left: none !important;
                 border-right: none !important;
@@ -3919,13 +3921,13 @@
                 background: #151515;
             }
             .game-header-container {
-                width: calc(100vw - 8px);
-                padding: 0 8px;
+                width: 100%;
+                padding: 0 6px;
                 margin-top: 78px !important;
                 margin-bottom: 2px;
             }
             .game-container {
-                width: calc(100vw - 4px);
+                width: 100%;
                 margin-top: 4px;
                 padding: 8px 0 18px;
                 border-radius: 0 !important;
@@ -3936,16 +3938,16 @@
             .instructions {
                 margin: 0 0 14px;
                 font-size: 15px;
-                padding: 0 8px;
+                padding: 0 6px;
             }
             #grid-container {
-                width: calc(100vw - 8px);
+                width: 100%;
                 max-width: none !important;
                 gap: 6px !important;
                 padding: 0 !important;
                 margin-bottom: 18px;
-                margin-left: auto;
-                margin-right: auto;
+                margin-left: 0;
+                margin-right: 0;
                 border: none !important;
                 background: transparent !important;
                 box-shadow: none !important;
@@ -3983,7 +3985,7 @@
             .controls {
                 gap: 10px;
                 flex-wrap: wrap;
-                padding: 0 6px;
+                padding: 0 4px;
             }
             button {
                 min-width: calc(50% - 5px);
@@ -4001,7 +4003,7 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 text-align: center;
-                padding: 0 6px;
+                padding: 0 4px;
             }
             .solved-title {
                 font-size: 12px;
@@ -4069,11 +4071,11 @@
                 content: none !important;
             }
             body.visual-dashboard #grid-container {
-                width: calc(100vw - 8px) !important;
+                width: 100% !important;
                 max-width: none !important;
                 padding: 0 !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
@@ -4092,7 +4094,7 @@
         }
         @media (max-width: 420px) {
             #grid-container {
-                width: calc(100vw - 6px);
+                width: 100%;
                 gap: 5px !important;
             }
             .card {
@@ -4156,11 +4158,15 @@
             z-index: 0;
         }
         body.preview-mobile .nyt-nav {
-            width: min(390px, calc(100vw - 44px)) !important;
-            max-width: 390px !important;
+            width: calc(100% - 8px) !important;
+            max-width: none !important;
             min-height: 58px;
             height: auto;
-            top: 18px;
+            top: 0;
+            left: auto;
+            transform: none;
+            position: sticky;
+            margin: 0 auto 18px;
             padding: 8px 14px;
             gap: 10px;
             border-radius: 18px;
@@ -4217,13 +4223,13 @@
         }
         body.preview-mobile .game-header-container,
         body.preview-mobile .game-container {
-            width: min(390px, calc(100vw - 44px)) !important;
-            max-width: 390px !important;
+            width: 100% !important;
+            max-width: none !important;
             align-self: stretch;
         }
         body.preview-mobile .game-header-container {
-            padding: 0 8px;
-            margin-top: 88px !important;
+            padding: 0 6px;
+            margin-top: 0 !important;
             margin-bottom: 2px;
         }
         body.preview-mobile h1 {
@@ -4241,15 +4247,15 @@
         body.preview-mobile .instructions {
             margin: 0 0 14px;
             font-size: 15px;
-            padding: 0 8px;
+            padding: 0 6px;
         }
         body.preview-mobile #grid-container {
-            width: calc(100% - 4px) !important;
+            width: 100% !important;
             gap: 6px !important;
             padding: 0 !important;
             margin-bottom: 18px;
-            margin-left: auto !important;
-            margin-right: auto !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
             border: none !important;
             background: transparent !important;
             box-shadow: none !important;
@@ -4284,7 +4290,7 @@
         body.preview-mobile .controls {
             gap: 10px;
             flex-wrap: wrap;
-            padding: 0 6px;
+            padding: 0 4px;
         }
         body.preview-mobile button {
             min-width: calc(50% - 5px);
@@ -4302,7 +4308,7 @@
             flex-wrap: wrap;
             justify-content: center;
             text-align: center;
-            padding: 0 6px;
+            padding: 0 4px;
         }
         body.preview-mobile .solved-title {
             font-size: 12px;
@@ -4340,11 +4346,11 @@
             border-radius: 0 !important;
         }
         body.preview-mobile.visual-dashboard #grid-container {
-            width: calc(100% - 4px) !important;
+            width: 100% !important;
             max-width: none !important;
             padding: 0 !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
@@ -5080,11 +5086,15 @@
             try {
                 const params = new URLSearchParams(window.location.search);
                 const queryPreview = params.get(DEV_PREVIEW_QUERY_PARAM);
+                const host = window.location.hostname || '';
+                const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.local');
+                const isLocalFile = window.location.protocol === 'file:';
                 if (queryPreview === 'mobile' || queryPreview === 'desktop') {
                     savedMode = queryPreview;
                 } else {
                     const raw = localStorage.getItem(DEV_PREVIEW_MODE_KEY);
                     if (raw === 'mobile' || raw === 'desktop') savedMode = raw;
+                    else if (isLocalHost || isLocalFile) savedMode = 'mobile';
                 }
             } catch (_) {}
 
