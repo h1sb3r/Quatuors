@@ -4658,6 +4658,391 @@
             box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
         }
 
+        #solve-animation-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 2200;
+            pointer-events: none;
+            overflow: visible;
+        }
+        .solved-banner.measure-proxy {
+            visibility: hidden !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* === Canonical Mobile Override === */
+        body.mobile-layout-active {
+            --mobile-side-gutter: 12px;
+            --mobile-grid-gap: 6px;
+            --mobile-card-radius: 13px;
+            --mobile-card-aspect: 1.24 / 1;
+            --mobile-nav-height: 68px;
+            --mobile-button-height: 58px;
+            --mobile-stage-width: calc(100vw - (var(--mobile-side-gutter) * 2));
+            --mobile-title-size: clamp(42px, 13vw, 58px);
+            --mobile-copy-size: clamp(17px, 4.8vw, 22px);
+            --mobile-word-size: clamp(10px, 2.95vw, 13px);
+            overflow-x: hidden;
+        }
+        body.mobile-layout-active:not(.preview-mobile) {
+            padding: 0 0 24px !important;
+            align-items: stretch !important;
+        }
+        body.mobile-layout-active:not(.preview-mobile) #dev-tools-panel {
+            display: none !important;
+        }
+        body.preview-mobile.mobile-layout-active {
+            --preview-frame-width: clamp(320px, calc(100vw - 360px), 414px);
+            --mobile-stage-width: calc(var(--preview-frame-width) - (var(--mobile-side-gutter) * 2));
+            padding: 18px 0 28px !important;
+            width: auto !important;
+            max-width: none !important;
+            margin: 0 !important;
+            min-height: 100vh;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #111722 !important;
+            align-items: stretch !important;
+        }
+        body.preview-mobile.mobile-layout-active::before {
+            content: "" !important;
+            position: fixed !important;
+            top: 10px !important;
+            bottom: 10px !important;
+            left: 50% !important;
+            width: var(--preview-frame-width) !important;
+            transform: translateX(-50%) !important;
+            border-radius: 38px !important;
+            background:
+                linear-gradient(0deg, rgba(194, 138, 82, 0.028) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(194, 138, 82, 0.028) 1px, transparent 1px),
+                radial-gradient(980px 540px at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 62%, rgba(255, 255, 255, 0) 100%),
+                linear-gradient(180deg, #f9f7f3 0%, #f3efe8 58%, #ede6da 100%) !important;
+            background-size: 92px 92px, 92px 92px, auto, auto !important;
+            box-shadow:
+                0 0 0 200vmax #111722,
+                0 28px 70px rgba(0, 0, 0, 0.42) !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+        body.preview-mobile.mobile-layout-active::after {
+            content: "" !important;
+            position: fixed !important;
+            top: 18px !important;
+            left: 50% !important;
+            width: 122px !important;
+            max-width: calc(var(--preview-frame-width) - 120px) !important;
+            height: 24px !important;
+            transform: translateX(-50%) !important;
+            border-radius: 0 0 16px 16px !important;
+            background: #101319 !important;
+            z-index: 1 !important;
+            pointer-events: none !important;
+        }
+        body.mobile-layout-active .game-header-container,
+        body.mobile-layout-active .game-container {
+            width: var(--mobile-stage-width) !important;
+            max-width: var(--mobile-stage-width) !important;
+            align-self: stretch !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        body.mobile-layout-active .game-container {
+            align-items: stretch !important;
+        }
+        body.mobile-layout-active:not(.preview-mobile) .nyt-nav {
+            position: fixed !important;
+            top: 0;
+            left: 50% !important;
+            width: var(--mobile-stage-width) !important;
+            max-width: var(--mobile-stage-width) !important;
+            min-height: var(--mobile-nav-height);
+            height: auto;
+            padding: 10px 16px;
+            gap: 12px;
+            transform: translateX(-50%) !important;
+            border-radius: 0 0 20px 20px;
+            border-left: none !important;
+            border-right: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        body.preview-mobile.mobile-layout-active .nyt-nav {
+            position: sticky !important;
+            top: 0 !important;
+            left: auto !important;
+            width: var(--mobile-stage-width) !important;
+            max-width: var(--mobile-stage-width) !important;
+            min-height: var(--mobile-nav-height);
+            margin: 0 auto 18px !important;
+            padding: 10px 16px;
+            gap: 12px;
+            transform: none !important;
+            border-radius: 18px;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+        body.mobile-layout-active .nav-left {
+            gap: 12px;
+            font-size: 17px;
+            font-family: 'Libre Franklin', sans-serif;
+            font-weight: 700;
+        }
+        body.mobile-layout-active .nav-left span {
+            font-size: 17px;
+        }
+        body.mobile-layout-active .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 0;
+        }
+        body.mobile-layout-active .nav-right {
+            gap: 12px;
+        }
+        body.mobile-layout-active .hamburger {
+            width: 22px;
+            height: 16px;
+        }
+        body.mobile-layout-active .hamburger span {
+            height: 2.5px;
+            border-radius: 999px;
+            background: #151515;
+        }
+        body.mobile-layout-active .nyt-nav .nav-sound-option {
+            padding: 4px 10px;
+            gap: 7px;
+            font-size: 11px;
+            border-radius: 999px;
+            box-shadow: none !important;
+        }
+        body.mobile-layout-active .nyt-nav .nav-sound-option .sound-switch {
+            width: 42px;
+            height: 24px;
+        }
+        body.mobile-layout-active .nyt-nav .nav-sound-option .sound-slider:before {
+            width: 16px;
+            height: 16px;
+            left: 4px;
+            top: 4px;
+        }
+        body.mobile-layout-active .nyt-nav .nav-sound-option .sound-switch input:checked + .sound-slider:before {
+            transform: translateX(18px);
+        }
+        body.mobile-layout-active .game-header-container {
+            padding: 0;
+            margin-top: calc(var(--mobile-nav-height) + 22px) !important;
+            margin-bottom: 8px;
+        }
+        body.preview-mobile.mobile-layout-active .game-header-container {
+            margin-top: 0 !important;
+        }
+        body.mobile-layout-active h1 {
+            font-size: var(--mobile-title-size);
+            margin: 0 0 10px;
+            text-shadow: none !important;
+        }
+        body.mobile-layout-active .game-container {
+            margin-top: 0;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+        }
+        body.mobile-layout-active .instructions {
+            margin: 0 0 18px;
+            padding: 0;
+            text-align: center;
+            font-size: var(--mobile-copy-size);
+            font-weight: 500;
+        }
+        body.mobile-layout-active #grid-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: var(--mobile-grid-gap) !important;
+            padding: 0 !important;
+            margin: 0 0 20px !important;
+            position: static !important;
+            left: auto !important;
+            transform: none !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+            contain: none !important;
+            opacity: 1 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+        body.mobile-layout-active #grid-container.magic-flash::after {
+            content: none !important;
+        }
+        body.mobile-layout-active .card {
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            aspect-ratio: var(--mobile-card-aspect) !important;
+            min-height: 0 !important;
+            height: auto !important;
+            border-radius: var(--mobile-card-radius) !important;
+            padding: 6px 4px !important;
+            overflow: hidden;
+            justify-self: stretch !important;
+        }
+        body.mobile-layout-active .scene,
+        body.mobile-layout-active .flip-card,
+        body.mobile-layout-active .card-face,
+        body.mobile-layout-active .card-shell {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        body.mobile-layout-active .card-shell {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        body.mobile-layout-active .card-shell {
+            padding: 0 4px !important;
+        }
+        body.mobile-layout-active .card-title {
+            width: 100%;
+            font-size: var(--mobile-word-size) !important;
+            line-height: 1.06;
+            letter-spacing: 0;
+            text-align: center;
+            text-wrap: balance;
+            word-break: normal;
+            overflow-wrap: anywhere;
+            hyphens: none;
+        }
+        body.mobile-layout-active .solved-banner {
+            width: 100% !important;
+            min-height: 78px;
+            height: auto !important;
+            border-radius: var(--mobile-card-radius) !important;
+            padding: 10px 12px;
+        }
+        body.mobile-layout-active .solved-title {
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+        body.mobile-layout-active .solved-words {
+            font-size: 11px;
+            line-height: 1.16;
+            padding: 0 4px;
+        }
+        body.mobile-layout-active .mistakes-container {
+            margin: 0 0 20px;
+            padding: 0;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            text-align: center;
+            font-size: clamp(15px, 4.4vw, 20px);
+        }
+        body.mobile-layout-active #dots {
+            gap: 10px !important;
+            margin-left: 0 !important;
+        }
+        body.mobile-layout-active .controls {
+            width: 100%;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+        body.mobile-layout-active button {
+            flex: 1 1 calc(50% - 6px);
+            min-width: 0;
+            min-height: var(--mobile-button-height);
+            font-size: clamp(14px, 4.3vw, 18px);
+            padding: 10px 12px;
+        }
+        body.mobile-layout-active #submit-btn {
+            flex-basis: 100%;
+            width: 100%;
+            min-width: 100%;
+        }
+        body.mobile-layout-active.visual-dashboard .nyt-nav {
+            background: rgba(255, 255, 255, 0.96) !important;
+            border: 1px solid #ded8cf !important;
+        }
+        body.mobile-layout-active:not(.preview-mobile).visual-dashboard .nyt-nav {
+            border-top: none !important;
+        }
+        body.mobile-layout-active.visual-dashboard .nav-left,
+        body.mobile-layout-active.visual-dashboard .nav-left span,
+        body.mobile-layout-active.visual-dashboard .nav-icon {
+            color: #151515 !important;
+            stroke: #151515 !important;
+        }
+        body.mobile-layout-active.visual-dashboard .nyt-nav .nav-sound-option {
+            background: #faf6ef !important;
+            border: 1px solid #ded8cf !important;
+        }
+        body.mobile-layout-active.visual-dashboard .game-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body.mobile-layout-active.visual-dashboard .game-container::before {
+            content: none !important;
+        }
+        body.mobile-layout-active.visual-dashboard #grid-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            position: static !important;
+            left: auto !important;
+            transform: none !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding: 0 !important;
+            gap: var(--mobile-grid-gap) !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            animation: none !important;
+        }
+        @media (max-width: 420px) {
+            body.mobile-layout-active {
+                --mobile-side-gutter: 10px;
+                --mobile-grid-gap: 5px;
+                --mobile-button-height: 52px;
+                --mobile-title-size: clamp(36px, 12vw, 50px);
+                --mobile-copy-size: clamp(16px, 4.5vw, 19px);
+                --mobile-word-size: clamp(9px, 2.8vw, 11px);
+            }
+        }
+        @media (max-width: 600px) {
+            body.preview-mobile.mobile-layout-active {
+                --mobile-stage-width: calc(100vw - (var(--mobile-side-gutter) * 2));
+                padding: 0 0 24px !important;
+                background:
+                    linear-gradient(0deg, rgba(194, 138, 82, 0.028) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(194, 138, 82, 0.028) 1px, transparent 1px),
+                    radial-gradient(980px 540px at 50% 50%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 62%, rgba(255, 255, 255, 0) 100%),
+                    linear-gradient(180deg, #f9f7f3 0%, #f3efe8 58%, #ede6da 100%) !important;
+                background-size: 92px 92px, 92px 92px, auto, auto !important;
+            }
+            body.preview-mobile.mobile-layout-active::before,
+            body.preview-mobile.mobile-layout-active::after {
+                content: none !important;
+                display: none !important;
+            }
+            body.preview-mobile.mobile-layout-active #dev-tools-panel {
+                display: none !important;
+            }
+        }
+
 </style>
     <script defer src="https://cloud.umami.is/script.js" data-website-id="389d942f-c6af-4e34-acc7-13f1ebdf5cbc"></script>
 </head>
@@ -4875,6 +5260,7 @@
         const DEV_PANEL_QUERY_PARAM = 'dev';
         const DEV_PREVIEW_QUERY_PARAM = 'preview';
         const DEV_PREVIEW_MODE_KEY = 'quatuors_dev_preview_mode_v1';
+        const MOBILE_LAYOUT_BREAKPOINT_PX = 600;
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
             const audio = new Audio(CLICK_SOUND_URL);
             audio.preload = 'auto';
@@ -4949,6 +5335,7 @@
         let isSoundEnabled = false;
         let currentVisualStyle = VISUAL_STYLES.DASHBOARD;
         let currentPreviewMode = 'desktop';
+        let mobileLayoutMediaQuery = null;
         let cardSheenTimeout = null;
         let lastSheenCard = null;
         let isGameOver = false;
@@ -5076,10 +5463,37 @@
             document.body.classList.toggle('dev-tools-enabled', enabled);
         }
 
+        function isMobileLayoutViewport() {
+            if (mobileLayoutMediaQuery) return mobileLayoutMediaQuery.matches;
+            return window.innerWidth <= MOBILE_LAYOUT_BREAKPOINT_PX;
+        }
+
+        function syncMobileLayoutClass() {
+            const body = document.body;
+            if (!body) return;
+            const isPreviewMobile = body.classList.contains('preview-mobile');
+            body.classList.toggle('mobile-layout-active', isPreviewMobile || isMobileLayoutViewport());
+        }
+
+        function initMobileLayoutSync() {
+            const update = () => syncMobileLayoutClass();
+            try {
+                mobileLayoutMediaQuery = window.matchMedia(`(max-width: ${MOBILE_LAYOUT_BREAKPOINT_PX}px)`);
+                if (typeof mobileLayoutMediaQuery.addEventListener === 'function') {
+                    mobileLayoutMediaQuery.addEventListener('change', update);
+                } else if (typeof mobileLayoutMediaQuery.addListener === 'function') {
+                    mobileLayoutMediaQuery.addListener(update);
+                }
+            } catch (_) {}
+            window.addEventListener('resize', update, { passive: true });
+            update();
+        }
+
         function applyPreviewMode(mode, persist = true) {
             const nextMode = mode === 'mobile' ? 'mobile' : 'desktop';
             currentPreviewMode = nextMode;
             document.body.classList.toggle('preview-mobile', nextMode === 'mobile');
+            syncMobileLayoutClass();
 
             const desktopBtn = document.getElementById('preview-desktop-btn');
             const mobileBtn = document.getElementById('preview-mobile-btn');
@@ -5282,6 +5696,26 @@
         function getSolvedTone(index) {
             const tones = SOLVED_TONES[getActiveTheme()] || SOLVED_TONES.light;
             return tones[Math.min(index, tones.length - 1)];
+        }
+
+        function getOrCreateSolveAnimationLayer() {
+            let layer = document.getElementById('solve-animation-layer');
+            if (layer) return layer;
+
+            layer = document.createElement('div');
+            layer.id = 'solve-animation-layer';
+            document.body.appendChild(layer);
+            return layer;
+        }
+
+        function createSolvedBannerElement(groupData, solvedBgColor, solvedTextColor) {
+            const banner = document.createElement('div');
+            banner.className = 'solved-banner';
+            banner.style.backgroundColor = solvedBgColor;
+            banner.style.color = solvedTextColor;
+            banner.innerHTML = `<div class="solved-title">${groupData.category}</div><div class="solved-words">${groupData.items.join(', ')}</div>`;
+            fitSolvedBannerText(banner);
+            return banner;
         }
 
         function syncLegendPalette() {
@@ -6383,7 +6817,7 @@
             }
         }
 
-        async function handleSuccess(categoryName) {
+        async function handleSuccessLegacy(categoryName) {
             isAnimating = true;
             const groupData = gameData.find(g => g.category === categoryName);
             const container = document.getElementById('grid-container');
@@ -6562,6 +6996,196 @@
             isAnimating = false;
         }
 
+        async function handleSuccess(categoryName) {
+            isAnimating = true;
+            const groupData = gameData.find(g => g.category === categoryName);
+            const container = document.getElementById('grid-container');
+            if (!groupData || !container) {
+                isAnimating = false;
+                return;
+            }
+
+            const solvedTone = getSolvedTone(solvedCount);
+            const solvedBgColor = solvedTone.bg;
+            const solvedTextColor = solvedTone.text;
+            const isMobileLayout = document.body.classList.contains('mobile-layout-active');
+            const animationLayer = getOrCreateSolveAnimationLayer();
+            const activeSelection = [...selectedItems];
+            const successCards = activeSelection.map(item => item.element).filter(Boolean);
+            let containerHeightLocked = false;
+
+            try {
+                spawnMagicStars(successCards);
+                container.classList.add('magic-flash');
+                successCards.forEach(card => card.classList.add('magic-burst'));
+                await delay(150);
+
+                const containerRect = container.getBoundingClientRect();
+                if (containerRect.height > 0) {
+                    container.style.minHeight = `${Math.ceil(containerRect.height)}px`;
+                    containerHeightLocked = true;
+                }
+
+                const startPositions = activeSelection
+                    .map(item => {
+                        const element = item.element;
+                        if (!element) return null;
+
+                        const rect = element.getBoundingClientRect();
+                        if (!rect.width || !rect.height) return null;
+
+                        const computed = window.getComputedStyle(element);
+                        const titleNode = element.querySelector('.card-title');
+                        const metaNode = element.querySelector('.card-meta');
+                        const visualNode = element.querySelector('.card-visual');
+                        const titleComputed = titleNode ? window.getComputedStyle(titleNode) : null;
+                        const metaComputed = metaNode ? window.getComputedStyle(metaNode) : null;
+                        const visualComputed = visualNode ? window.getComputedStyle(visualNode) : null;
+
+                        return {
+                            item,
+                            element,
+                            left: rect.left,
+                            top: rect.top,
+                            width: rect.width,
+                            height: rect.height,
+                            startBg: computed.backgroundColor,
+                            startBorder: computed.borderColor,
+                            startColor: computed.color,
+                            startTitleColor: titleComputed ? titleComputed.color : computed.color,
+                            startMetaColor: metaComputed ? metaComputed.color : computed.color,
+                            startVisualBg: visualComputed ? visualComputed.backgroundColor : '',
+                            startVisualBorder: visualComputed ? visualComputed.borderColor : ''
+                        };
+                    })
+                    .filter(Boolean);
+
+                const banner = createSolvedBannerElement(groupData, solvedBgColor, solvedTextColor);
+                banner.classList.add('measure-proxy');
+
+                startPositions.forEach(pos => {
+                    pos.element.classList.remove('magic-burst', 'selected', 'jump', 'shake');
+                    pos.element.remove();
+                });
+
+                const firstVisibleCard = container.querySelector('.card');
+                if (firstVisibleCard) {
+                    container.insertBefore(banner, firstVisibleCard);
+                } else {
+                    container.appendChild(banner);
+                }
+
+                const bannerRect = banner.getBoundingClientRect();
+                const segmentGap = isMobileLayout ? 6 : 8;
+                const segmentWidth = Math.max(1, (bannerRect.width - (segmentGap * 3)) / 4);
+                const flightDuration = isMobileLayout ? 900 : 820;
+                const flightLift = isMobileLayout ? 16 : 10;
+
+                const flightCards = startPositions.map((pos, index) => {
+                    const ghost = document.createElement('div');
+                    ghost.className = 'card flight-ghost';
+                    ghost.setAttribute('aria-hidden', 'true');
+
+                    const ghostShell = document.createElement('div');
+                    ghostShell.className = 'card-shell';
+
+                    const ghostTitle = document.createElement('div');
+                    ghostTitle.className = 'card-title';
+                    ghostTitle.textContent = pos.element.querySelector('.card-title')?.textContent || pos.item.word || '';
+
+                    ghostShell.appendChild(ghostTitle);
+                    ghost.appendChild(ghostShell);
+
+                    ghost.style.top = `${pos.top}px`;
+                    ghost.style.left = `${pos.left}px`;
+                    ghost.style.width = `${pos.width}px`;
+                    ghost.style.height = `${pos.height}px`;
+                    ghost.style.opacity = '1';
+                    ghost.style.setProperty('background-color', pos.startBg, 'important');
+                    ghost.style.setProperty('border-color', pos.startBorder, 'important');
+                    ghost.style.setProperty('color', pos.startColor, 'important');
+                    ghost.style.transition = 'background-color 420ms ease, border-color 420ms ease, color 320ms ease';
+
+                    ghostTitle.style.color = pos.startTitleColor;
+                    ghostTitle.style.transition = 'color 320ms ease';
+
+                    animationLayer.appendChild(ghost);
+
+                    const targetLeft = bannerRect.left + (index * (segmentWidth + segmentGap));
+                    const dx = targetLeft - pos.left;
+                    const dy = bannerRect.top - pos.top;
+                    const sx = segmentWidth / pos.width;
+                    const sy = bannerRect.height / pos.height;
+
+                    const anim = ghost.animate(
+                        [
+                            { transform: 'translate(0px, 0px) scale(1, 1)', opacity: 1 },
+                            {
+                                transform: `translate(${(dx * 0.7).toFixed(2)}px, ${((dy * 0.7) - flightLift).toFixed(2)}px) scale(${(1 + ((sx - 1) * 0.7)).toFixed(4)}, ${(1 + ((sy - 1) * 0.7)).toFixed(4)})`,
+                                opacity: 1,
+                                offset: 0.72
+                            },
+                            { transform: `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`, opacity: 1 }
+                        ],
+                        { duration: flightDuration, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
+                    );
+
+                    requestAnimationFrame(() => {
+                        ghost.style.setProperty('background-color', solvedBgColor, 'important');
+                        ghost.style.setProperty('border-color', solvedBgColor, 'important');
+                        ghost.style.setProperty('color', solvedTextColor, 'important');
+                        ghostTitle.style.color = solvedTextColor;
+                    });
+
+                    return { ghost, anim };
+                });
+
+                await Promise.all(flightCards.map(flight => flight.anim.finished.catch(() => {})));
+
+                banner.classList.remove('measure-proxy');
+                banner.style.visibility = 'visible';
+                void banner.offsetWidth;
+                banner.classList.add('reveal');
+                banner.classList.add('grand-fuse');
+                banner.style.opacity = '1';
+
+                await delay(90);
+
+                const fadePromises = flightCards.map(flight => {
+                    const fade = flight.ghost.animate(
+                        [{ opacity: 1 }, { opacity: 0 }],
+                        { duration: 230, easing: 'ease-out', fill: 'forwards' }
+                    );
+                    return fade.finished.catch(() => {});
+                });
+                await Promise.all(fadePromises);
+                flightCards.forEach(flight => flight.ghost.remove());
+                setTimeout(() => banner.classList.remove('grand-fuse'), 710);
+
+                activeSelection.forEach(item => {
+                    item.solved = true;
+                    item.element = null;
+                });
+                selectedItems = [];
+                applyGlassCardStagger();
+                playSolvedBannerSound();
+
+                solvedCount++;
+                updateSubmitButton();
+
+                if (solvedCount === 4) {
+                    await transitionToNextGameAfterWin();
+                    return;
+                }
+            } finally {
+                container.classList.remove('magic-flash');
+                if (containerHeightLocked) {
+                    container.style.removeProperty('min-height');
+                }
+                isAnimating = false;
+            }
+        }
+
         function showMessage(text) {
             return;
         }
@@ -6570,6 +7194,7 @@
         initSoundToggle();
         initDevToolsPanel();
         initDevPreviewToggle();
+        initMobileLayoutSync();
         initDevQuickSolveControls();
         initWrongBubbleDelayControl();
         applyVisualStyle();
