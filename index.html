@@ -3871,7 +3871,7 @@
         }
         @media (max-width: 600px) {
             body {
-                padding: 0 4px 18px;
+                padding: 0 2px 18px;
             }
             .game-header-container,
             .game-container {
@@ -3879,13 +3879,13 @@
                 max-width: none !important;
             }
             .nyt-nav {
-                width: calc(100% - 8px);
+                width: calc(100% - 4px);
                 max-width: none;
                 min-height: 58px;
                 height: auto;
                 padding: 8px 14px;
                 gap: 10px;
-                left: 4px;
+                left: 2px;
                 transform: none;
                 border-radius: 0 0 18px 18px;
                 border-left: none !important;
@@ -3922,7 +3922,7 @@
             }
             .game-header-container {
                 width: 100%;
-                padding: 0 6px;
+                padding: 0 2px;
                 margin-top: 78px !important;
                 margin-bottom: 2px;
             }
@@ -3938,16 +3938,16 @@
             .instructions {
                 margin: 0 0 14px;
                 font-size: 15px;
-                padding: 0 6px;
+                padding: 0 2px;
             }
             #grid-container {
-                width: 100%;
+                width: calc(100% + 2px);
                 max-width: none !important;
-                gap: 6px !important;
+                gap: 4px !important;
                 padding: 0 !important;
                 margin-bottom: 18px;
-                margin-left: 0;
-                margin-right: 0;
+                margin-left: -1px;
+                margin-right: -1px;
                 border: none !important;
                 background: transparent !important;
                 box-shadow: none !important;
@@ -3957,22 +3957,22 @@
             .card {
                 aspect-ratio: auto;
                 min-height: 0;
-                height: 82px !important;
-                border-radius: 12px !important;
-                padding: 6px 4px !important;
+                height: 70px !important;
+                border-radius: 11px !important;
+                padding: 5px 3px !important;
             }
             .solved-banner {
                 min-height: 0;
-                height: 86px !important;
-                border-radius: 12px !important;
+                height: 74px !important;
+                border-radius: 11px !important;
                 padding: 10px 10px;
             }
             .card-shell {
-                padding: 0 4px;
+                padding: 0 3px;
             }
             .card-title {
-                font-size: clamp(11px, 3.05vw, 13px) !important;
-                line-height: 1.12;
+                font-size: clamp(10px, 3vw, 12px) !important;
+                line-height: 1.06;
                 letter-spacing: 0;
                 word-break: normal;
                 overflow-wrap: break-word;
@@ -3985,7 +3985,7 @@
             .controls {
                 gap: 10px;
                 flex-wrap: wrap;
-                padding: 0 4px;
+                padding: 0 2px;
             }
             button {
                 min-width: calc(50% - 5px);
@@ -4003,7 +4003,7 @@
                 flex-wrap: wrap;
                 justify-content: center;
                 text-align: center;
-                padding: 0 4px;
+                padding: 0 2px;
             }
             .solved-title {
                 font-size: 12px;
@@ -4071,11 +4071,11 @@
                 content: none !important;
             }
             body.visual-dashboard #grid-container {
-                width: 100% !important;
+                width: calc(100% + 2px) !important;
                 max-width: none !important;
                 padding: 0 !important;
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+                margin-left: -1px !important;
+                margin-right: -1px !important;
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
@@ -4095,19 +4095,19 @@
         @media (max-width: 420px) {
             #grid-container {
                 width: 100%;
-                gap: 5px !important;
+                gap: 4px !important;
             }
             .card {
-                height: 76px !important;
+                height: 64px !important;
                 padding: 5px 3px !important;
             }
             .solved-banner {
-                height: 80px !important;
+                height: 68px !important;
                 padding: 9px 10px;
             }
             .card-title {
-                font-size: clamp(10px, 3.2vw, 11.5px) !important;
-                line-height: 1.08;
+                font-size: clamp(9px, 3vw, 10.5px) !important;
+                line-height: 1.04;
             }
             .game-container {
                 padding: 8px 0 16px;
@@ -4158,7 +4158,7 @@
             z-index: 0;
         }
         body.preview-mobile .nyt-nav {
-            width: calc(100% - 8px) !important;
+            width: calc(100% - 4px) !important;
             max-width: none !important;
             min-height: 58px;
             height: auto;
@@ -4228,7 +4228,7 @@
             align-self: stretch;
         }
         body.preview-mobile .game-header-container {
-            padding: 0 6px;
+            padding: 0 2px;
             margin-top: 0 !important;
             margin-bottom: 2px;
         }
@@ -4247,15 +4247,15 @@
         body.preview-mobile .instructions {
             margin: 0 0 14px;
             font-size: 15px;
-            padding: 0 6px;
+            padding: 0 2px;
         }
         body.preview-mobile #grid-container {
-            width: 100% !important;
-            gap: 6px !important;
+            width: calc(100% + 2px) !important;
+            gap: 4px !important;
             padding: 0 !important;
             margin-bottom: 18px;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
+            margin-left: -1px !important;
+            margin-right: -1px !important;
             border: none !important;
             background: transparent !important;
             box-shadow: none !important;
@@ -4266,22 +4266,22 @@
         body.preview-mobile .card {
             aspect-ratio: auto;
             min-height: 0;
-            height: 82px !important;
-            border-radius: 12px !important;
-            padding: 6px 4px !important;
+            height: 70px !important;
+            border-radius: 11px !important;
+            padding: 5px 3px !important;
         }
         body.preview-mobile .solved-banner {
             min-height: 0;
-            height: 86px !important;
-            border-radius: 12px !important;
+            height: 74px !important;
+            border-radius: 11px !important;
             padding: 10px 10px;
         }
         body.preview-mobile .card-shell {
-            padding: 0 4px;
+            padding: 0 3px;
         }
         body.preview-mobile .card-title {
-            font-size: clamp(11px, 3.05vw, 13px) !important;
-            line-height: 1.12;
+            font-size: clamp(10px, 3vw, 12px) !important;
+            line-height: 1.06;
             letter-spacing: 0;
             word-break: normal;
             overflow-wrap: break-word;
@@ -4290,7 +4290,7 @@
         body.preview-mobile .controls {
             gap: 10px;
             flex-wrap: wrap;
-            padding: 0 4px;
+            padding: 0 2px;
         }
         body.preview-mobile button {
             min-width: calc(50% - 5px);
@@ -4308,7 +4308,7 @@
             flex-wrap: wrap;
             justify-content: center;
             text-align: center;
-            padding: 0 4px;
+            padding: 0 2px;
         }
         body.preview-mobile .solved-title {
             font-size: 12px;
@@ -4346,11 +4346,11 @@
             border-radius: 0 !important;
         }
         body.preview-mobile.visual-dashboard #grid-container {
-            width: 100% !important;
+            width: calc(100% + 2px) !important;
             max-width: none !important;
             padding: 0 !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
+            margin-left: -1px !important;
+            margin-right: -1px !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
