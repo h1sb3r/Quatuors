@@ -5959,6 +5959,10 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+        function nextFrame() {
+            return new Promise(resolve => requestAnimationFrame(() => resolve()));
+        }
+
         function spawnMagicStars(cards) {
             if (!Array.isArray(cards) || !cards.length) return;
             if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -7248,9 +7252,10 @@
                 const finalBannerRect = measureSolvedBannerRect(container, groupData, solvedBgColor, solvedTextColor);
                 const segmentGap = isMobileLayout ? 6 : 8;
                 const segmentWidth = Math.max(1, (finalBannerRect.width - (segmentGap * 3)) / 4);
-                const flightDuration = isMobileLayout ? 620 : 560;
-                const flightLift = isMobileLayout ? 18 : 14;
-                const fuseDuration = isMobileLayout ? 320 : 280;
+                const flightDuration = isMobileLayout ? 760 : 660;
+                const flightLift = isMobileLayout ? 22 : 16;
+                const rowHoldDuration = isMobileLayout ? 170 : 130;
+                const fuseDuration = isMobileLayout ? 430 : 360;
 
                 const bannerOverlay = createSolvedBannerElement(groupData, solvedBgColor, solvedTextColor);
                 bannerOverlay.classList.add('solve-banner-overlay');
@@ -7280,19 +7285,8 @@
                     const dy = targetRect.top - pos.top;
                     const sx = targetRect.width / pos.width;
                     const sy = targetRect.height / pos.height;
-
-                    const anim = ghost.animate(
-                        [
-                            { transform: 'translate(0px, 0px) scale(1, 1)', opacity: 1 },
-                            {
-                                transform: `translate(${(dx * 0.72).toFixed(2)}px, ${((dy * 0.72) - flightLift).toFixed(2)}px) scale(${(1 + ((sx - 1) * 0.72)).toFixed(4)}, ${(1 + ((sy - 1) * 0.72)).toFixed(4)})`,
-                                opacity: 1,
-                                offset: 0.74
-                            },
-                            { transform: `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`, opacity: 1 }
-                        ],
-                        { duration: flightDuration, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' }
-                    );
+                    ghost.style.transform = 'translate(0px, 0px) scale(1, 1)';
+                    ghost.style.transition = 'none';
 
                     requestAnimationFrame(() => {
                         ghost.style.setProperty('background-color', solvedBgColor, 'important');
@@ -7301,52 +7295,61 @@
                         ghostTitle.style.color = solvedTextColor;
                     });
 
-                    return { ghost, anim, targetRect };
+                    return { ghost, targetRect, dx, dy, sx, sy };
                 });
 
-                await delay(flightDuration + 40);
+                await nextFrame();
+                flightCards.forEach(flight => {
+                    flight.ghost.style.transition = `transform ${flightDuration}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+                    flight.ghost.style.transform = `translate(${flight.dx.toFixed(2)}px, ${flight.dy.toFixed(2)}px) scale(${flight.sx.toFixed(4)}, ${flight.sy.toFixed(4)})`;
+                });
+
+                await delay(flightDuration + 50);
 
                 flightCards.forEach(flight => {
+                    flight.ghost.style.transition = 'none';
                     flight.ghost.style.left = `${flight.targetRect.left}px`;
                     flight.ghost.style.top = `${flight.targetRect.top}px`;
                     flight.ghost.style.width = `${flight.targetRect.width}px`;
                     flight.ghost.style.height = `${flight.targetRect.height}px`;
-                    flight.anim.cancel();
+                    flight.ghost.style.transform = 'translate(0px, 0px) scale(1, 1)';
                 });
 
-                const collapseBase = Math.max(6, segmentGap * (isMobileLayout ? 1.55 : 1.2));
+                await delay(rowHoldDuration);
+
+                const collapseBase = Math.max(segmentWidth * (isMobileLayout ? 1.08 : 0.9), 18);
                 const inwardOffsets = [
                     collapseBase,
-                    collapseBase * 0.34,
-                    -collapseBase * 0.34,
+                    collapseBase * 0.36,
+                    -collapseBase * 0.36,
                     -collapseBase
                 ];
 
-                const bannerAnim = bannerOverlay.animate(
-                    [
-                        { opacity: 0, transform: 'translateY(6px) scale(0.9, 0.84)', filter: 'brightness(1.08) saturate(1.06)' },
-                        { opacity: 1, transform: 'translateY(-2px) scale(1.03, 1.05)', filter: 'brightness(1.12) saturate(1.08)', offset: 0.62 },
-                        { opacity: 1, transform: 'translateY(0) scale(1, 1)', filter: 'brightness(1) saturate(1)' }
-                    ],
-                    { duration: fuseDuration, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' }
-                );
+                bannerOverlay.style.transformOrigin = 'center center';
+                bannerOverlay.style.transform = 'translateY(10px) scale(0.46, 0.82)';
+                bannerOverlay.style.filter = 'brightness(1.08) saturate(1.04)';
+                bannerOverlay.style.transition = 'none';
 
-                const fadePromises = flightCards.map((flight, index) => {
-                    flight.ghost.animate(
-                        [{ opacity: 1 }, { opacity: 0 }],
-                        { duration: fuseDuration - 30, easing: 'ease-out', fill: 'forwards' }
-                    );
-                    flight.ghost.animate(
-                        [
-                            { transform: 'translate(0px, 0px) scale(1, 1)', opacity: 1 },
-                            { transform: `translate(${inwardOffsets[index].toFixed(2)}px, 0px) scale(1.09, 0.95)`, opacity: 0 }
-                        ],
-                        { duration: fuseDuration, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' }
-                    );
-                    return true;
+                flightCards.forEach(flight => {
+                    flight.ghost.style.transition = 'none';
+                    flight.ghost.style.transform = 'translate(0px, 0px) scale(1, 1)';
+                    flight.ghost.style.opacity = '1';
                 });
-                void fadePromises;
-                await delay(fuseDuration + 40);
+
+                await nextFrame();
+
+                bannerOverlay.style.transition = `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${fuseDuration}ms ease-out, filter ${fuseDuration}ms ease-out`;
+                bannerOverlay.style.opacity = '1';
+                bannerOverlay.style.transform = 'translateY(0px) scale(1, 1)';
+                bannerOverlay.style.filter = 'brightness(1) saturate(1)';
+
+                flightCards.forEach((flight, index) => {
+                    flight.ghost.style.transition = `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1), opacity ${Math.max(120, fuseDuration - 40)}ms ease-out`;
+                    flight.ghost.style.transform = `translate(${inwardOffsets[index].toFixed(2)}px, 0px) scale(1.26, 0.78)`;
+                    flight.ghost.style.opacity = '0';
+                });
+
+                await delay(fuseDuration + 60);
 
                 insertSolvedBannerIntoGrid();
                 bannerOverlay.remove();
