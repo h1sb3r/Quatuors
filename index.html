@@ -4048,6 +4048,15 @@
                 border-top: none !important;
                 border-bottom: 1px solid #ded8cf !important;
             }
+            body.visual-dashboard .game-container {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
+            body.visual-dashboard .game-container::before {
+                content: none !important;
+            }
             body.visual-dashboard .nav-left,
             body.visual-dashboard .nav-left span,
             body.visual-dashboard .nav-icon {
@@ -4294,6 +4303,12 @@
         }
         body.preview-mobile.visual-dashboard .nyt-nav {
             background: rgba(255, 255, 255, 0.96) !important;
+        }
+        body.preview-mobile.visual-dashboard .game-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
         }
         body.preview-mobile.visual-dashboard .nav-left,
         body.preview-mobile.visual-dashboard .nav-left span,
