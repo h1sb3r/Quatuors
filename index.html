@@ -3873,6 +3873,11 @@
             body {
                 padding: 0 0 18px;
             }
+            .game-header-container,
+            .game-container {
+                align-self: stretch;
+                max-width: none !important;
+            }
             .nyt-nav {
                 width: 100%;
                 max-width: none;
@@ -3914,13 +3919,13 @@
                 background: #151515;
             }
             .game-header-container {
-                width: 100%;
-                padding: 0 10px;
+                width: calc(100vw - 8px);
+                padding: 0 8px;
                 margin-top: 78px !important;
                 margin-bottom: 2px;
             }
             .game-container {
-                width: 100%;
+                width: calc(100vw - 4px);
                 margin-top: 4px;
                 padding: 8px 0 18px;
                 border-radius: 0 !important;
@@ -3931,27 +3936,33 @@
             .instructions {
                 margin: 0 0 14px;
                 font-size: 15px;
+                padding: 0 8px;
             }
             #grid-container {
+                width: calc(100vw - 8px);
+                max-width: none !important;
                 gap: 6px !important;
                 padding: 0 !important;
                 margin-bottom: 18px;
+                margin-left: auto;
+                margin-right: auto;
                 border: none !important;
                 background: transparent !important;
                 box-shadow: none !important;
                 border-radius: 0 !important;
+                overflow: visible !important;
             }
             .card {
-                aspect-ratio: 1 / 1;
-                min-height: 74px;
-                height: auto !important;
-                border-radius: 10px !important;
+                aspect-ratio: auto;
+                min-height: 0;
+                height: 82px !important;
+                border-radius: 12px !important;
                 padding: 6px 4px !important;
             }
             .solved-banner {
-                min-height: 78px;
-                height: auto !important;
-                border-radius: 10px !important;
+                min-height: 0;
+                height: 86px !important;
+                border-radius: 12px !important;
                 padding: 10px 10px;
             }
             .card-shell {
@@ -4057,6 +4068,17 @@
             body.visual-dashboard .game-container::before {
                 content: none !important;
             }
+            body.visual-dashboard #grid-container {
+                width: calc(100vw - 8px) !important;
+                max-width: none !important;
+                padding: 0 !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+            }
             body.visual-dashboard .nav-left,
             body.visual-dashboard .nav-left span,
             body.visual-dashboard .nav-icon {
@@ -4070,14 +4092,15 @@
         }
         @media (max-width: 420px) {
             #grid-container {
-                gap: 6px !important;
+                width: calc(100vw - 6px);
+                gap: 5px !important;
             }
             .card {
-                min-height: 66px;
+                height: 76px !important;
                 padding: 5px 3px !important;
             }
             .solved-banner {
-                min-height: 70px;
+                height: 80px !important;
                 padding: 9px 10px;
             }
             .card-title {
@@ -4196,9 +4219,10 @@
         body.preview-mobile .game-container {
             width: min(390px, calc(100vw - 44px)) !important;
             max-width: 390px !important;
+            align-self: stretch;
         }
         body.preview-mobile .game-header-container {
-            padding: 0 10px;
+            padding: 0 8px;
             margin-top: 88px !important;
             margin-bottom: 2px;
         }
@@ -4217,28 +4241,33 @@
         body.preview-mobile .instructions {
             margin: 0 0 14px;
             font-size: 15px;
+            padding: 0 8px;
         }
         body.preview-mobile #grid-container {
+            width: calc(100% - 4px) !important;
             gap: 6px !important;
             padding: 0 !important;
             margin-bottom: 18px;
+            margin-left: auto !important;
+            margin-right: auto !important;
             border: none !important;
             background: transparent !important;
             box-shadow: none !important;
             border-radius: 0 !important;
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            overflow: visible !important;
         }
         body.preview-mobile .card {
-            aspect-ratio: 1 / 1;
-            min-height: 74px;
-            height: auto !important;
-            border-radius: 10px !important;
+            aspect-ratio: auto;
+            min-height: 0;
+            height: 82px !important;
+            border-radius: 12px !important;
             padding: 6px 4px !important;
         }
         body.preview-mobile .solved-banner {
-            min-height: 78px;
-            height: auto !important;
-            border-radius: 10px !important;
+            min-height: 0;
+            height: 86px !important;
+            border-radius: 12px !important;
             padding: 10px 10px;
         }
         body.preview-mobile .card-shell {
@@ -4305,6 +4334,17 @@
             background: rgba(255, 255, 255, 0.96) !important;
         }
         body.preview-mobile.visual-dashboard .game-container {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+        }
+        body.preview-mobile.visual-dashboard #grid-container {
+            width: calc(100% - 4px) !important;
+            max-width: none !important;
+            padding: 0 !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
