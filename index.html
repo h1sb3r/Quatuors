@@ -2970,6 +2970,9 @@
             padding: 0 12px;
             overflow-wrap: anywhere;
         }
+        .solved-word-target {
+            display: inline-block;
+        }
 
         .mistakes-container {
             display: flex;
@@ -5718,7 +5721,25 @@
             banner.className = 'solved-banner';
             banner.style.backgroundColor = solvedBgColor;
             banner.style.color = solvedTextColor;
-            banner.innerHTML = `<div class="solved-title">${groupData.category}</div><div class="solved-words">${groupData.items.join(', ')}</div>`;
+            const title = document.createElement('div');
+            title.className = 'solved-title';
+            title.textContent = groupData.category;
+
+            const words = document.createElement('div');
+            words.className = 'solved-words';
+            groupData.items.forEach((word, index) => {
+                const span = document.createElement('span');
+                span.className = 'solved-word-target';
+                span.dataset.word = word;
+                span.textContent = word;
+                words.appendChild(span);
+                if (index < groupData.items.length - 1) {
+                    words.appendChild(document.createTextNode(', '));
+                }
+            });
+
+            banner.appendChild(title);
+            banner.appendChild(words);
             fitSolvedBannerText(banner);
             return banner;
         }
@@ -5860,22 +5881,9 @@
                     .map(createCardAnimationEntry)
                     .filter(Boolean)
             );
-            const topAnchor = allEntries.length
-                ? Math.min(...allEntries.map(entry => entry.top))
-                : container.getBoundingClientRect().top;
             const entries = allEntries.filter(entry => selectedSet.has(entry.item));
             const orderedSelection = entries.length ? entries.map(entry => entry.item) : [...selection];
             const remainingEntries = allEntries.filter(entry => !selectedSet.has(entry.item));
-            const topRowEntries = allEntries.slice(0, Math.min(4, allEntries.length));
-            const finalLayout = measureSolveFinalLayout(
-                container,
-                remainingEntries,
-                groupData,
-                solvedBgColor,
-                solvedTextColor,
-                topAnchor
-            );
-            const finalRectMap = new Map(finalLayout.finalRects.map(rect => [rect.item, rect]));
 
             return {
                 selection: orderedSelection,
@@ -5885,17 +5893,9 @@
                 solvedBgColor,
                 solvedTextColor,
                 isMobileLayout,
-                switchRects: topRowEntries.map(entry => ({
-                    left: entry.left,
-                    top: entry.top,
-                    width: entry.width,
-                    height: entry.height
-                })),
-                bannerRect: finalLayout.bannerRect,
-                finalRectMap,
                 timings: isMobileLayout
-                    ? { flight: 500, hold: 120, fuse: 300 }
-                    : { flight: 430, hold: 100, fuse: 250 }
+                    ? { ghost: 540, banner: 340, flip: 360, settle: 80 }
+                    : { ghost: 480, banner: 320, flip: 320, settle: 70 }
             };
         }
 
@@ -5949,23 +5949,7 @@
             session.style.pointerEvents = 'none';
             session.style.overflow = 'visible';
 
-            const banner = createSolvedBannerElement(
-                measurement.groupData,
-                measurement.solvedBgColor,
-                measurement.solvedTextColor
-            );
-            banner.classList.add('solve-banner-overlay');
-            banner.style.left = `${measurement.bannerRect.left}px`;
-            banner.style.top = `${measurement.bannerRect.top}px`;
-            banner.style.width = `${measurement.bannerRect.width}px`;
-            banner.style.height = `${measurement.bannerRect.height}px`;
-            banner.style.opacity = '0';
-            banner.style.transform = `translate3d(0, ${measurement.isMobileLayout ? 10 : 8}px, 0) scale(0.96, 0.92)`;
-            banner.style.filter = 'brightness(1.05) saturate(1.04)';
-            banner.style.willChange = 'transform, opacity';
-            session.appendChild(banner);
-
-            const ghosts = measurement.entries.map((entry, index) => {
+            const ghosts = measurement.entries.map(entry => {
                 const { ghost, title } = createSolveGhostFromEntry(entry);
                 ghost.style.zIndex = '4';
                 session.appendChild(ghost);
@@ -5973,131 +5957,138 @@
                 return {
                     entry,
                     ghost,
-                    title,
-                    targetRect: measurement.switchRects[index] || {
-                        left: entry.left,
-                        top: entry.top,
-                        width: entry.width,
-                        height: entry.height
-                    }
+                    title
                 };
             });
-
-            const remainingGhosts = measurement.remainingEntries
-                .map(entry => {
-                    const targetRect = measurement.finalRectMap.get(entry.item);
-                    if (!targetRect) return null;
-                    const { ghost, title } = createSolveGhostFromEntry(entry);
-                    ghost.style.zIndex = '2';
-                    session.appendChild(ghost);
-                    return { entry, ghost, title, targetRect };
-                })
-                .filter(Boolean);
 
             layer.appendChild(session);
 
             return {
                 session,
-                banner,
                 ghosts,
-                remainingGhosts,
                 destroy() {
-                    [...ghosts, ...remainingGhosts].forEach(item => {
+                    ghosts.forEach(item => {
                         item.ghost.style.removeProperty('will-change');
                     });
-                    banner.style.removeProperty('will-change');
                     session.remove();
                 }
             };
         }
 
-        async function playSolveFlightPhase(measurement, overlay) {
-            await nextFrame();
+        function measureBannerWordTargets(banner) {
+            return Array.from(banner.querySelectorAll('.solved-word-target')).map(node => ({
+                word: node.dataset.word || node.textContent || '',
+                rect: node.getBoundingClientRect()
+            }));
+        }
 
-            overlay.ghosts.forEach(item => {
-                const dx = item.targetRect.left - item.entry.left;
-                const dy = item.targetRect.top - item.entry.top;
-                const sx = item.targetRect.width / item.entry.width;
-                const sy = item.targetRect.height / item.entry.height;
+        async function animateRemainingCardsFlip(measurement) {
+            const animatedCards = [];
 
-                item.ghost.style.transition = [
-                    `transform ${measurement.timings.flight}ms cubic-bezier(0.22, 1, 0.36, 1)`,
-                    `background-color ${Math.min(260, measurement.timings.flight - 80)}ms ease`,
-                    `border-color ${Math.min(260, measurement.timings.flight - 80)}ms ease`,
-                    `color ${Math.min(220, measurement.timings.flight - 120)}ms ease`,
-                    `box-shadow ${Math.min(220, measurement.timings.flight - 120)}ms ease`
-                ].join(', ');
-                item.title.style.transition = `color ${Math.min(220, measurement.timings.flight - 120)}ms ease`;
-                item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
-                item.ghost.style.backgroundColor = measurement.solvedBgColor;
-                item.ghost.style.borderColor = measurement.solvedBgColor;
-                item.ghost.style.boxShadow = '0 10px 22px rgba(0, 0, 0, 0.16)';
-                item.title.style.color = measurement.solvedTextColor;
+            measurement.remainingEntries.forEach(entry => {
+                const element = entry && entry.element;
+                if (!element || !element.isConnected) return;
+                const lastRect = element.getBoundingClientRect();
+                const dx = entry.left - lastRect.left;
+                const dy = entry.top - lastRect.top;
+                if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) return;
+
+                element.style.transition = 'none';
+                element.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)`;
+                element.style.willChange = 'transform';
+                animatedCards.push(element);
             });
 
-            overlay.remainingGhosts.forEach(item => {
-                const dx = item.targetRect.left - item.entry.left;
-                const dy = item.targetRect.top - item.entry.top;
-                item.ghost.style.transition = `transform ${measurement.timings.flight}ms cubic-bezier(0.22, 1, 0.36, 1)`;
-                item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(1, 1)`;
+            if (!animatedCards.length) return;
+
+            await nextFrame();
+            animatedCards.forEach(element => {
+                element.style.transition = `transform ${measurement.timings.flip}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
+                element.style.transform = 'translate3d(0, 0, 0)';
             });
 
             await Promise.all(
-                [...overlay.ghosts, ...overlay.remainingGhosts]
-                    .map(item => waitForTransitionOrTimeout(item.ghost, measurement.timings.flight + 180))
+                animatedCards.map(element => waitForTransitionOrTimeout(element, measurement.timings.flip + 140))
             );
 
-            [...overlay.ghosts, ...overlay.remainingGhosts].forEach(item => {
-                item.ghost.style.transition = 'none';
-                item.ghost.style.left = `${item.targetRect.left}px`;
-                item.ghost.style.top = `${item.targetRect.top}px`;
-                item.ghost.style.setProperty('width', `${item.targetRect.width}px`, 'important');
-                item.ghost.style.setProperty('height', `${item.targetRect.height}px`, 'important');
-                item.ghost.style.setProperty('min-height', `${item.targetRect.height}px`, 'important');
-                item.ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
+            animatedCards.forEach(element => {
+                element.style.removeProperty('transition');
+                element.style.removeProperty('transform');
+                element.style.removeProperty('will-change');
             });
-
-            await nextFrame();
-            await delay(measurement.timings.hold);
         }
 
-        async function playSolveFusePhase(measurement, overlay) {
-            const bannerCenterX = measurement.bannerRect.left + (measurement.bannerRect.width / 2);
-            const fuseDuration = measurement.timings.fuse;
+        async function playSolveFlightPhase(measurement, overlay, banner) {
+            const targetMap = new Map(
+                measureBannerWordTargets(banner).map(target => [target.word, target.rect])
+            );
+
+            banner.style.transition = 'none';
+            banner.style.opacity = '0';
+            banner.style.transform = 'scale(0.98) translateY(6px)';
 
             await nextFrame();
 
-            overlay.banner.style.transition = [
-                `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
-                `opacity ${fuseDuration}ms ease-out`,
-                `filter ${fuseDuration}ms ease-out`
+            banner.style.transition = [
+                `opacity ${measurement.timings.banner}ms ease`,
+                `transform ${measurement.timings.banner}ms cubic-bezier(0.2, 0.8, 0.2, 1)`
             ].join(', ');
-            overlay.banner.style.opacity = '1';
-            overlay.banner.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
-            overlay.banner.style.filter = 'brightness(1) saturate(1)';
+            banner.classList.add('reveal');
+            banner.style.opacity = '1';
+            banner.style.transform = 'none';
 
             overlay.ghosts.forEach(item => {
-                const currentCenterX = item.targetRect.left + (item.targetRect.width / 2);
-                const dxToCenter = bannerCenterX - currentCenterX;
+                const targetRect = targetMap.get(item.entry.word) || banner.getBoundingClientRect();
+                const dx = targetRect.left - item.entry.left;
+                const dy = targetRect.top - item.entry.top;
+                const sx = Math.max(0.28, targetRect.width / item.entry.width);
+                const sy = Math.max(0.32, targetRect.height / item.entry.height);
+
                 item.ghost.style.transition = [
-                    `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
-                    `opacity ${Math.max(180, fuseDuration - 20)}ms ease-out`
+                    `transform ${measurement.timings.ghost}ms cubic-bezier(0.2, 0.85, 0.2, 1)`,
+                    `opacity ${measurement.timings.ghost}ms ease`,
+                    `background-color ${Math.min(260, measurement.timings.ghost - 80)}ms ease`,
+                    `border-color ${Math.min(260, measurement.timings.ghost - 80)}ms ease`,
+                    `color ${Math.min(220, measurement.timings.ghost - 120)}ms ease`,
+                    `border-radius ${measurement.timings.ghost}ms ease`
                 ].join(', ');
-                item.ghost.style.transform = `translate3d(${dxToCenter.toFixed(2)}px, 0, 0) scale(0.78, 0.84)`;
-                item.ghost.style.opacity = '0';
+                item.title.style.transition = `color ${Math.min(220, measurement.timings.ghost - 120)}ms ease`;
+                item.ghost.style.backgroundColor = measurement.solvedBgColor;
+                item.ghost.style.borderColor = measurement.solvedBgColor;
+                item.ghost.style.borderRadius = '10px';
+                item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+                item.ghost.style.opacity = '0.92';
+                item.title.style.color = measurement.solvedTextColor;
             });
 
-            await waitForTransitionOrTimeout(overlay.banner, fuseDuration + 180);
+            await Promise.all(
+                overlay.ghosts.map(item => waitForTransitionOrTimeout(item.ghost, measurement.timings.ghost + 180))
+            );
+
+            overlay.ghosts.forEach(item => item.ghost.remove());
+            await delay(measurement.timings.settle);
         }
 
-        function commitSolvedRow(container, measurement) {
+        async function playSolveFusePhase() {
+            return;
+        }
+
+        function commitSolvedRow(container, measurement, options = {}) {
+            const shouldReveal = options.reveal !== false;
+            const shouldPlaySound = options.playSound !== false;
             const banner = createSolvedBannerElement(
                 measurement.groupData,
                 measurement.solvedBgColor,
                 measurement.solvedTextColor
             );
-            banner.classList.add('reveal');
-            banner.style.opacity = '1';
+            if (shouldReveal) {
+                banner.classList.add('reveal');
+                banner.style.opacity = '1';
+                banner.style.transform = 'none';
+            } else {
+                banner.style.opacity = '0';
+                banner.style.transform = 'scale(0.98) translateY(6px)';
+            }
 
             const selectedCards = measurement.selection
                 .map(item => item && item.element)
@@ -6131,7 +6122,9 @@
             selectedItems = [];
             applyGlassCardStagger();
             scheduleFitVisibleText();
-            playSolvedBannerSound();
+            if (shouldPlaySound) {
+                playSolvedBannerSound();
+            }
 
             solvedCount++;
             updateSubmitButton();
@@ -7769,6 +7762,7 @@
             };
             let measurement = null;
             let overlay = null;
+            let banner = null;
             let committed = false;
 
             try {
@@ -7795,16 +7789,15 @@
                     if (!item || !item.element) return;
                     item.element.classList.add('anim-hidden');
                 });
-                measurement.remainingEntries.forEach(entry => {
-                    if (!entry || !entry.element) return;
-                    entry.element.classList.add('anim-hidden');
-                });
 
-                await playSolveFlightPhase(measurement, overlay);
-                await playSolveFusePhase(measurement, overlay);
-
-                commitSolvedRow(container, measurement);
+                banner = commitSolvedRow(container, measurement, { reveal: false, playSound: false });
                 committed = true;
+
+                const flipPromise = animateRemainingCardsFlip(measurement);
+                await playSolveFlightPhase(measurement, overlay, banner);
+                await flipPromise;
+                await playSolveFusePhase();
+                playSolvedBannerSound();
 
                 overlay.destroy();
                 overlay = null;
@@ -7823,6 +7816,10 @@
                         if (!card || !card.isConnected) return;
                         card.classList.remove('anim-hidden', 'magic-burst', 'jump', 'shake');
                     });
+                } else if (banner && banner.isConnected) {
+                    banner.classList.add('reveal');
+                    banner.style.opacity = '1';
+                    banner.style.transform = 'none';
                 }
                 if (overlay) {
                     overlay.destroy();
