@@ -5733,97 +5733,212 @@
             });
         }
 
-        function measureSolveAnimation(container, selection, groupData, solvedBgColor, solvedTextColor) {
+        function createCardAnimationEntry(item) {
+            const element = item && item.element;
+            if (!element) return null;
+
+            const rect = element.getBoundingClientRect();
+            if (!rect.width || !rect.height) return null;
+
+            const computed = window.getComputedStyle(element);
+            const titleNode = element.querySelector('.card-title');
+            const titleComputed = titleNode ? window.getComputedStyle(titleNode) : null;
+
+            return {
+                item,
+                element,
+                word: item.word,
+                left: rect.left,
+                top: rect.top,
+                width: rect.width,
+                height: rect.height,
+                startBg: computed.backgroundColor,
+                startBorder: computed.border,
+                startBorderColor: computed.borderColor,
+                startShadow: computed.boxShadow,
+                startColor: computed.color,
+                startRadius: computed.borderRadius,
+                startPadding: computed.padding,
+                startTitleColor: titleComputed ? titleComputed.color : computed.color,
+                startTitleFontSize: titleComputed ? titleComputed.fontSize : '',
+                startTitleLineHeight: titleComputed ? titleComputed.lineHeight : '',
+                startTitleLetterSpacing: titleComputed ? titleComputed.letterSpacing : '',
+                startTitleTextShadow: titleComputed ? titleComputed.textShadow : ''
+            };
+        }
+
+        function createMeasureCardClone(entry) {
+            const clone = entry.element.cloneNode(true);
+            clone.classList.remove(
+                'selected',
+                'anim-hidden',
+                'jump',
+                'shake',
+                'magic-burst',
+                'moving',
+                'fade-in',
+                'flip-intro',
+                'flip-reveal',
+                'glass-enter',
+                'new-pop',
+                'solo-sheen',
+                'hover-reset'
+            );
+            clone.style.removeProperty('visibility');
+            clone.style.removeProperty('opacity');
+            clone.style.removeProperty('transform');
+            clone.style.removeProperty('--hover-x');
+            clone.style.removeProperty('--hover-y');
+            const flipCard = clone.querySelector('.scene > .flip-card');
+            if (flipCard) flipCard.classList.remove('flipped');
+            return clone;
+        }
+
+        function measureSolveFinalLayout(container, remainingEntries, groupData, solvedBgColor, solvedTextColor, anchorTop) {
             const layer = getOrCreateSolveAnimationLayer();
-            const isMobileLayout = document.body.classList.contains('mobile-layout-active');
             const containerRect = container.getBoundingClientRect();
-            const entries = sortEntriesByVisualOrder(selection
-                .map(item => {
-                    const element = item && item.element;
-                    if (!element) return null;
-
-                    const rect = element.getBoundingClientRect();
-                    if (!rect.width || !rect.height) return null;
-
-                    const computed = window.getComputedStyle(element);
-                    const titleNode = element.querySelector('.card-title');
-                    const titleComputed = titleNode ? window.getComputedStyle(titleNode) : null;
-
-                    return {
-                        item,
-                        element,
-                        word: item.word,
-                        left: rect.left,
-                        top: rect.top,
-                        width: rect.width,
-                        height: rect.height,
-                        startBg: computed.backgroundColor,
-                        startBorder: computed.border,
-                        startShadow: computed.boxShadow,
-                        startColor: computed.color,
-                        startRadius: computed.borderRadius,
-                        startPadding: computed.padding,
-                        startTitleColor: titleComputed ? titleComputed.color : computed.color,
-                        startTitleFontSize: titleComputed ? titleComputed.fontSize : '',
-                        startTitleLineHeight: titleComputed ? titleComputed.lineHeight : '',
-                        startTitleLetterSpacing: titleComputed ? titleComputed.letterSpacing : '',
-                        startTitleTextShadow: titleComputed ? titleComputed.textShadow : ''
-                    };
-                })
-                .filter(Boolean));
-            const orderedSelection = entries.length ? entries.map(entry => entry.item) : [...selection];
-            const visibleCardRects = Array.from(container.querySelectorAll('.card'))
-                .map(card => card.getBoundingClientRect())
-                .filter(rect => rect.width && rect.height);
-            const top = visibleCardRects.length
-                ? Math.min(...visibleCardRects.map(rect => rect.top))
-                : containerRect.top;
+            const containerComputed = window.getComputedStyle(container);
 
             const host = document.createElement('div');
             host.style.position = 'fixed';
-            host.style.left = '-200vw';
-            host.style.top = '0';
+            host.style.left = `${containerRect.left}px`;
+            host.style.top = `${anchorTop}px`;
             host.style.width = `${containerRect.width}px`;
+            host.style.display = 'grid';
+            host.style.gridTemplateColumns = containerComputed.gridTemplateColumns;
+            host.style.gap = containerComputed.gap;
+            host.style.padding = containerComputed.padding;
+            host.style.margin = '0';
+            host.style.boxSizing = 'border-box';
             host.style.pointerEvents = 'none';
             host.style.visibility = 'hidden';
             host.style.opacity = '0';
 
             const banner = createSolvedBannerElement(groupData, solvedBgColor, solvedTextColor);
             banner.classList.add('measure-proxy');
-            banner.style.width = '100%';
             host.appendChild(banner);
+
+            const clones = remainingEntries.map(entry => {
+                const clone = createMeasureCardClone(entry);
+                host.appendChild(clone);
+                return { entry, clone };
+            });
+
             layer.appendChild(host);
 
             const bannerRect = banner.getBoundingClientRect();
-            const measuredHeight = bannerRect.height || (isMobileLayout ? 78 : 112);
+            const finalRects = clones.map(({ entry, clone }) => {
+                const rect = clone.getBoundingClientRect();
+                return {
+                    item: entry.item,
+                    left: rect.left,
+                    top: rect.top,
+                    width: rect.width,
+                    height: rect.height
+                };
+            });
+
             host.remove();
-            const bannerTargetRect = {
-                left: containerRect.left,
-                top,
-                width: containerRect.width,
-                height: measuredHeight
+
+            return {
+                bannerRect: {
+                    left: bannerRect.left,
+                    top: bannerRect.top,
+                    width: bannerRect.width,
+                    height: bannerRect.height
+                },
+                finalRects
             };
-            const segmentGap = isMobileLayout ? 6 : 8;
-            const segmentWidth = Math.max(1, (bannerTargetRect.width - (segmentGap * 3)) / 4);
+        }
+
+        function measureSolveAnimation(container, selection, groupData, solvedBgColor, solvedTextColor) {
+            const isMobileLayout = document.body.classList.contains('mobile-layout-active');
+            const selectedSet = new Set(selection);
+            const allEntries = sortEntriesByVisualOrder(
+                gridItems
+                    .filter(item => !item.solved && item.element)
+                    .map(createCardAnimationEntry)
+                    .filter(Boolean)
+            );
+            const topAnchor = allEntries.length
+                ? Math.min(...allEntries.map(entry => entry.top))
+                : container.getBoundingClientRect().top;
+            const entries = allEntries.filter(entry => selectedSet.has(entry.item));
+            const orderedSelection = entries.length ? entries.map(entry => entry.item) : [...selection];
+            const remainingEntries = allEntries.filter(entry => !selectedSet.has(entry.item));
+            const topRowEntries = allEntries.slice(0, Math.min(4, allEntries.length));
+            const finalLayout = measureSolveFinalLayout(
+                container,
+                remainingEntries,
+                groupData,
+                solvedBgColor,
+                solvedTextColor,
+                topAnchor
+            );
+            const finalRectMap = new Map(finalLayout.finalRects.map(rect => [rect.item, rect]));
 
             return {
                 selection: orderedSelection,
                 entries,
+                remainingEntries,
                 groupData,
                 solvedBgColor,
                 solvedTextColor,
                 isMobileLayout,
-                bannerRect: bannerTargetRect,
-                segmentRects: Array.from({ length: 4 }, (_, index) => ({
-                    left: bannerTargetRect.left + (index * (segmentWidth + segmentGap)),
-                    top: bannerTargetRect.top,
-                    width: segmentWidth,
-                    height: bannerTargetRect.height
+                switchRects: topRowEntries.map(entry => ({
+                    left: entry.left,
+                    top: entry.top,
+                    width: entry.width,
+                    height: entry.height
                 })),
+                bannerRect: finalLayout.bannerRect,
+                finalRectMap,
                 timings: isMobileLayout
-                    ? { flight: 540, hold: 120, fuse: 300 }
-                    : { flight: 460, hold: 100, fuse: 250 }
+                    ? { flight: 500, hold: 120, fuse: 300 }
+                    : { flight: 430, hold: 100, fuse: 250 }
             };
+        }
+
+        function createSolveGhostFromEntry(entry) {
+            const ghost = document.createElement('div');
+            ghost.className = 'card flight-ghost';
+            ghost.setAttribute('aria-hidden', 'true');
+
+            const shell = document.createElement('div');
+            shell.className = 'card-shell';
+
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            title.textContent = entry.word || '';
+            title.style.color = entry.startTitleColor;
+            if (entry.startTitleFontSize) title.style.fontSize = entry.startTitleFontSize;
+            if (entry.startTitleLineHeight) title.style.lineHeight = entry.startTitleLineHeight;
+            if (entry.startTitleLetterSpacing) title.style.letterSpacing = entry.startTitleLetterSpacing;
+            if (entry.startTitleTextShadow) title.style.textShadow = entry.startTitleTextShadow;
+
+            shell.appendChild(title);
+            ghost.appendChild(shell);
+
+            ghost.style.left = `${entry.left}px`;
+            ghost.style.top = `${entry.top}px`;
+            ghost.style.setProperty('width', `${entry.width}px`, 'important');
+            ghost.style.setProperty('height', `${entry.height}px`, 'important');
+            ghost.style.setProperty('min-height', `${entry.height}px`, 'important');
+            ghost.style.setProperty('aspect-ratio', 'auto', 'important');
+            ghost.style.margin = '0';
+            ghost.style.padding = entry.startPadding;
+            ghost.style.opacity = '1';
+            ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
+            ghost.style.transition = 'none';
+            ghost.style.border = entry.startBorder;
+            ghost.style.borderColor = entry.startBorderColor;
+            ghost.style.borderRadius = entry.startRadius;
+            ghost.style.boxShadow = entry.startShadow;
+            ghost.style.backgroundColor = entry.startBg;
+            ghost.style.color = entry.startColor;
+            ghost.style.willChange = 'transform, opacity';
+
+            return { ghost, title };
         }
 
         function buildSolveOverlay(measurement) {
@@ -5851,50 +5966,33 @@
             session.appendChild(banner);
 
             const ghosts = measurement.entries.map((entry, index) => {
-                const ghost = document.createElement('div');
-                ghost.className = 'card flight-ghost';
-                ghost.setAttribute('aria-hidden', 'true');
-
-                const shell = document.createElement('div');
-                shell.className = 'card-shell';
-
-                const title = document.createElement('div');
-                title.className = 'card-title';
-                title.textContent = entry.word || '';
-                title.style.color = entry.startTitleColor;
-                if (entry.startTitleFontSize) title.style.fontSize = entry.startTitleFontSize;
-                if (entry.startTitleLineHeight) title.style.lineHeight = entry.startTitleLineHeight;
-                if (entry.startTitleLetterSpacing) title.style.letterSpacing = entry.startTitleLetterSpacing;
-                if (entry.startTitleTextShadow) title.style.textShadow = entry.startTitleTextShadow;
-
-                shell.appendChild(title);
-                ghost.appendChild(shell);
-
-                ghost.style.left = `${entry.left}px`;
-                ghost.style.top = `${entry.top}px`;
-                ghost.style.width = `${entry.width}px`;
-                ghost.style.height = `${entry.height}px`;
-                ghost.style.margin = '0';
-                ghost.style.padding = entry.startPadding;
-                ghost.style.opacity = '1';
-                ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
-                ghost.style.transition = 'none';
-                ghost.style.border = entry.startBorder;
-                ghost.style.borderRadius = entry.startRadius;
-                ghost.style.boxShadow = entry.startShadow;
-                ghost.style.backgroundColor = entry.startBg;
-                ghost.style.color = entry.startColor;
-                ghost.style.willChange = 'transform, opacity';
-
+                const { ghost, title } = createSolveGhostFromEntry(entry);
+                ghost.style.zIndex = '4';
                 session.appendChild(ghost);
 
                 return {
                     entry,
                     ghost,
                     title,
-                    targetRect: measurement.segmentRects[index]
+                    targetRect: measurement.switchRects[index] || {
+                        left: entry.left,
+                        top: entry.top,
+                        width: entry.width,
+                        height: entry.height
+                    }
                 };
             });
+
+            const remainingGhosts = measurement.remainingEntries
+                .map(entry => {
+                    const targetRect = measurement.finalRectMap.get(entry.item);
+                    if (!targetRect) return null;
+                    const { ghost, title } = createSolveGhostFromEntry(entry);
+                    ghost.style.zIndex = '2';
+                    session.appendChild(ghost);
+                    return { entry, ghost, title, targetRect };
+                })
+                .filter(Boolean);
 
             layer.appendChild(session);
 
@@ -5902,8 +6000,9 @@
                 session,
                 banner,
                 ghosts,
+                remainingGhosts,
                 destroy() {
-                    ghosts.forEach(item => {
+                    [...ghosts, ...remainingGhosts].forEach(item => {
                         item.ghost.style.removeProperty('will-change');
                     });
                     banner.style.removeProperty('will-change');
@@ -5936,16 +6035,25 @@
                 item.title.style.color = measurement.solvedTextColor;
             });
 
+            overlay.remainingGhosts.forEach(item => {
+                const dx = item.targetRect.left - item.entry.left;
+                const dy = item.targetRect.top - item.entry.top;
+                item.ghost.style.transition = `transform ${measurement.timings.flight}ms cubic-bezier(0.22, 1, 0.36, 1)`;
+                item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(1, 1)`;
+            });
+
             await Promise.all(
-                overlay.ghosts.map(item => waitForTransitionOrTimeout(item.ghost, measurement.timings.flight + 180))
+                [...overlay.ghosts, ...overlay.remainingGhosts]
+                    .map(item => waitForTransitionOrTimeout(item.ghost, measurement.timings.flight + 180))
             );
 
-            overlay.ghosts.forEach(item => {
+            [...overlay.ghosts, ...overlay.remainingGhosts].forEach(item => {
                 item.ghost.style.transition = 'none';
                 item.ghost.style.left = `${item.targetRect.left}px`;
                 item.ghost.style.top = `${item.targetRect.top}px`;
-                item.ghost.style.width = `${item.targetRect.width}px`;
-                item.ghost.style.height = `${item.targetRect.height}px`;
+                item.ghost.style.setProperty('width', `${item.targetRect.width}px`, 'important');
+                item.ghost.style.setProperty('height', `${item.targetRect.height}px`, 'important');
+                item.ghost.style.setProperty('min-height', `${item.targetRect.height}px`, 'important');
                 item.ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
             });
 
@@ -6013,6 +6121,11 @@
                 if (!item) return;
                 item.solved = true;
                 item.element = null;
+            });
+
+            (measurement.remainingEntries || []).forEach(entry => {
+                if (!entry || !entry.element || !entry.element.isConnected) return;
+                entry.element.classList.remove('anim-hidden');
             });
 
             selectedItems = [];
@@ -7649,15 +7762,17 @@
             const activeSelection = [...selectedItems];
             const fallbackMeasurement = {
                 selection: activeSelection,
+                remainingEntries: [],
                 groupData,
                 solvedBgColor,
                 solvedTextColor
             };
+            let measurement = null;
             let overlay = null;
             let committed = false;
 
             try {
-                const measurement = measureSolveAnimation(
+                measurement = measureSolveAnimation(
                     container,
                     activeSelection,
                     groupData,
@@ -7680,6 +7795,10 @@
                     if (!item || !item.element) return;
                     item.element.classList.add('anim-hidden');
                 });
+                measurement.remainingEntries.forEach(entry => {
+                    if (!entry || !entry.element) return;
+                    entry.element.classList.add('anim-hidden');
+                });
 
                 await playSolveFlightPhase(measurement, overlay);
                 await playSolveFusePhase(measurement, overlay);
@@ -7695,8 +7814,12 @@
                 }
             } finally {
                 if (!committed) {
-                    activeSelection.forEach(item => {
-                        const card = item && item.element;
+                    const restoreEntries = [
+                        ...activeSelection.map(item => ({ element: item && item.element })),
+                        ...((measurement && measurement.remainingEntries) || []).map(entry => ({ element: entry && entry.element }))
+                    ];
+                    restoreEntries.forEach(entry => {
+                        const card = entry && entry.element;
                         if (!card || !card.isConnected) return;
                         card.classList.remove('anim-hidden', 'magic-burst', 'jump', 'shake');
                     });
