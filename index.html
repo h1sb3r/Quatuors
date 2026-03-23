@@ -7130,6 +7130,7 @@
             const successCards = activeSelection.map(item => item.element).filter(Boolean);
             let containerHeightLocked = false;
             let committed = false;
+            let startPositions = [];
             const transientNodes = [];
 
             const insertSolvedBannerIntoGrid = () => {
@@ -7164,7 +7165,7 @@
                     containerHeightLocked = true;
                 }
 
-                const startPositions = sortEntriesByVisualOrder(activeSelection
+                startPositions = sortEntriesByVisualOrder(activeSelection
                     .map(item => {
                         const element = item.element;
                         if (!element) return null;
