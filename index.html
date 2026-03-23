@@ -543,7 +543,6 @@
             margin: 0;
             box-shadow: 0 10px 20px rgba(0,0,0,0.15);
             transform-origin: top left;
-            will-change: transform, opacity;
         }
 
         .card.fade-in { animation: fadeIn 0.3s ease-in; }
@@ -4670,7 +4669,6 @@
             margin: 0 !important;
             z-index: 1420 !important;
             pointer-events: none !important;
-            will-change: transform, opacity, filter;
         }
         .solved-banner.measure-proxy {
             visibility: hidden !important;
@@ -5652,34 +5650,6 @@
             });
         }
 
-        function scheduleLocalAutoSolveFromQuery() {
-            try {
-                const host = window.location.hostname || '';
-                const isLocalHost = host === 'localhost' || host === '127.0.0.1' || host === '::1' || host.endsWith('.local');
-                const isLocalFile = window.location.protocol === 'file:';
-                if (!isLocalHost && !isLocalFile) return;
-
-                const params = new URLSearchParams(window.location.search);
-                const raw = Number(params.get('dev-autosolve'));
-                const solveCount = Math.max(0, Math.min(4, Math.floor(Number.isFinite(raw) ? raw : 0)));
-                if (!solveCount) return;
-
-                let attempts = 0;
-                const trySolve = () => {
-                    if (isAnimating || !gridItems.length) {
-                        attempts += 1;
-                        if (attempts < 40) {
-                            window.setTimeout(trySolve, 120);
-                        }
-                        return;
-                    }
-                    void runDevQuickSolve(solveCount);
-                };
-
-                window.setTimeout(trySolve, 1200);
-            } catch (_) {}
-        }
-
         function clampNumber(value, min, max) {
             const num = Number(value);
             if (!Number.isFinite(num)) return min;
@@ -5763,9 +5733,45 @@
             });
         }
 
-        function measureSolvedBannerRect(container, groupData, solvedBgColor, solvedTextColor) {
+        function measureSolveAnimation(container, selection, groupData, solvedBgColor, solvedTextColor) {
             const layer = getOrCreateSolveAnimationLayer();
+            const isMobileLayout = document.body.classList.contains('mobile-layout-active');
             const containerRect = container.getBoundingClientRect();
+            const entries = sortEntriesByVisualOrder(selection
+                .map(item => {
+                    const element = item && item.element;
+                    if (!element) return null;
+
+                    const rect = element.getBoundingClientRect();
+                    if (!rect.width || !rect.height) return null;
+
+                    const computed = window.getComputedStyle(element);
+                    const titleNode = element.querySelector('.card-title');
+                    const titleComputed = titleNode ? window.getComputedStyle(titleNode) : null;
+
+                    return {
+                        item,
+                        element,
+                        word: item.word,
+                        left: rect.left,
+                        top: rect.top,
+                        width: rect.width,
+                        height: rect.height,
+                        startBg: computed.backgroundColor,
+                        startBorder: computed.border,
+                        startShadow: computed.boxShadow,
+                        startColor: computed.color,
+                        startRadius: computed.borderRadius,
+                        startPadding: computed.padding,
+                        startTitleColor: titleComputed ? titleComputed.color : computed.color,
+                        startTitleFontSize: titleComputed ? titleComputed.fontSize : '',
+                        startTitleLineHeight: titleComputed ? titleComputed.lineHeight : '',
+                        startTitleLetterSpacing: titleComputed ? titleComputed.letterSpacing : '',
+                        startTitleTextShadow: titleComputed ? titleComputed.textShadow : ''
+                    };
+                })
+                .filter(Boolean));
+            const orderedSelection = entries.length ? entries.map(entry => entry.item) : [...selection];
             const visibleCardRects = Array.from(container.querySelectorAll('.card'))
                 .map(card => card.getBoundingClientRect())
                 .filter(rect => rect.width && rect.height);
@@ -5789,15 +5795,235 @@
             layer.appendChild(host);
 
             const bannerRect = banner.getBoundingClientRect();
-            const measuredHeight = bannerRect.height || (document.body.classList.contains('mobile-layout-active') ? 78 : 112);
+            const measuredHeight = bannerRect.height || (isMobileLayout ? 78 : 112);
             host.remove();
-
-            return {
+            const bannerTargetRect = {
                 left: containerRect.left,
                 top,
                 width: containerRect.width,
                 height: measuredHeight
             };
+            const segmentGap = isMobileLayout ? 6 : 8;
+            const segmentWidth = Math.max(1, (bannerTargetRect.width - (segmentGap * 3)) / 4);
+
+            return {
+                selection: orderedSelection,
+                entries,
+                groupData,
+                solvedBgColor,
+                solvedTextColor,
+                isMobileLayout,
+                bannerRect: bannerTargetRect,
+                segmentRects: Array.from({ length: 4 }, (_, index) => ({
+                    left: bannerTargetRect.left + (index * (segmentWidth + segmentGap)),
+                    top: bannerTargetRect.top,
+                    width: segmentWidth,
+                    height: bannerTargetRect.height
+                })),
+                timings: isMobileLayout
+                    ? { flight: 540, hold: 120, fuse: 300 }
+                    : { flight: 460, hold: 100, fuse: 250 }
+            };
+        }
+
+        function buildSolveOverlay(measurement) {
+            const layer = getOrCreateSolveAnimationLayer();
+            const session = document.createElement('div');
+            session.style.position = 'fixed';
+            session.style.inset = '0';
+            session.style.pointerEvents = 'none';
+            session.style.overflow = 'visible';
+
+            const banner = createSolvedBannerElement(
+                measurement.groupData,
+                measurement.solvedBgColor,
+                measurement.solvedTextColor
+            );
+            banner.classList.add('solve-banner-overlay');
+            banner.style.left = `${measurement.bannerRect.left}px`;
+            banner.style.top = `${measurement.bannerRect.top}px`;
+            banner.style.width = `${measurement.bannerRect.width}px`;
+            banner.style.height = `${measurement.bannerRect.height}px`;
+            banner.style.opacity = '0';
+            banner.style.transform = `translate3d(0, ${measurement.isMobileLayout ? 10 : 8}px, 0) scale(0.96, 0.92)`;
+            banner.style.filter = 'brightness(1.05) saturate(1.04)';
+            banner.style.willChange = 'transform, opacity';
+            session.appendChild(banner);
+
+            const ghosts = measurement.entries.map((entry, index) => {
+                const ghost = document.createElement('div');
+                ghost.className = 'card flight-ghost';
+                ghost.setAttribute('aria-hidden', 'true');
+
+                const shell = document.createElement('div');
+                shell.className = 'card-shell';
+
+                const title = document.createElement('div');
+                title.className = 'card-title';
+                title.textContent = entry.word || '';
+                title.style.color = entry.startTitleColor;
+                if (entry.startTitleFontSize) title.style.fontSize = entry.startTitleFontSize;
+                if (entry.startTitleLineHeight) title.style.lineHeight = entry.startTitleLineHeight;
+                if (entry.startTitleLetterSpacing) title.style.letterSpacing = entry.startTitleLetterSpacing;
+                if (entry.startTitleTextShadow) title.style.textShadow = entry.startTitleTextShadow;
+
+                shell.appendChild(title);
+                ghost.appendChild(shell);
+
+                ghost.style.left = `${entry.left}px`;
+                ghost.style.top = `${entry.top}px`;
+                ghost.style.width = `${entry.width}px`;
+                ghost.style.height = `${entry.height}px`;
+                ghost.style.margin = '0';
+                ghost.style.padding = entry.startPadding;
+                ghost.style.opacity = '1';
+                ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
+                ghost.style.transition = 'none';
+                ghost.style.border = entry.startBorder;
+                ghost.style.borderRadius = entry.startRadius;
+                ghost.style.boxShadow = entry.startShadow;
+                ghost.style.backgroundColor = entry.startBg;
+                ghost.style.color = entry.startColor;
+                ghost.style.willChange = 'transform, opacity';
+
+                session.appendChild(ghost);
+
+                return {
+                    entry,
+                    ghost,
+                    title,
+                    targetRect: measurement.segmentRects[index]
+                };
+            });
+
+            layer.appendChild(session);
+
+            return {
+                session,
+                banner,
+                ghosts,
+                destroy() {
+                    ghosts.forEach(item => {
+                        item.ghost.style.removeProperty('will-change');
+                    });
+                    banner.style.removeProperty('will-change');
+                    session.remove();
+                }
+            };
+        }
+
+        async function playSolveFlightPhase(measurement, overlay) {
+            await nextFrame();
+
+            overlay.ghosts.forEach(item => {
+                const dx = item.targetRect.left - item.entry.left;
+                const dy = item.targetRect.top - item.entry.top;
+                const sx = item.targetRect.width / item.entry.width;
+                const sy = item.targetRect.height / item.entry.height;
+
+                item.ghost.style.transition = [
+                    `transform ${measurement.timings.flight}ms cubic-bezier(0.22, 1, 0.36, 1)`,
+                    `background-color ${Math.min(260, measurement.timings.flight - 80)}ms ease`,
+                    `border-color ${Math.min(260, measurement.timings.flight - 80)}ms ease`,
+                    `color ${Math.min(220, measurement.timings.flight - 120)}ms ease`,
+                    `box-shadow ${Math.min(220, measurement.timings.flight - 120)}ms ease`
+                ].join(', ');
+                item.title.style.transition = `color ${Math.min(220, measurement.timings.flight - 120)}ms ease`;
+                item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+                item.ghost.style.backgroundColor = measurement.solvedBgColor;
+                item.ghost.style.borderColor = measurement.solvedBgColor;
+                item.ghost.style.boxShadow = '0 10px 22px rgba(0, 0, 0, 0.16)';
+                item.title.style.color = measurement.solvedTextColor;
+            });
+
+            await Promise.all(
+                overlay.ghosts.map(item => waitForTransitionOrTimeout(item.ghost, measurement.timings.flight + 180))
+            );
+
+            overlay.ghosts.forEach(item => {
+                item.ghost.style.transition = 'none';
+                item.ghost.style.left = `${item.targetRect.left}px`;
+                item.ghost.style.top = `${item.targetRect.top}px`;
+                item.ghost.style.width = `${item.targetRect.width}px`;
+                item.ghost.style.height = `${item.targetRect.height}px`;
+                item.ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
+            });
+
+            await nextFrame();
+            await delay(measurement.timings.hold);
+        }
+
+        async function playSolveFusePhase(measurement, overlay) {
+            const bannerCenterX = measurement.bannerRect.left + (measurement.bannerRect.width / 2);
+            const fuseDuration = measurement.timings.fuse;
+
+            await nextFrame();
+
+            overlay.banner.style.transition = [
+                `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+                `opacity ${fuseDuration}ms ease-out`,
+                `filter ${fuseDuration}ms ease-out`
+            ].join(', ');
+            overlay.banner.style.opacity = '1';
+            overlay.banner.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
+            overlay.banner.style.filter = 'brightness(1) saturate(1)';
+
+            overlay.ghosts.forEach(item => {
+                const currentCenterX = item.targetRect.left + (item.targetRect.width / 2);
+                const dxToCenter = bannerCenterX - currentCenterX;
+                item.ghost.style.transition = [
+                    `transform ${fuseDuration}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+                    `opacity ${Math.max(180, fuseDuration - 20)}ms ease-out`
+                ].join(', ');
+                item.ghost.style.transform = `translate3d(${dxToCenter.toFixed(2)}px, 0, 0) scale(0.78, 0.84)`;
+                item.ghost.style.opacity = '0';
+            });
+
+            await waitForTransitionOrTimeout(overlay.banner, fuseDuration + 180);
+        }
+
+        function commitSolvedRow(container, measurement) {
+            const banner = createSolvedBannerElement(
+                measurement.groupData,
+                measurement.solvedBgColor,
+                measurement.solvedTextColor
+            );
+            banner.classList.add('reveal');
+            banner.style.opacity = '1';
+
+            const selectedCards = measurement.selection
+                .map(item => item && item.element)
+                .filter(Boolean);
+            const remainingCards = Array.from(container.querySelectorAll('.card'))
+                .filter(card => !selectedCards.includes(card));
+            const anchor = remainingCards[0] && remainingCards[0].isConnected ? remainingCards[0] : null;
+
+            selectedCards.forEach(card => {
+                card.classList.remove('anim-hidden', 'selected', 'jump', 'shake', 'magic-burst');
+                if (card.isConnected) card.remove();
+            });
+
+            if (anchor) {
+                container.insertBefore(banner, anchor);
+            } else {
+                container.appendChild(banner);
+            }
+
+            measurement.selection.forEach(item => {
+                if (!item) return;
+                item.solved = true;
+                item.element = null;
+            });
+
+            selectedItems = [];
+            applyGlassCardStagger();
+            scheduleFitVisibleText();
+            playSolvedBannerSound();
+
+            solvedCount++;
+            updateSubmitButton();
+
+            return banner;
         }
 
         function createSolveFlightGhost(position) {
@@ -6100,6 +6326,26 @@
             });
         }
 
+        function waitForTransitionOrTimeout(element, timeoutMs = 900) {
+            return new Promise(resolve => {
+                let done = false;
+                let timerId = null;
+                const finish = () => {
+                    if (done) return;
+                    done = true;
+                    if (timerId !== null) clearTimeout(timerId);
+                    element.removeEventListener('transitionend', onEnd);
+                    resolve();
+                };
+                const onEnd = (event) => {
+                    if (event.target !== element) return;
+                    finish();
+                };
+                element.addEventListener('transitionend', onEnd);
+                timerId = setTimeout(finish, timeoutMs);
+            });
+        }
+
         function setCurrentGame(game) {
             currentGame = game || null;
             gameData = currentGame && Array.isArray(currentGame.groups) ? currentGame.groups : [];
@@ -6306,7 +6552,6 @@
                 const initialGame = allGames.find(game => game.id === requestedId) || pickRandomGame(allGames);
                 setCurrentGame(initialGame);
                 initGame({ animateCards: true });
-                scheduleLocalAutoSolveFromQuery();
             } catch (error) {
                 console.error(error);
                 document.getElementById('grid-container').innerHTML = "<div style='grid-column: span 4; text-align:center; padding: 20px;'><strong>Impossible de charger 'data.json'.</strong><br><br>Veuillez lancer ce fichier via un serveur local<br>(ex: Live Server sur VS Code) ou vérifier le nom du fichier.</div>";
@@ -7115,7 +7360,7 @@
             isAnimating = false;
         }
 
-        async function handleSuccess(categoryName) {
+        async function handleSuccessCssTransitionLegacy(categoryName) {
             isAnimating = true;
             const groupData = gameData.find(g => g.category === categoryName);
             const container = document.getElementById('grid-container');
@@ -7383,6 +7628,81 @@
                 transientNodes.forEach(node => node.remove());
                 if (containerHeightLocked) {
                     container.style.removeProperty('min-height');
+                }
+                isAnimating = false;
+            }
+        }
+
+        async function handleSuccess(categoryName) {
+            isAnimating = true;
+            const groupData = gameData.find(g => g.category === categoryName);
+            const container = document.getElementById('grid-container');
+            if (!groupData || !container) {
+                isAnimating = false;
+                return;
+            }
+
+            const solvedTone = getSolvedTone(solvedCount);
+            const solvedBgColor = solvedTone.bg;
+            const solvedTextColor = solvedTone.text;
+            const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            const activeSelection = [...selectedItems];
+            const fallbackMeasurement = {
+                selection: activeSelection,
+                groupData,
+                solvedBgColor,
+                solvedTextColor
+            };
+            let overlay = null;
+            let committed = false;
+
+            try {
+                const measurement = measureSolveAnimation(
+                    container,
+                    activeSelection,
+                    groupData,
+                    solvedBgColor,
+                    solvedTextColor
+                );
+                const resolvedMeasurement = measurement || fallbackMeasurement;
+
+                if (reduceMotion || !measurement || !measurement.entries.length) {
+                    commitSolvedRow(container, resolvedMeasurement);
+                    committed = true;
+                    if (solvedCount === 4) {
+                        await transitionToNextGameAfterWin();
+                    }
+                    return;
+                }
+
+                overlay = buildSolveOverlay(measurement);
+                measurement.selection.forEach(item => {
+                    if (!item || !item.element) return;
+                    item.element.classList.add('anim-hidden');
+                });
+
+                await playSolveFlightPhase(measurement, overlay);
+                await playSolveFusePhase(measurement, overlay);
+
+                commitSolvedRow(container, measurement);
+                committed = true;
+
+                overlay.destroy();
+                overlay = null;
+
+                if (solvedCount === 4) {
+                    await transitionToNextGameAfterWin();
+                }
+            } finally {
+                if (!committed) {
+                    activeSelection.forEach(item => {
+                        const card = item && item.element;
+                        if (!card || !card.isConnected) return;
+                        card.classList.remove('anim-hidden', 'magic-burst', 'jump', 'shake');
+                    });
+                }
+                if (overlay) {
+                    overlay.destroy();
                 }
                 isAnimating = false;
             }
