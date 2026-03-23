@@ -3934,6 +3934,7 @@
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
+                overflow: visible;
             }
             .instructions {
                 margin: 0 0 14px;
@@ -3941,13 +3942,16 @@
                 padding: 0 4px;
             }
             #grid-container {
-                width: calc(100% + 28px);
+                position: relative;
+                left: 50%;
+                transform: translateX(-50%);
+                width: calc(100vw - 12px);
                 max-width: none !important;
                 gap: 4px !important;
                 padding: 0 !important;
                 margin-bottom: 18px;
-                margin-left: -14px;
-                margin-right: -14px;
+                margin-left: 0;
+                margin-right: 0;
                 border: none !important;
                 background: transparent !important;
                 box-shadow: none !important;
@@ -4071,11 +4075,13 @@
                 content: none !important;
             }
             body.visual-dashboard #grid-container {
-                width: calc(100% + 28px) !important;
+                width: calc(100vw - 12px) !important;
                 max-width: none !important;
                 padding: 0 !important;
-                margin-left: -14px !important;
-                margin-right: -14px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
                 background: transparent !important;
                 border: none !important;
                 box-shadow: none !important;
@@ -4094,10 +4100,12 @@
         }
         @media (max-width: 420px) {
             #grid-container {
-                width: calc(100% + 24px);
+                width: calc(100vw - 8px);
                 gap: 4px !important;
-                margin-left: -12px;
-                margin-right: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                margin-left: 0;
+                margin-right: 0;
             }
             .card {
                 height: 58px !important;
@@ -4245,6 +4253,7 @@
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            overflow: visible;
         }
         body.preview-mobile .instructions {
             margin: 0 0 14px;
@@ -4252,12 +4261,15 @@
             padding: 0 4px;
         }
         body.preview-mobile #grid-container {
-            width: calc(100% + 28px) !important;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% + 20px) !important;
             gap: 4px !important;
             padding: 0 !important;
             margin-bottom: 18px;
-            margin-left: -14px !important;
-            margin-right: -14px !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
             border: none !important;
             background: transparent !important;
             box-shadow: none !important;
@@ -4348,11 +4360,13 @@
             border-radius: 0 !important;
         }
         body.preview-mobile.visual-dashboard #grid-container {
-            width: calc(100% + 28px) !important;
+            width: calc(100% + 20px) !important;
             max-width: none !important;
             padding: 0 !important;
-            margin-left: -14px !important;
-            margin-right: -14px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
