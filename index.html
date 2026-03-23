@@ -3871,93 +3871,135 @@
         }
         @media (max-width: 600px) {
             body {
-                padding: 0 8px 20px;
+                padding: 0 0 18px;
             }
             .nyt-nav {
-                width: calc(100% - 16px);
-                min-height: 62px;
+                width: 100%;
+                max-width: none;
+                min-height: 58px;
                 height: auto;
-                padding: 8px 12px;
-                gap: 8px;
+                padding: 8px 14px;
+                gap: 10px;
+                border-radius: 0 0 18px 18px;
+                border-left: none !important;
+                border-right: none !important;
+                box-shadow: none !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
             }
             .nav-left {
                 gap: 10px;
-                font-size: 18px;
+                font-size: 16px;
+                font-family: 'Libre Franklin', sans-serif;
+                font-weight: 700;
             }
             .nav-left span {
-                font-size: 18px;
+                font-size: 16px;
             }
             .nav-icon {
+                width: 24px;
+                height: 24px;
+                margin-left: 0;
+            }
+            .nav-right {
+                gap: 12px;
+            }
+            .hamburger {
                 width: 22px;
-                height: 22px;
-                margin-left: 2px;
+                height: 16px;
+            }
+            .hamburger span {
+                height: 2.5px;
+                border-radius: 999px;
+                background: #151515;
             }
             .game-header-container {
                 width: 100%;
-                padding: 0 6px;
-                margin-top: 72px !important;
+                padding: 0 10px;
+                margin-top: 78px !important;
+                margin-bottom: 2px;
             }
             .game-container {
                 width: 100%;
-                margin-top: 18px;
-                padding: 12px 8px 16px;
-                border-radius: 20px !important;
+                margin-top: 4px;
+                padding: 8px 0 18px;
+                border-radius: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
             .instructions {
-                margin-top: 2px;
-                margin-bottom: 10px;
-                font-size: 14px;
+                margin: 0 0 14px;
+                font-size: 15px;
             }
             #grid-container {
-                gap: 5px !important;
-                padding: 6px !important;
-            }
-            .card,
-            .solved-banner {
-                height: 66px !important;
+                gap: 6px !important;
+                padding: 0 !important;
+                margin-bottom: 18px;
+                border: none !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
             }
             .card {
+                aspect-ratio: 1 / 1;
+                min-height: 74px;
+                height: auto !important;
                 border-radius: 10px !important;
-                padding: 5px 3px !important;
+                padding: 6px 4px !important;
+            }
+            .solved-banner {
+                min-height: 78px;
+                height: auto !important;
+                border-radius: 10px !important;
+                padding: 10px 10px;
+            }
+            .card-shell {
+                padding: 0 4px;
             }
             .card-title {
-                font-size: clamp(10px, 2.9vw, 11px) !important;
-                line-height: 1.05;
-                letter-spacing: 0.1px;
+                font-size: clamp(11px, 3.05vw, 13px) !important;
+                line-height: 1.12;
+                letter-spacing: 0;
+                word-break: normal;
+                overflow-wrap: break-word;
+                hyphens: none;
             }
             h1 {
                 font-size: clamp(30px, 11vw, 42px);
-                margin: 0 0 8px;
+                margin: 0 0 6px;
             }
             .controls {
-                gap: 8px;
+                gap: 10px;
                 flex-wrap: wrap;
+                padding: 0 6px;
             }
             button {
-                min-width: calc(50% - 6px);
-                min-height: 38px;
-                font-size: 12px;
-                padding: 8px 8px;
+                min-width: calc(50% - 5px);
+                min-height: 44px;
+                font-size: 13px;
+                padding: 10px 8px;
             }
             #submit-btn {
                 min-width: 100%;
             }
             .mistakes-container {
-                margin-bottom: 14px;
-                font-size: 13px;
-                gap: 8px;
+                margin-bottom: 18px;
+                font-size: 14px;
+                gap: 10px;
                 flex-wrap: wrap;
                 justify-content: center;
                 text-align: center;
+                padding: 0 6px;
             }
             .solved-title {
-                font-size: 11px;
+                font-size: 12px;
                 margin-bottom: 2px;
             }
             .solved-words {
-                font-size: 10px;
-                line-height: 1.15;
-                padding: 0 3px;
+                font-size: 11px;
+                line-height: 1.18;
+                padding: 0 4px;
             }
             .modal-overlay {
                 padding: 8px;
@@ -3977,9 +4019,11 @@
                 font-size: 13px;
             }
             .nyt-nav .nav-sound-option {
-                padding: 4px 6px;
+                padding: 4px 9px;
                 font-size: 11px;
                 gap: 6px;
+                border-radius: 999px;
+                box-shadow: none !important;
             }
             .nyt-nav .nav-sound-option .sound-switch {
                 width: 42px;
@@ -3999,62 +4043,132 @@
                 width: 100%;
                 margin: 8px auto 0;
             }
+            body.visual-dashboard .nyt-nav {
+                background: rgba(255, 255, 255, 0.96) !important;
+                border-top: none !important;
+                border-bottom: 1px solid #ded8cf !important;
+            }
+            body.visual-dashboard .nav-left,
+            body.visual-dashboard .nav-left span,
+            body.visual-dashboard .nav-icon {
+                color: #151515 !important;
+                stroke: #151515 !important;
+            }
+            body.visual-dashboard .nyt-nav .nav-sound-option {
+                background: #faf6ef !important;
+                border: 1px solid #ded8cf !important;
+            }
         }
         @media (max-width: 420px) {
             #grid-container {
-                gap: 4px !important;
-                padding: 5px !important;
+                gap: 6px !important;
             }
-            .card,
+            .card {
+                min-height: 66px;
+                padding: 5px 3px !important;
+            }
             .solved-banner {
-                height: 58px !important;
+                min-height: 70px;
+                padding: 9px 10px;
             }
             .card-title {
-                font-size: clamp(9px, 2.8vw, 10px) !important;
+                font-size: clamp(10px, 3.2vw, 11.5px) !important;
+                line-height: 1.08;
             }
             .game-container {
-                padding: 10px 6px 14px;
+                padding: 8px 0 16px;
             }
             .instructions {
-                font-size: 13px;
+                font-size: 14px;
+                margin-bottom: 12px;
             }
             button {
-                min-height: 36px;
-                font-size: 11px;
-                padding: 7px 6px;
+                min-height: 42px;
+                font-size: 12px;
+                padding: 9px 7px;
             }
             .mistakes-container {
-                font-size: 12px;
+                font-size: 13px;
             }
         }
 
         body.preview-mobile {
-            padding: 0 8px 20px;
+            padding: 18px 0 28px;
+            width: 414px;
+            max-width: calc(100vw - 20px);
+            margin: 10px auto 24px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #f7f4ee 0%, #f4eee4 100%) !important;
+            align-items: center;
+            border-radius: 38px;
+            overflow-x: hidden;
+            box-shadow:
+                0 0 0 200vmax #111722,
+                0 28px 70px rgba(0, 0, 0, 0.42);
+        }
+        body.preview-mobile::before {
+            content: none !important;
+        }
+        body.preview-mobile::after {
+            content: "" !important;
+            position: fixed;
+            inset: auto;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 122px;
+            max-width: calc(100vw - 160px);
+            height: 24px;
+            border-radius: 0 0 16px 16px;
+            background: #101319;
+            z-index: 0;
         }
         body.preview-mobile .nyt-nav {
-            width: min(390px, calc(100% - 16px)) !important;
+            width: min(390px, calc(100vw - 44px)) !important;
             max-width: 390px !important;
-            min-height: 62px;
+            min-height: 58px;
             height: auto;
-            padding: 8px 12px;
-            gap: 8px;
+            top: 18px;
+            padding: 8px 14px;
+            gap: 10px;
+            border-radius: 18px;
+            border: 1px solid #ded8cf !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
         }
         body.preview-mobile .nav-left {
             gap: 10px;
-            font-size: 18px;
+            font-size: 16px;
+            font-family: 'Libre Franklin', sans-serif;
+            font-weight: 700;
         }
         body.preview-mobile .nav-left span {
-            font-size: 18px;
+            font-size: 16px;
         }
         body.preview-mobile .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 0;
+        }
+        body.preview-mobile .nav-right {
+            gap: 12px;
+        }
+        body.preview-mobile .hamburger {
             width: 22px;
-            height: 22px;
-            margin-left: 2px;
+            height: 16px;
+        }
+        body.preview-mobile .hamburger span {
+            height: 2.5px;
+            border-radius: 999px;
+            background: #151515;
         }
         body.preview-mobile .nyt-nav .nav-sound-option {
-            padding: 4px 6px;
+            padding: 4px 9px;
             font-size: 11px;
             gap: 6px;
+            border-radius: 999px;
+            box-shadow: none !important;
         }
         body.preview-mobile .nyt-nav .nav-sound-option .sound-switch {
             width: 42px;
@@ -4071,75 +4185,95 @@
         }
         body.preview-mobile .game-header-container,
         body.preview-mobile .game-container {
-            width: min(100%, 390px) !important;
+            width: min(390px, calc(100vw - 44px)) !important;
             max-width: 390px !important;
         }
         body.preview-mobile .game-header-container {
-            padding: 0 6px;
-            margin-top: 72px !important;
-            margin-bottom: 4px;
+            padding: 0 10px;
+            margin-top: 88px !important;
+            margin-bottom: 2px;
         }
         body.preview-mobile h1 {
             font-size: clamp(30px, 11vw, 42px);
-            margin: 0 0 8px;
+            margin: 0 0 6px;
         }
         body.preview-mobile .game-container {
-            margin-top: 18px;
-            padding: 10px 6px 14px;
-            border-radius: 20px !important;
+            margin-top: 4px;
+            padding: 8px 0 20px;
+            border-radius: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
         body.preview-mobile .instructions {
-            margin-top: 2px;
-            margin-bottom: 10px;
-            font-size: 13px;
+            margin: 0 0 14px;
+            font-size: 15px;
         }
         body.preview-mobile #grid-container {
-            gap: 4px !important;
-            padding: 5px !important;
+            gap: 6px !important;
+            padding: 0 !important;
+            margin-bottom: 18px;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
         }
-        body.preview-mobile .card,
-        body.preview-mobile .solved-banner {
-            height: 58px !important;
-        }
         body.preview-mobile .card {
+            aspect-ratio: 1 / 1;
+            min-height: 74px;
+            height: auto !important;
             border-radius: 10px !important;
-            padding: 4px 3px !important;
+            padding: 6px 4px !important;
+        }
+        body.preview-mobile .solved-banner {
+            min-height: 78px;
+            height: auto !important;
+            border-radius: 10px !important;
+            padding: 10px 10px;
+        }
+        body.preview-mobile .card-shell {
+            padding: 0 4px;
         }
         body.preview-mobile .card-title {
-            font-size: clamp(9px, 2.6vw, 10px) !important;
-            line-height: 1.05;
-            letter-spacing: 0.05px;
+            font-size: clamp(11px, 3.05vw, 13px) !important;
+            line-height: 1.12;
+            letter-spacing: 0;
+            word-break: normal;
+            overflow-wrap: break-word;
+            hyphens: none;
         }
         body.preview-mobile .controls {
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
+            padding: 0 6px;
         }
         body.preview-mobile button {
-            min-width: calc(50% - 6px);
-            min-height: 36px;
-            font-size: 11px;
-            padding: 7px 6px;
+            min-width: calc(50% - 5px);
+            min-height: 44px;
+            font-size: 13px;
+            padding: 10px 8px;
         }
         body.preview-mobile #submit-btn {
             min-width: 100%;
         }
         body.preview-mobile .mistakes-container {
-            margin-bottom: 14px;
-            font-size: 12px;
-            gap: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
             text-align: center;
+            padding: 0 6px;
         }
         body.preview-mobile .solved-title {
-            font-size: 11px;
+            font-size: 12px;
             margin-bottom: 2px;
         }
         body.preview-mobile .solved-words {
-            font-size: 10px;
-            line-height: 1.15;
-            padding: 0 3px;
+            font-size: 11px;
+            line-height: 1.18;
+            padding: 0 4px;
         }
         body.preview-mobile .modal-overlay {
             padding: 8px;
@@ -4157,6 +4291,19 @@
         body.preview-mobile .modal-examples,
         body.preview-mobile .modal-note {
             font-size: 14px;
+        }
+        body.preview-mobile.visual-dashboard .nyt-nav {
+            background: rgba(255, 255, 255, 0.96) !important;
+        }
+        body.preview-mobile.visual-dashboard .nav-left,
+        body.preview-mobile.visual-dashboard .nav-left span,
+        body.preview-mobile.visual-dashboard .nav-icon {
+            color: #151515 !important;
+            stroke: #151515 !important;
+        }
+        body.preview-mobile.visual-dashboard .nyt-nav .nav-sound-option {
+            background: #faf6ef !important;
+            border: 1px solid #ded8cf !important;
         }
     
         /* === Theme: Soft UI (inspiré des cartes pastel) === */
@@ -4649,6 +4796,7 @@
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         const CLICK_SOUND_POOL_SIZE = 4;
         const DEV_PANEL_QUERY_PARAM = 'dev';
+        const DEV_PREVIEW_QUERY_PARAM = 'preview';
         const DEV_PREVIEW_MODE_KEY = 'quatuors_dev_preview_mode_v1';
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
             const audio = new Audio(CLICK_SOUND_URL);
@@ -4875,8 +5023,14 @@
 
             let savedMode = 'desktop';
             try {
-                const raw = localStorage.getItem(DEV_PREVIEW_MODE_KEY);
-                if (raw === 'mobile' || raw === 'desktop') savedMode = raw;
+                const params = new URLSearchParams(window.location.search);
+                const queryPreview = params.get(DEV_PREVIEW_QUERY_PARAM);
+                if (queryPreview === 'mobile' || queryPreview === 'desktop') {
+                    savedMode = queryPreview;
+                } else {
+                    const raw = localStorage.getItem(DEV_PREVIEW_MODE_KEY);
+                    if (raw === 'mobile' || raw === 'desktop') savedMode = raw;
+                }
             } catch (_) {}
 
             applyPreviewMode(savedMode, false);
