@@ -3375,6 +3375,11 @@
             border: none !important;
             border-radius: inherit;
             box-shadow: none !important;
+            position: relative;
+            overflow: hidden;
+        }
+        .visual-dashboard .card-shell.card-face.card-front::before {
+            content: none;
         }
         body.visual-dashboard .card::before,
         body.visual-dashboard .card::after {
@@ -3389,6 +3394,8 @@
             color: #151515 !important;
             text-shadow: none !important;
             font-weight: 800 !important;
+            position: relative;
+            z-index: 1;
         }
         body.visual-dashboard .card:hover,
         body.visual-dashboard .card:hover:not(.selected) {
@@ -3439,6 +3446,63 @@
         body.visual-dashboard .card.selected .card-title {
             color: var(--dash-card-selected-text-solid, var(--dash-selected-text)) !important;
             text-shadow: none !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card:not(.selected):not(.shake) {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+            border-color: rgba(255, 255, 255, 0.34) !important;
+            box-shadow:
+                0 12px 24px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+            color: var(--preview-gradient-text, #ffffff) !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card:not(.selected):not(.shake) .card-shell.card-face.card-front {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card:not(.selected):not(.shake) .card-shell.card-face.card-front::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.18),
+                rgba(255, 255, 255, 0) 35%,
+                rgba(255, 255, 255, 0) 65%,
+                rgba(255, 255, 255, 0.08)
+            );
+            pointer-events: none;
+        }
+        body.preview-colored-cards.visual-dashboard .card:not(.selected):not(.shake) .card-title {
+            color: var(--preview-gradient-text, #ffffff) !important;
+            text-shadow: 0 1px 4px rgba(15, 23, 42, 0.18) !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card:hover:not(.selected):not(.shake) {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16) !important;
+            filter: saturate(1.08) brightness(1.04);
+        }
+        body.preview-colored-cards.visual-dashboard .card:hover:not(.selected):not(.shake) .card-shell.card-face.card-front {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card.hover-reset,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover:not(.selected):not(.shake) {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+            border-color: rgba(255, 255, 255, 0.34) !important;
+            box-shadow:
+                0 12px 24px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+            filter: none !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card.hover-reset .card-shell.card-face.card-front,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover .card-shell.card-face.card-front,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover:not(.selected):not(.shake) .card-shell.card-face.card-front {
+            background: var(--preview-gradient-bg, var(--dash-card-bg)) !important;
+        }
+        body.preview-colored-cards.visual-dashboard .card.hover-reset .card-title,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover .card-title,
+        body.preview-colored-cards.visual-dashboard .card.hover-reset:hover:not(.selected):not(.shake) .card-title {
+            color: var(--preview-gradient-text, #ffffff) !important;
         }
 
         body.visual-dashboard .solved-banner {
@@ -3592,6 +3656,53 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 6px;
         }
+        .dev-preview-subtitle {
+            margin: 8px 0 4px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.35px;
+            text-transform: uppercase;
+            color: #7a8aa1;
+        }
+        .dev-preview-palette {
+            display: grid;
+            gap: 4px;
+            margin-top: 8px;
+        }
+        .dev-preview-palette-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 6px;
+        }
+        .dev-preview-palette > span {
+            font-size: 11px;
+            font-weight: 700;
+            color: #5b6d86;
+        }
+        .dev-preview-palette select {
+            width: 100%;
+            min-height: 34px;
+            padding: 7px 10px;
+            border: 1px solid rgba(141, 158, 182, 0.42);
+            border-radius: 10px;
+            background: #ffffff;
+            color: #243246;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .dev-preview-random-btn {
+            min-width: 0;
+            padding-left: 12px;
+            padding-right: 12px;
+            white-space: nowrap;
+        }
+        .dev-preview-palette.is-disabled {
+            opacity: 0.58;
+        }
+        .dev-preview-palette select:disabled {
+            cursor: not-allowed;
+        }
         .dev-preview-btn {
             min-width: 0;
             min-height: 34px;
@@ -3724,6 +3835,18 @@
             border-color: #9b6a3f !important;
             color: #fffaf3 !important;
             box-shadow: 0 8px 18px rgba(155, 106, 63, 0.22) !important;
+        }
+        body.visual-dashboard .dev-preview-subtitle {
+            color: #667896;
+        }
+        body.visual-dashboard .dev-preview-palette > span {
+            color: #556781;
+        }
+        body.visual-dashboard .dev-preview-palette select {
+            background: var(--dash-surface-bg) !important;
+            border-color: #d2dbe9 !important;
+            color: #243246 !important;
+            box-shadow: 0 1px 1px rgba(23, 37, 58, var(--dash-shadow-soft)) !important;
         }
         body.visual-dashboard #dev-tools-panel .game-picker {
             background: var(--dash-surface-soft) !important;
@@ -5105,6 +5228,29 @@
         body.mobile-layout-active .card-shell {
             padding: 0 4px !important;
         }
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card:not(.selected):not(.shake) {
+            background: #f6d6e1 !important;
+            border-color: #e6bccb !important;
+            box-shadow: 0 8px 18px rgba(120, 72, 92, 0.08) !important;
+        }
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card:not(.selected):not(.shake) .card-shell.card-face.card-front {
+            background: #f6d6e1 !important;
+        }
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card:hover:not(.selected):not(.shake),
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset,
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset:hover,
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset:hover:not(.selected):not(.shake) {
+            background: #f6d6e1 !important;
+            border-color: #e6bccb !important;
+            box-shadow: 0 8px 18px rgba(120, 72, 92, 0.08) !important;
+            filter: none !important;
+        }
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card:hover:not(.selected):not(.shake) .card-shell.card-face.card-front,
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset .card-shell.card-face.card-front,
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset:hover .card-shell.card-face.card-front,
+        body.mobile-layout-active.visual-dashboard:not(.preview-mobile) .card.hover-reset:hover:not(.selected):not(.shake) .card-shell.card-face.card-front {
+            background: #f6d6e1 !important;
+        }
         body.mobile-layout-active .card-title {
             width: 100%;
             font-size: var(--mobile-word-size) !important;
@@ -5297,6 +5443,27 @@
                     <button class="dev-preview-btn" id="preview-desktop-btn" type="button">Desktop</button>
                     <button class="dev-preview-btn" id="preview-mobile-btn" type="button">Mobile</button>
                 </div>
+                <div class="dev-preview-subtitle">Cartes</div>
+                <div class="dev-preview-toggle" role="group" aria-label="Apercu cartes normale coloree">
+                    <button class="dev-preview-btn" id="preview-style-normal-btn" type="button">Normale</button>
+                    <button class="dev-preview-btn" id="preview-style-color-btn" type="button">Coloree</button>
+                </div>
+                <label class="dev-preview-palette" id="preview-color-palette-wrap" for="preview-color-family">
+                    <span>Palette</span>
+                    <div class="dev-preview-palette-row">
+                        <select id="preview-color-family" aria-label="Palette des cartes colorees">
+                            <option value="mix">Multicolore</option>
+                            <option value="random">Aleatoire</option>
+                            <option value="orange">Orange</option>
+                            <option value="jaune">Jaune</option>
+                            <option value="rose">Rose</option>
+                            <option value="bleu">Bleu</option>
+                            <option value="vert">Vert</option>
+                            <option value="violet">Violet</option>
+                        </select>
+                        <button class="dev-preview-btn dev-preview-random-btn" id="preview-random-palette-btn" type="button">Aleatoire</button>
+                    </div>
+                </label>
             </div>
             <div class="dev-shortcut-section">
                 <div class="dev-style-title">Reussite</div>
@@ -5473,7 +5640,46 @@
         const DEV_PANEL_QUERY_PARAM = 'dev';
         const DEV_PREVIEW_QUERY_PARAM = 'preview';
         const DEV_PREVIEW_MODE_KEY = 'quatuors_dev_preview_mode_v1';
+        const DEV_CARD_PREVIEW_MODE_KEY = 'quatuors_dev_card_preview_mode_v1';
+        const DEV_CARD_PREVIEW_PALETTE_KEY = 'quatuors_dev_card_preview_palette_v1';
+        const DEV_CARD_PREVIEW_RANDOM_SEED_KEY = 'quatuors_dev_card_preview_random_seed_v1';
         const MOBILE_LAYOUT_BREAKPOINT_PX = 600;
+        const DEV_CARD_PREVIEW_PALETTE_OPTIONS = Object.freeze([
+            { value: 'mix', label: 'Multicolore' },
+            { value: 'random', label: 'Aleatoire' },
+            { value: 'orange', label: 'Orange' },
+            { value: 'jaune', label: 'Jaune' },
+            { value: 'rose', label: 'Rose' },
+            { value: 'bleu', label: 'Bleu' },
+            { value: 'vert', label: 'Vert' },
+            { value: 'violet', label: 'Violet' }
+        ]);
+        const DEV_CARD_PREVIEW_MIXED_GRADIENTS = Object.freeze([
+            { background: 'linear-gradient(135deg, #ff7a18 0%, #ff2d55 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #6a00ff 0%, #ff00c8 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #00c6ff 0%, #0072ff 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #00ffcc 0%, #00b894 100%)', text: '#132230' },
+            { background: 'linear-gradient(135deg, #ffcc00 0%, #ff6f00 100%)', text: '#2a1a06' },
+            { background: 'linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #7f00ff 0%, #00d4ff 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', text: '#11212c' },
+            { background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', text: '#2f2230' },
+            { background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #f953c6 0%, #b91d73 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #f7971e 0%, #ffd200 100%)', text: '#2d2009' },
+            { background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', text: '#0f2130' },
+            { background: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', text: '#2d2640' },
+            { background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)', text: '#ffffff' },
+            { background: 'linear-gradient(135deg, #fc466b 0%, #3f5efb 100%)', text: '#ffffff' }
+        ]);
+        const DEV_CARD_PREVIEW_MONO_PALETTES = Object.freeze({
+            orange: Object.freeze({ hue: 26, companionHue: 46, midHueShift: 9, hueVariance: 7, saturation: 94, saturationVariance: 6, lightness: 58, lightnessVariance: 10, darkTextThreshold: 63 }),
+            jaune: Object.freeze({ hue: 52, companionHue: 32, midHueShift: -6, hueVariance: 7, saturation: 92, saturationVariance: 8, lightness: 66, lightnessVariance: 12, darkTextThreshold: 59 }),
+            rose: Object.freeze({ hue: 338, companionHue: 12, midHueShift: 6, hueVariance: 8, saturation: 86, saturationVariance: 6, lightness: 61, lightnessVariance: 9, darkTextThreshold: 64 }),
+            bleu: Object.freeze({ hue: 214, companionHue: 188, midHueShift: -10, hueVariance: 10, saturation: 82, saturationVariance: 8, lightness: 56, lightnessVariance: 10, darkTextThreshold: 62 }),
+            vert: Object.freeze({ hue: 145, companionHue: 172, midHueShift: 8, hueVariance: 9, saturation: 74, saturationVariance: 8, lightness: 53, lightnessVariance: 10, darkTextThreshold: 60 }),
+            violet: Object.freeze({ hue: 278, companionHue: 324, midHueShift: 10, hueVariance: 10, saturation: 76, saturationVariance: 8, lightness: 57, lightnessVariance: 10, darkTextThreshold: 63 })
+        });
         const clickSounds = Array.from({ length: CLICK_SOUND_POOL_SIZE }, () => {
             const audio = new Audio(CLICK_SOUND_URL);
             audio.preload = 'auto';
@@ -5678,6 +5884,10 @@
         let isSoundEnabled = false;
         let currentVisualStyle = VISUAL_STYLES.DASHBOARD;
         let currentPreviewMode = 'desktop';
+        let currentCardPreviewMode = 'normal';
+        let currentCardPreviewPalette = 'mix';
+        let currentCardPreviewRandomSeed = 1;
+        let devCardPreviewPaletteCache = new Map();
         let mobileLayoutMediaQuery = null;
         let cardSheenTimeout = null;
         let lastSheenCard = null;
@@ -5877,6 +6087,237 @@
             applyPreviewMode(savedMode, false);
             desktopBtn.addEventListener('click', () => applyPreviewMode('desktop', true));
             mobileBtn.addEventListener('click', () => applyPreviewMode('mobile', true));
+        }
+
+        function normalizeDevCardPreviewPalette(value) {
+            const nextValue = typeof value === 'string' ? value.trim().toLowerCase() : '';
+            if (nextValue === 'random') return 'random';
+            if (DEV_CARD_PREVIEW_PALETTE_OPTIONS.some(option => option.value === nextValue)) return nextValue;
+            return 'mix';
+        }
+
+        function normalizeDevCardPreviewRandomSeed(value) {
+            const parsedValue = Number.parseInt(value, 10);
+            if (!Number.isInteger(parsedValue)) return null;
+            const normalizedValue = Math.abs(parsedValue) % 2147483647;
+            return normalizedValue === 0 ? 1 : normalizedValue;
+        }
+
+        function createDevCardPreviewRandomSeed() {
+            return Math.floor(Math.random() * 2147483646) + 1;
+        }
+
+        function createSeededRandom(seed) {
+            let state = normalizeDevCardPreviewRandomSeed(seed) || 1;
+            return () => {
+                state = (state * 48271) % 2147483647;
+                return (state - 1) / 2147483646;
+            };
+        }
+
+        function normalizeHue(value) {
+            const numericValue = Number.isFinite(value) ? value : 0;
+            const hue = numericValue % 360;
+            return hue < 0 ? hue + 360 : hue;
+        }
+
+        function formatHslColor(hue, saturation, lightness) {
+            return `hsl(${Math.round(normalizeHue(hue))}, ${Math.round(clampNumber(saturation, 44, 100))}%, ${Math.round(clampNumber(lightness, 18, 86))}%)`;
+        }
+
+        function buildDevCardPreviewPalette(config) {
+            return Array.from({ length: 16 }, (_, index) => {
+                const rowOffset = Math.floor(index / 4) - 1.5;
+                const columnOffset = (index % 4) - 1.5;
+                const startHue = config.hue + (columnOffset * config.hueVariance) + (rowOffset * config.hueVariance * 0.55);
+                const midHue = config.hue + config.midHueShift + (columnOffset * config.hueVariance * 0.35) - (rowOffset * config.hueVariance * 0.4);
+                const endHue = config.companionHue + (rowOffset * config.hueVariance) + (columnOffset * config.hueVariance * 0.4);
+                const startSaturation = config.saturation + config.saturationVariance - Math.abs(rowOffset) * 3 - Math.abs(columnOffset) * 2;
+                const midSaturation = config.saturation + (config.saturationVariance * 0.6) - Math.abs(rowOffset) * 2 + Math.abs(columnOffset) * 1.5;
+                const endSaturation = config.saturation - (config.saturationVariance * 0.45) - Math.abs(columnOffset) * 3 + (rowOffset * 1.5);
+                const startLightness = config.lightness - (rowOffset * config.lightnessVariance * 0.55) + (columnOffset * 1.8);
+                const midLightness = config.lightness + (config.lightnessVariance * 0.45) - (rowOffset * 1.7) - (columnOffset * 0.8);
+                const endLightness = config.lightness + config.lightnessVariance - (columnOffset * 1.5) - (rowOffset * 1.2);
+                const averageLightness = (startLightness + midLightness + endLightness) / 3;
+                const textColor = averageLightness >= config.darkTextThreshold ? '#1c2230' : '#ffffff';
+                return {
+                    background: `linear-gradient(135deg, ${formatHslColor(startHue, startSaturation, startLightness)} 0%, ${formatHslColor(midHue, midSaturation, midLightness)} 52%, ${formatHslColor(endHue, endSaturation, endLightness)} 100%)`,
+                    text: textColor
+                };
+            });
+        }
+
+        function buildRandomDevCardPreviewPalette(seed) {
+            const random = createSeededRandom(seed);
+            return Array.from({ length: 16 }, (_, index) => {
+                const rowOffset = Math.floor(index / 4) - 1.5;
+                const columnOffset = (index % 4) - 1.5;
+                const anchorHue = normalizeHue(((index * 360) / 16) + ((random() - 0.5) * 56) + (rowOffset * 8) + (columnOffset * 5));
+                const hueDirection = random() > 0.5 ? 1 : -1;
+                const endHue = anchorHue + (hueDirection * (22 + (random() * 46)));
+                const midHue = anchorHue + (hueDirection * (10 + (random() * 18)));
+                const startSaturation = 76 + (random() * 18) - (Math.abs(rowOffset) * 2);
+                const midSaturation = 80 + (random() * 16) - (Math.abs(columnOffset) * 2);
+                const endSaturation = 72 + (random() * 20) - (Math.abs(rowOffset + columnOffset) * 1.5);
+                const startLightness = 58 + (random() * 12) + (rowOffset * 1.4);
+                const midLightness = 66 + (random() * 10) - (columnOffset * 1.2);
+                const endLightness = 60 + (random() * 12) - (rowOffset * 1.1);
+                const averageLightness = (startLightness + midLightness + endLightness) / 3;
+                const textColor = averageLightness >= 66 ? '#1c2230' : '#ffffff';
+                return {
+                    background: `linear-gradient(135deg, ${formatHslColor(anchorHue, startSaturation, startLightness)} 0%, ${formatHslColor(midHue, midSaturation, midLightness)} 52%, ${formatHslColor(endHue, endSaturation, endLightness)} 100%)`,
+                    text: textColor
+                };
+            });
+        }
+
+        function getDevCardPreviewGradients(palette = currentCardPreviewPalette) {
+            const normalizedPalette = normalizeDevCardPreviewPalette(palette);
+            if (normalizedPalette === 'mix') return DEV_CARD_PREVIEW_MIXED_GRADIENTS;
+            if (normalizedPalette === 'random') {
+                const randomSeed = normalizeDevCardPreviewRandomSeed(currentCardPreviewRandomSeed) || 1;
+                const randomCacheKey = `random:${randomSeed}`;
+                if (devCardPreviewPaletteCache.has(randomCacheKey)) {
+                    return devCardPreviewPaletteCache.get(randomCacheKey);
+                }
+                const randomPalette = Object.freeze(buildRandomDevCardPreviewPalette(randomSeed));
+                devCardPreviewPaletteCache.set(randomCacheKey, randomPalette);
+                return randomPalette;
+            }
+            if (devCardPreviewPaletteCache.has(normalizedPalette)) {
+                return devCardPreviewPaletteCache.get(normalizedPalette);
+            }
+            const config = DEV_CARD_PREVIEW_MONO_PALETTES[normalizedPalette];
+            if (!config) return DEV_CARD_PREVIEW_MIXED_GRADIENTS;
+            const generatedPalette = Object.freeze(buildDevCardPreviewPalette(config));
+            devCardPreviewPaletteCache.set(normalizedPalette, generatedPalette);
+            return generatedPalette;
+        }
+
+        function getDevCardPreviewPreset(index) {
+            const gradients = getDevCardPreviewGradients(currentCardPreviewPalette);
+            if (!gradients.length) return null;
+            const normalizedIndex = ((index % gradients.length) + gradients.length) % gradients.length;
+            return gradients[normalizedIndex];
+        }
+
+        function refreshCardPreviewGradients() {
+            if (typeof gridItems === 'undefined' || !Array.isArray(gridItems) || !gridItems.length) return;
+            gridItems.forEach((item, index) => {
+                if (item && item.element) applyCardPreviewGradient(item, item.element, index);
+            });
+        }
+
+        function syncDevCardPreviewPaletteControl() {
+            const paletteWrap = document.getElementById('preview-color-palette-wrap');
+            const paletteSelect = document.getElementById('preview-color-family');
+            const randomBtn = document.getElementById('preview-random-palette-btn');
+            const isColorMode = currentCardPreviewMode === 'color';
+            if (paletteWrap) paletteWrap.classList.toggle('is-disabled', !isColorMode);
+            if (randomBtn) {
+                randomBtn.disabled = !isColorMode;
+                randomBtn.classList.toggle('is-active', currentCardPreviewPalette === 'random');
+            }
+            if (!paletteSelect) return;
+            paletteSelect.value = normalizeDevCardPreviewPalette(currentCardPreviewPalette);
+            paletteSelect.disabled = !isColorMode;
+            paletteSelect.setAttribute('aria-disabled', (!isColorMode).toString());
+        }
+
+        function applyCardPreviewGradient(item, element, index = 0) {
+            if (!element) return;
+            const gradients = getDevCardPreviewGradients(currentCardPreviewPalette);
+            if (!gradients.length) {
+                element.style.removeProperty('--preview-gradient-bg');
+                element.style.removeProperty('--preview-gradient-text');
+                return;
+            }
+            const fallbackIndex = Number.isFinite(index) ? index : 0;
+            const paletteIndex = Number.isInteger(item && item.devPreviewGradientIndex)
+                ? item.devPreviewGradientIndex
+                : (fallbackIndex % gradients.length);
+            if (item && !Number.isInteger(item.devPreviewGradientIndex)) {
+                item.devPreviewGradientIndex = paletteIndex;
+            }
+            const preset = getDevCardPreviewPreset(paletteIndex);
+            if (!preset) {
+                element.style.removeProperty('--preview-gradient-bg');
+                element.style.removeProperty('--preview-gradient-text');
+                return;
+            }
+            element.style.setProperty('--preview-gradient-bg', preset.background);
+            element.style.setProperty('--preview-gradient-text', preset.text);
+        }
+
+        function applyCardPreviewPalette(palette, persist = true, options = {}) {
+            const normalizedPalette = normalizeDevCardPreviewPalette(palette);
+            const shouldRerollRandom = options.rerollRandom === true;
+            if (normalizedPalette === 'random') {
+                const normalizedSeed = normalizeDevCardPreviewRandomSeed(currentCardPreviewRandomSeed);
+                currentCardPreviewRandomSeed = shouldRerollRandom || !normalizedSeed
+                    ? createDevCardPreviewRandomSeed()
+                    : normalizedSeed;
+            }
+            currentCardPreviewPalette = normalizedPalette;
+            const paletteSelect = document.getElementById('preview-color-family');
+            if (paletteSelect) paletteSelect.value = currentCardPreviewPalette;
+            refreshCardPreviewGradients();
+            syncDevCardPreviewPaletteControl();
+            if (persist) {
+                try {
+                    localStorage.setItem(DEV_CARD_PREVIEW_PALETTE_KEY, currentCardPreviewPalette);
+                    if (currentCardPreviewPalette === 'random') {
+                        localStorage.setItem(DEV_CARD_PREVIEW_RANDOM_SEED_KEY, String(currentCardPreviewRandomSeed));
+                    } else {
+                        localStorage.removeItem(DEV_CARD_PREVIEW_RANDOM_SEED_KEY);
+                    }
+                } catch (_) {}
+            }
+        }
+
+        function applyCardPreviewMode(mode, persist = true) {
+            const nextMode = mode === 'color' ? 'color' : 'normal';
+            currentCardPreviewMode = nextMode;
+            const shouldApplyColorPreview = document.body.classList.contains('dev-tools-enabled') && nextMode === 'color';
+            document.body.classList.toggle('preview-colored-cards', shouldApplyColorPreview);
+
+            const normalBtn = document.getElementById('preview-style-normal-btn');
+            const colorBtn = document.getElementById('preview-style-color-btn');
+            if (normalBtn) normalBtn.classList.toggle('is-active', nextMode === 'normal');
+            if (colorBtn) colorBtn.classList.toggle('is-active', nextMode === 'color');
+            syncDevCardPreviewPaletteControl();
+
+            if (persist) {
+                try {
+                    localStorage.setItem(DEV_CARD_PREVIEW_MODE_KEY, nextMode);
+                } catch (_) {}
+            }
+        }
+
+        function initDevCardPreviewToggle() {
+            const normalBtn = document.getElementById('preview-style-normal-btn');
+            const colorBtn = document.getElementById('preview-style-color-btn');
+            const paletteSelect = document.getElementById('preview-color-family');
+            const randomBtn = document.getElementById('preview-random-palette-btn');
+            if (!normalBtn || !colorBtn || !paletteSelect || !randomBtn) return;
+
+            let savedMode = 'normal';
+            let savedPalette = 'mix';
+            let savedRandomSeed = null;
+            try {
+                const rawMode = localStorage.getItem(DEV_CARD_PREVIEW_MODE_KEY);
+                if (rawMode === 'color' || rawMode === 'normal') savedMode = rawMode;
+                savedPalette = normalizeDevCardPreviewPalette(localStorage.getItem(DEV_CARD_PREVIEW_PALETTE_KEY));
+                savedRandomSeed = normalizeDevCardPreviewRandomSeed(localStorage.getItem(DEV_CARD_PREVIEW_RANDOM_SEED_KEY));
+            } catch (_) {}
+
+            currentCardPreviewRandomSeed = savedRandomSeed || createDevCardPreviewRandomSeed();
+            applyCardPreviewPalette(savedPalette, false, { rerollRandom: savedPalette === 'random' && !savedRandomSeed });
+            applyCardPreviewMode(savedMode, false);
+            normalBtn.addEventListener('click', () => applyCardPreviewMode('normal', true));
+            colorBtn.addEventListener('click', () => applyCardPreviewMode('color', true));
+            paletteSelect.addEventListener('change', () => applyCardPreviewPalette(paletteSelect.value, true));
+            randomBtn.addEventListener('click', () => applyCardPreviewPalette('random', true, { rerollRandom: true }));
         }
 
         function normalizeWrongBubbleDelayMs(value) {
@@ -8066,7 +8507,7 @@
             const faceDown = !!options.faceDown;
             const container = document.getElementById('grid-container');
             if(solvedCount === 0) container.innerHTML = ''; 
-            gridItems.forEach(item => {
+            gridItems.forEach((item, index) => {
                 if (!item.solved && !item.element) {
                     const div = document.createElement('div');
                     div.className = 'card';
@@ -8102,12 +8543,14 @@
                     div.addEventListener('pointermove', updateCardHoverPoint, { passive: true });
                     div.addEventListener('pointerleave', resetCardHoverPoint, { passive: true });
                     div.addEventListener('pointercancel', resetCardHoverPoint, { passive: true });
+                    applyCardPreviewGradient(item, div, index);
                     item.element = div;
                     container.appendChild(div);
                 } else if (!item.solved && item.element) {
                     setCardFaceDown(item.element, faceDown);
                     const existingTitle = item.element.querySelector('.card-title');
                     if (existingTitle) existingTitle.style.removeProperty('font-size');
+                    applyCardPreviewGradient(item, item.element, index);
                     container.appendChild(item.element);
                 }
             });
@@ -9201,6 +9644,7 @@
         initSoundToggle();
         initDevToolsPanel();
         initDevPreviewToggle();
+        initDevCardPreviewToggle();
         initMobileLayoutSync();
         initDevQuickSolveControls();
         initWrongBubbleDelayControl();
