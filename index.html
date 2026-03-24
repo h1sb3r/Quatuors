@@ -3370,6 +3370,12 @@
             box-shadow: 0 10px 18px rgba(0, 0, 0, 0.06) !important;
             transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease !important;
         }
+        .visual-dashboard .card-shell.card-face.card-front {
+            background: var(--dash-card-bg) !important;
+            border: 1px solid var(--dash-card-border) !important;
+            border-radius: inherit;
+            box-shadow: inherit;
+        }
         body.visual-dashboard .card::before,
         body.visual-dashboard .card::after {
             content: none !important;
@@ -3391,6 +3397,11 @@
             border-color: var(--dash-card-hover-border) !important;
             box-shadow: 0 14px 24px rgba(0, 0, 0, 0.08) !important;
         }
+        .visual-dashboard .card:hover .card-shell.card-face.card-front,
+        .visual-dashboard .card:hover:not(.selected) .card-shell.card-face.card-front {
+            background: var(--dash-card-hover-bg) !important;
+            border-color: var(--dash-card-hover-border) !important;
+        }
         body.visual-dashboard .card.hover-reset,
         body.visual-dashboard .card.hover-reset:hover,
         body.visual-dashboard .card.hover-reset:hover:not(.selected) {
@@ -3398,6 +3409,12 @@
             background: var(--dash-card-bg) !important;
             border-color: var(--dash-card-border) !important;
             box-shadow: 0 1px 2px rgba(23, 35, 53, var(--dash-shadow-soft)) !important;
+        }
+        .visual-dashboard .card.hover-reset .card-shell.card-face.card-front,
+        .visual-dashboard .card.hover-reset:hover .card-shell.card-face.card-front,
+        .visual-dashboard .card.hover-reset:hover:not(.selected) .card-shell.card-face.card-front {
+            background: var(--dash-card-bg) !important;
+            border-color: var(--dash-card-border) !important;
         }
         body.visual-dashboard .card.selected {
             background: var(--dash-card-selected-bg-solid, var(--dash-selected-a)) !important;
@@ -3408,12 +3425,19 @@
             color: var(--dash-card-selected-text-solid, var(--dash-selected-text)) !important;
             transform: none !important;
         }
+        .visual-dashboard .card.selected .card-shell.card-face.card-front {
+            background: var(--dash-card-selected-bg-solid, var(--dash-selected-a)) !important;
+            border-color: var(--dash-card-selected-border-solid, var(--dash-selected-border)) !important;
+        }
         body.visual-dashboard .card.shake {
             animation: none !important;
             transition: none !important;
             border-color: #7f93b4 !important;
             box-shadow: 0 0 0 2px rgba(96, 117, 150, 0.28), 0 3px 10px rgba(52, 72, 104, 0.22) !important;
             z-index: 12;
+        }
+        .visual-dashboard .card.shake .card-shell.card-face.card-front {
+            border-color: #7f93b4 !important;
         }
         body.visual-dashboard .card.shake .card-shell {
             animation: shakeShellMotion 0.7s cubic-bezier(.36,.07,.19,.97) both !important;
