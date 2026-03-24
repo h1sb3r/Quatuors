@@ -5894,8 +5894,8 @@
                 solvedTextColor,
                 isMobileLayout,
                 timings: isMobileLayout
-                    ? { ghost: 0, banner: 520, flip: 1100, settle: 0 }
-                    : { ghost: 0, banner: 460, flip: 920, settle: 0 }
+                    ? { ghost: 760, banner: 560, flip: 820 }
+                    : { ghost: 620, banner: 500, flip: 660 }
             };
         }
 
@@ -5929,7 +5929,7 @@
             ghost.style.padding = entry.startPadding;
             ghost.style.opacity = '1';
             ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
-            ghost.style.transition = 'none';
+            ghost.style.setProperty('transition', 'none', 'important');
             ghost.style.border = entry.startBorder;
             ghost.style.borderColor = entry.startBorderColor;
             ghost.style.borderRadius = entry.startRadius;
@@ -5993,7 +5993,7 @@
                 const dy = entry.top - lastRect.top;
                 if (Math.abs(dx) <= 0.5 && Math.abs(dy) <= 0.5) return;
 
-                element.style.transition = 'none';
+                element.style.setProperty('transition', 'none', 'important');
                 element.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0)`;
                 element.style.willChange = 'transform';
                 animatedCards.push(element);
@@ -6003,7 +6003,7 @@
 
             await nextFrame();
             animatedCards.forEach(element => {
-                element.style.transition = `transform ${measurement.timings.flip}ms cubic-bezier(0.2, 0.8, 0.2, 1)`;
+                element.style.setProperty('transition', `transform ${measurement.timings.flip}ms cubic-bezier(0.2, 0.8, 0.2, 1)`, 'important');
                 element.style.transform = 'translate3d(0, 0, 0)';
             });
 
@@ -6018,7 +6018,105 @@
             });
         }
 
-        async function revealSolvedBannerSlowly(banner, measurement) {
+        function getSolveBannerCardSlotRects(container, banner, slotCount = 4) {
+            if (!container || !banner || slotCount <= 0) return [];
+
+            const bannerRect = banner.getBoundingClientRect();
+            const computed = window.getComputedStyle(container);
+            const gap = parseFloat(computed.columnGap || computed.gap || '0') || 0;
+            const parsedColumns = (computed.gridTemplateColumns || '')
+                .split(/\s+/)
+                .map(value => parseFloat(value))
+                .filter(value => Number.isFinite(value) && value > 0);
+
+            const fallbackWidth = Math.max(1, (bannerRect.width - (gap * Math.max(0, slotCount - 1))) / slotCount);
+            const widths = Array.from({ length: slotCount }, (_, index) => parsedColumns[index] || fallbackWidth);
+            const totalWidth = widths.reduce((sum, width) => sum + width, 0) + (gap * Math.max(0, widths.length - 1));
+            let cursorLeft = bannerRect.left + Math.max(0, (bannerRect.width - totalWidth) / 2);
+
+            return widths.map(width => {
+                const rect = {
+                    left: cursorLeft,
+                    top: bannerRect.top,
+                    width,
+                    height: bannerRect.height
+                };
+                cursorLeft += width + gap;
+                return rect;
+            });
+        }
+
+        async function animateSelectedCardsToBannerRow(container, measurement, overlay, banner) {
+            if (!container || !measurement || !overlay || !banner) return;
+
+            const targets = getSolveBannerCardSlotRects(container, banner, overlay.ghosts.length || 4);
+            if (!targets.length) return;
+
+            await nextFrame();
+
+            const animations = overlay.ghosts.map((item, index) => {
+                const target = targets[index] || targets[targets.length - 1];
+                if (!target) return Promise.resolve();
+
+                const dx = target.left - item.entry.left;
+                const dy = target.top - item.entry.top;
+                const sx = Math.max(0.84, target.width / item.entry.width);
+                const sy = Math.max(0.88, target.height / item.entry.height);
+                item.ghost.style.opacity = '1';
+
+                if (typeof item.ghost.animate !== 'function') {
+                    item.ghost.style.setProperty('transition', [
+                        `transform ${measurement.timings.ghost}ms linear`,
+                        `opacity ${measurement.timings.ghost}ms ease`
+                    ].join(', '), 'important');
+                    item.ghost.style.transform = `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+                    return waitForTransitionOrTimeout(item.ghost, measurement.timings.ghost + 180);
+                }
+
+                const distance = Math.hypot(dx, dy);
+                const impactDistance = Math.min(measurement.isMobileLayout ? 6 : 8, Math.max(2.5, distance * 0.035));
+                const unitX = distance > 0.001 ? (dx / distance) : 0;
+                const unitY = distance > 0.001 ? (dy / distance) : 0;
+                const preImpactX = dx - (unitX * impactDistance);
+                const preImpactY = dy - (unitY * impactDistance);
+                const travelScaleX = 1 + ((sx - 1) * 0.88);
+                const travelScaleY = 1 + ((sy - 1) * 0.88);
+                const impactScaleX = sx * 1.03;
+                const impactScaleY = sy * 0.95;
+
+                const animation = item.ghost.animate(
+                    [
+                        { transform: 'translate3d(0px, 0px, 0) scale(1, 1)', opacity: 1, offset: 0 },
+                        {
+                            transform: `translate3d(${(dx * 0.82).toFixed(2)}px, ${(dy * 0.82).toFixed(2)}px, 0) scale(${travelScaleX.toFixed(4)}, ${travelScaleY.toFixed(4)})`,
+                            opacity: 1,
+                            offset: 0.82
+                        },
+                        {
+                            transform: `translate3d(${preImpactX.toFixed(2)}px, ${preImpactY.toFixed(2)}px, 0) scale(${(sx * 0.994).toFixed(4)}, ${(sy * 1.006).toFixed(4)})`,
+                            opacity: 1,
+                            offset: 0.92
+                        },
+                        {
+                            transform: `translate3d(${dx.toFixed(2)}px, ${dy.toFixed(2)}px, 0) scale(${impactScaleX.toFixed(4)}, ${impactScaleY.toFixed(4)})`,
+                            opacity: 1,
+                            offset: 1
+                        }
+                    ],
+                    {
+                        duration: measurement.timings.ghost,
+                        easing: 'linear',
+                        fill: 'forwards'
+                    }
+                );
+
+                return animation.finished.catch(() => {});
+            });
+
+            await Promise.all(animations);
+        }
+
+        async function revealSolvedBannerSlowly(banner, measurement, overlay = null) {
             if (!banner || !banner.isConnected) return;
 
             const duration = Math.max(220, measurement && measurement.timings ? measurement.timings.banner : 420);
@@ -6035,6 +6133,14 @@
             ].join(', ');
             banner.style.opacity = '1';
             banner.style.transform = 'none';
+
+            if (overlay && Array.isArray(overlay.ghosts)) {
+                overlay.ghosts.forEach(item => {
+                    item.ghost.style.setProperty('transition', 'none', 'important');
+                    item.ghost.style.opacity = '0';
+                    item.ghost.remove();
+                });
+            }
 
             await waitForTransitionOrTimeout(banner, duration + 140);
 
@@ -6089,7 +6195,6 @@
             );
 
             overlay.ghosts.forEach(item => item.ghost.remove());
-            await delay(measurement.timings.settle);
         }
 
         async function playSolveFusePhase() {
@@ -7784,6 +7889,7 @@
                 solvedTextColor
             };
             let measurement = null;
+            let overlay = null;
             let banner = null;
             let committed = false;
 
@@ -7806,14 +7912,23 @@
                     return;
                 }
 
+                overlay = buildSolveOverlay(measurement);
+                measurement.selection.forEach(item => {
+                    if (!item || !item.element) return;
+                    item.element.classList.add('anim-hidden');
+                });
+
                 banner = commitSolvedRow(container, measurement, { reveal: false, playSound: false });
                 committed = true;
 
-                await Promise.all([
-                    revealSolvedBannerSlowly(banner, measurement),
-                    animateRemainingCardsSwitch(measurement)
-                ]);
+                const remainingCardsSwitch = animateRemainingCardsSwitch(measurement);
+                await animateSelectedCardsToBannerRow(container, measurement, overlay, banner);
+                await revealSolvedBannerSlowly(banner, measurement, overlay);
+                await remainingCardsSwitch;
                 playSolvedBannerSound();
+
+                overlay.destroy();
+                overlay = null;
 
                 if (solvedCount === 4) {
                     await transitionToNextGameAfterWin();
@@ -7834,6 +7949,9 @@
                     banner.style.opacity = '1';
                     banner.style.transform = 'none';
                     banner.style.removeProperty('transition');
+                }
+                if (overlay) {
+                    overlay.destroy();
                 }
                 isAnimating = false;
             }
