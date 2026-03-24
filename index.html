@@ -278,6 +278,7 @@
                 -10px -10px 22px #3f4a59,
                 0 0 22px rgba(93, 132, 191, 0.16);
             position: relative;
+            isolation: isolate;
             overflow: visible;
         }
         .game-container::before {
@@ -594,12 +595,12 @@
         .solved-words { font-weight: 400; font-size: 14px; }
 
         /* --- ERREURS --- */
-        .mistakes-container { display: flex; align-items: center; gap: 12px; font-size: 16px; margin-bottom: 20px; color: var(--neu-muted); font-weight: 600; }
+        .mistakes-container { display: flex; align-items: center; gap: 12px; font-size: 16px; margin-bottom: 20px; color: var(--neu-muted); font-weight: 600; position: relative; z-index: 14; }
         .dot { width: 14px; height: 14px; background: #5a677a; border-radius: 50%; transition: opacity 0.3s; box-shadow: 2px 2px 5px #1d2530, -2px -2px 5px #404b5b; }
         .dot.lost { opacity: 0.2; }
 
         /* --- CONTROLES --- */
-        .controls { display: flex; gap: 10px; justify-content: center; width: 100%; }
+        .controls { display: flex; gap: 10px; justify-content: center; width: 100%; position: relative; z-index: 14; }
         button {
             padding: 13px 22px;
             border-radius: 999px;
@@ -3241,14 +3242,14 @@
             --dash-surface-bg: #ffffff;
             --dash-surface-soft: #f8f6f2;
             --dash-grid-bg: #f6f1e9;
-            --dash-card-bg: #fffdfa;
+            --dash-card-bg: var(--dash-surface-soft);
             --dash-card-border: #ded8cf;
             --dash-card-hover-bg: #fff6ed;
             --dash-card-hover-border: #d6c2ac;
-            --dash-selected-a: #d3a26f;
-            --dash-selected-b: #c28a52;
-            --dash-selected-border: #9b6a3f;
-            --dash-selected-ring-rgb: 194, 138, 82;
+            --dash-selected-a: #50565f;
+            --dash-selected-b: #50565f;
+            --dash-selected-border: #434951;
+            --dash-selected-ring-rgb: 80, 86, 95;
             --dash-shadow-soft: 0.08;
             --dash-shadow-mid: 0.12;
             background:
@@ -3406,14 +3407,11 @@
             box-shadow: 0 1px 2px rgba(23, 35, 53, var(--dash-shadow-soft)) !important;
         }
         body.visual-dashboard .card.selected {
-            background: linear-gradient(145deg, var(--dash-selected-a), var(--dash-selected-b)) !important;
+            background: var(--dash-selected-a) !important;
             border: 1px solid var(--dash-selected-border) !important;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.92),
-                0 0 0 2px rgba(var(--dash-selected-ring-rgb), 0.25),
-                0 8px 18px rgba(155, 106, 63, 0.18) !important;
-            color: #fffaf3 !important;
-            transform: translateY(-1px);
+            box-shadow: none !important;
+            color: #f3f5f8 !important;
+            transform: none !important;
         }
         body.visual-dashboard .card.shake {
             animation: none !important;
@@ -3426,7 +3424,7 @@
             animation: shakeShellMotion 0.7s cubic-bezier(.36,.07,.19,.97) both !important;
         }
         body.visual-dashboard .card.selected .card-title {
-            color: #fffaf3 !important;
+            color: #f3f5f8 !important;
             text-shadow: none !important;
         }
 
@@ -3455,14 +3453,17 @@
             border-color: #d6c2ac !important;
         }
         body.visual-dashboard #submit-btn {
+            background: var(--dash-surface-bg) !important;
             color: #6c6c6c !important;
+            border-color: #ded8cf !important;
+            box-shadow: 0 10px 18px rgba(0, 0, 0, 0.05) !important;
         }
         body.visual-dashboard #submit-btn.active,
         body.visual-dashboard #submit-btn.active:hover {
-            background: #c28a52 !important;
-            color: #f8faff !important;
-            border-color: #9b6a3f !important;
-            box-shadow: 0 10px 22px rgba(155, 106, 63, 0.22) !important;
+            background: #d60b14 !important;
+            color: #fff8f8 !important;
+            border-color: #b10810 !important;
+            box-shadow: 0 10px 22px rgba(172, 10, 18, 0.26) !important;
         }
 
         body.visual-dashboard #message {
@@ -5910,7 +5911,7 @@
             const title = document.createElement('div');
             title.className = 'card-title';
             title.textContent = entry.word || '';
-            title.style.color = entry.startTitleColor;
+            title.style.setProperty('color', entry.startTitleColor, 'important');
             if (entry.startTitleFontSize) title.style.fontSize = entry.startTitleFontSize;
             if (entry.startTitleLineHeight) title.style.lineHeight = entry.startTitleLineHeight;
             if (entry.startTitleLetterSpacing) title.style.letterSpacing = entry.startTitleLetterSpacing;
@@ -5930,12 +5931,12 @@
             ghost.style.opacity = '1';
             ghost.style.transform = 'translate3d(0, 0, 0) scale(1, 1)';
             ghost.style.setProperty('transition', 'none', 'important');
-            ghost.style.border = entry.startBorder;
-            ghost.style.borderColor = entry.startBorderColor;
-            ghost.style.borderRadius = entry.startRadius;
-            ghost.style.boxShadow = entry.startShadow;
-            ghost.style.backgroundColor = entry.startBg;
-            ghost.style.color = entry.startColor;
+            ghost.style.setProperty('border', entry.startBorder, 'important');
+            ghost.style.setProperty('border-color', entry.startBorderColor, 'important');
+            ghost.style.setProperty('border-radius', entry.startRadius, 'important');
+            ghost.style.setProperty('box-shadow', entry.startShadow, 'important');
+            ghost.style.setProperty('background-color', entry.startBg, 'important');
+            ghost.style.setProperty('color', entry.startColor, 'important');
             ghost.style.willChange = 'transform, opacity';
 
             return { ghost, title };
@@ -6687,6 +6688,8 @@
             const container = document.getElementById('grid-container');
             const banners = Array.from(container.querySelectorAll('.solved-banner'));
             if (!banners.length) return;
+            const occlusion = getSolvedBannerOcclusionMetrics(container);
+            const mask = createSolvedBannerOcclusionMask(container, occlusion);
 
             const bannerEntries = banners
                 .map((banner, domIndex) => ({
@@ -6720,17 +6723,120 @@
                 banner.style.zIndex = String(index + 1);
             });
 
-            for (let index = 0; index < bannerEntries.length; index++) {
-                const banner = bannerEntries[index].banner;
-                const remainingBelow = bannerEntries.length - index - 1;
-                const fallDistance = 130 + (remainingBelow * 92);
-                banner.style.setProperty('--banner-fall-distance', `${fallDistance}px`);
-                playPanelWooshSound();
-                banner.classList.add('fall-out');
-                await waitForAnimationOrTimeout(banner, 860);
-                banner.remove();
-                await delay(70);
+            try {
+                for (let index = 0; index < bannerEntries.length; index++) {
+                    const { banner, top, height } = bannerEntries[index];
+                    const remainingBelow = bannerEntries.length - index - 1;
+                    const maskTop = Number.isFinite(occlusion && occlusion.topInGrid) ? occlusion.topInGrid : (top + height + 180);
+                    const hideDistance = Math.max(height + 24, maskTop - top);
+                    const fallDistance = hideDistance + 18 + (remainingBelow * 8);
+                    banner.style.setProperty('--banner-fall-distance', `${fallDistance}px`);
+                    playPanelWooshSound();
+                    await animateBannerDropBehindMask(banner, {
+                        top,
+                        height,
+                        fallDistance,
+                        occlusionTop: maskTop
+                    });
+                    banner.remove();
+                    await delay(70);
+                }
+            } finally {
+                if (mask && mask.isConnected) mask.remove();
             }
+        }
+
+        function getSolvedBannerOcclusionMetrics(container) {
+            if (!container || !container.isConnected) return null;
+
+            const submitButton = document.getElementById('submit-btn');
+            const gameContainer = container.closest('.game-container');
+            if (!submitButton || !submitButton.isConnected || !gameContainer || !gameContainer.isConnected) return null;
+
+            const containerRect = container.getBoundingClientRect();
+            const gameRect = gameContainer.getBoundingClientRect();
+            const submitRect = submitButton.getBoundingClientRect();
+            const clearance = document.body.classList.contains('mobile-layout-active') ? 10 : 12;
+            const topInGrid = submitRect.top - containerRect.top - clearance;
+            const topInGame = submitRect.top - gameRect.top - clearance;
+
+            if (!Number.isFinite(topInGrid) || !Number.isFinite(topInGame)) return null;
+            return {
+                topInGrid: Math.max(0, topInGrid),
+                topInGame: Math.max(0, topInGame)
+            };
+        }
+
+        function createSolvedBannerOcclusionMask(container, occlusion) {
+            if (!container || !container.isConnected || !occlusion || !Number.isFinite(occlusion.topInGame)) return null;
+
+            const gameContainer = container.closest('.game-container');
+            if (!gameContainer || !gameContainer.isConnected) return null;
+
+            const computed = window.getComputedStyle(gameContainer);
+            const mask = document.createElement('div');
+            const backgroundColor = computed.backgroundColor || '#ffffff';
+            const radius = computed.borderRadius || '24px';
+            const isDashboard = document.body.classList.contains('visual-dashboard');
+
+            mask.setAttribute('aria-hidden', 'true');
+            mask.style.position = 'absolute';
+            mask.style.left = '0';
+            mask.style.right = '0';
+            mask.style.top = `${occlusion.topInGame}px`;
+            mask.style.bottom = '0';
+            mask.style.pointerEvents = 'none';
+            mask.style.zIndex = '10';
+            mask.style.background = backgroundColor;
+            mask.style.borderBottomLeftRadius = radius;
+            mask.style.borderBottomRightRadius = radius;
+            mask.style.boxShadow = isDashboard
+                ? 'inset 0 1px 0 rgba(255,255,255,0.9), inset 0 18px 24px -22px rgba(194,138,82,0.34), inset 0 32px 42px -36px rgba(0,0,0,0.16)'
+                : 'inset 0 1px 0 rgba(255,255,255,0.3), inset 0 20px 28px -24px rgba(0,0,0,0.2)';
+
+            gameContainer.appendChild(mask);
+            return mask;
+        }
+
+        async function animateBannerDropBehindMask(banner, { top = 0, height = 0, fallDistance = 220, occlusionTop = null, duration = null } = {}) {
+            if (!banner || !banner.isConnected) return;
+
+            const bannerHeight = Math.max(1, height || banner.offsetHeight || 1);
+            const fullTravel = Math.max(40, fallDistance);
+            const maskTop = Number.isFinite(occlusionTop) ? occlusionTop : (top + bannerHeight);
+            const visibleTravel = Math.max(bannerHeight + 24, maskTop - top);
+            const resolvedDuration = duration == null
+                ? Math.max(320, Math.min(620, visibleTravel * 1.45))
+                : duration;
+
+            banner.style.opacity = '1';
+            banner.style.transform = 'none';
+            banner.style.filter = 'none';
+            banner.style.willChange = 'transform';
+
+            if (typeof banner.animate === 'function') {
+                const animation = banner.animate(
+                    [
+                        { transform: 'translateY(0px)' },
+                        { transform: `translateY(${fullTravel}px)` }
+                    ],
+                    {
+                        duration: resolvedDuration,
+                        easing: 'linear',
+                        fill: 'forwards'
+                    }
+                );
+
+                await animation.finished.catch(() => {});
+            } else {
+                banner.style.transition = `transform ${resolvedDuration}ms linear`;
+                await nextFrame();
+                banner.style.transform = `translateY(${fullTravel}px)`;
+                await waitForTransitionOrTimeout(banner, resolvedDuration + 120);
+                banner.style.removeProperty('transition');
+            }
+
+            banner.style.removeProperty('will-change');
         }
 
         async function transitionToNextGameAfterWin() {
