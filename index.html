@@ -3226,18 +3226,18 @@
             --dash-grid-alpha: 0.028;
             --dash-spot-a: 0.2;
             --dash-spot-b: 0.04;
-            --dash-bg-top: #f9f7f3;
-            --dash-bg-mid: #f3efe8;
-            --dash-bg-bottom: #ede6da;
+            --dash-bg-top: #f7f6f1;
+            --dash-bg-mid: #f2f1ec;
+            --dash-bg-bottom: #e6e8ed;
             --dash-nav-bg: rgba(249, 247, 243, 0.94);
             --dash-panel-bg: #ffffff;
             --dash-surface-bg: #ffffff;
             --dash-surface-soft: #f8f6f2;
             --dash-grid-bg: #f6f1e9;
-            --dash-card-bg: var(--dash-surface-soft);
-            --dash-card-border: #ded8cf;
-            --dash-card-hover-bg: #fff6ed;
-            --dash-card-hover-border: #d6c2ac;
+            --dash-card-bg: #f1e9d6;
+            --dash-card-border: #d6dfec;
+            --dash-card-hover-bg: #f4c6d1;
+            --dash-card-hover-border: #d6dfec;
             --dash-selected-a: #50565f;
             --dash-selected-b: #50565f;
             --dash-selected-border: #434951;
@@ -3372,9 +3372,9 @@
         }
         .visual-dashboard .card-shell.card-face.card-front {
             background: var(--dash-card-bg) !important;
-            border: 1px solid var(--dash-card-border) !important;
+            border: none !important;
             border-radius: inherit;
-            box-shadow: inherit;
+            box-shadow: none !important;
         }
         body.visual-dashboard .card::before,
         body.visual-dashboard .card::after {
@@ -3400,7 +3400,6 @@
         .visual-dashboard .card:hover .card-shell.card-face.card-front,
         .visual-dashboard .card:hover:not(.selected) .card-shell.card-face.card-front {
             background: var(--dash-card-hover-bg) !important;
-            border-color: var(--dash-card-hover-border) !important;
         }
         body.visual-dashboard .card.hover-reset,
         body.visual-dashboard .card.hover-reset:hover,
@@ -3414,7 +3413,6 @@
         .visual-dashboard .card.hover-reset:hover .card-shell.card-face.card-front,
         .visual-dashboard .card.hover-reset:hover:not(.selected) .card-shell.card-face.card-front {
             background: var(--dash-card-bg) !important;
-            border-color: var(--dash-card-border) !important;
         }
         body.visual-dashboard .card.selected {
             background: var(--dash-card-selected-bg-solid, var(--dash-selected-a)) !important;
@@ -3427,7 +3425,6 @@
         }
         .visual-dashboard .card.selected .card-shell.card-face.card-front {
             background: var(--dash-card-selected-bg-solid, var(--dash-selected-a)) !important;
-            border-color: var(--dash-card-selected-border-solid, var(--dash-selected-border)) !important;
         }
         body.visual-dashboard .card.shake {
             animation: none !important;
@@ -3435,9 +3432,6 @@
             border-color: #7f93b4 !important;
             box-shadow: 0 0 0 2px rgba(96, 117, 150, 0.28), 0 3px 10px rgba(52, 72, 104, 0.22) !important;
             z-index: 12;
-        }
-        .visual-dashboard .card.shake .card-shell.card-face.card-front {
-            border-color: #7f93b4 !important;
         }
         body.visual-dashboard .card.shake .card-shell {
             animation: shakeShellMotion 0.7s cubic-bezier(.36,.07,.19,.97) both !important;
@@ -5319,27 +5313,27 @@
 
                 <label class="dev-control">
                     <span>Fond haut</span>
-                    <input id="dev-bg-top" type="color" value="#eceff5">
+                    <input id="dev-bg-top" type="color" value="#f7f6f1">
                 </label>
                 <label class="dev-control">
                     <span>Fond milieu</span>
-                    <input id="dev-bg-mid" type="color" value="#e8edf4">
+                    <input id="dev-bg-mid" type="color" value="#f2f1ec">
                 </label>
                 <label class="dev-control">
                     <span>Fond bas</span>
-                    <input id="dev-bg-bottom" type="color" value="#e6ebf3">
+                    <input id="dev-bg-bottom" type="color" value="#e6e8ed">
                 </label>
                 <label class="dev-control">
                     <span>Cartes</span>
-                    <input id="dev-card-bg" type="color" value="#f7f9fd">
+                    <input id="dev-card-bg" type="color" value="#f1e9d6">
                 </label>
                 <label class="dev-control">
                     <span>Bordure cartes</span>
-                    <input id="dev-card-border" type="color" value="#d6deeb">
+                    <input id="dev-card-border" type="color" value="#d6dfec">
                 </label>
                 <label class="dev-control">
                     <span>Hover cartes</span>
-                    <input id="dev-card-hover" type="color" value="#fbfcff">
+                    <input id="dev-card-hover" type="color" value="#f4c6d1">
                 </label>
                 <label class="dev-control">
                     <span>Sélection haut</span>
@@ -5534,12 +5528,12 @@
         const DEV_STYLE_PREF_KEY = 'quatuors_dev_dashboard_style_v2';
         const DEV_STYLE_SHARE_ALL_MODES_PREF_KEY = 'quatuors_dev_dashboard_style_share_all_modes_v1';
         const LEGACY_DASHBOARD_STYLE_DEFAULTS = Object.freeze({
-            bgTop: '#eceff5',
-            bgMid: '#e8edf4',
-            bgBottom: '#e6ebf3',
-            cardBg: '#f7f9fd',
-            cardBorder: '#d6deeb',
-            cardHover: '#fbfcff',
+            bgTop: '#f7f6f1',
+            bgMid: '#f2f1ec',
+            bgBottom: '#e6e8ed',
+            cardBg: '#f1e9d6',
+            cardBorder: '#d6dfec',
+            cardHover: '#f4c6d1',
             selectedA: '#50565f',
             selectedB: '#50565f',
             selectedBorder: '#434951',
